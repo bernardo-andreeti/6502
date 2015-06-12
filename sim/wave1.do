@@ -12,12 +12,18 @@ add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/dat
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/sb
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/pch_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/pcl_q
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/abh_q
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/abl_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/address
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/ai_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/bi_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/ac_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/x_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/y_q
+add wave -noupdate -divider RAM
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/address
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/data_in
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/data_out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {2014 ns} 0}
 configure wave -namecolwidth 150

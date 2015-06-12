@@ -62,10 +62,11 @@ begin
         );
         
     -- Program/Data memory
-     RAM: entity work.Memory(block_ram) -- or block_ram architecture for synthesis
+     RAM: entity work.Memory(block_ram) -- or simulation architecture for Questa simulation
         generic map (
             DATA_WIDTH    => 8,
-            ADDR_WIDTH    => 16
+            ADDR_WIDTH    => 16,
+			IMAGE 		=> "image1.txt" -- only for simulation description
         )
         port map (
             clk         => clk,

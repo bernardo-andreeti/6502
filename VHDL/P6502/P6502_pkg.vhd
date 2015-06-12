@@ -11,18 +11,17 @@ use IEEE.Std_Logic_1164.all;
 package P6502_pkg is  
 
     -- Constant flags
-    constant CARRY      		: integer := 0;
-    constant ZERO       		: integer := 1;
-	constant INTERRUPT 	: integer := 2;
-	constant DECIMAL		: integer := 3;
-	constant BREAKF 		: integer := 4;
-    constant OVERFLOW   : integer := 6;
-    constant NEGATIVE  	: integer := 7;
+    constant CARRY     : integer := 0;
+    constant ZERO      : integer := 1;
+	constant INTERRUPT : integer := 2;
+	constant DECIMAL   : integer := 3;
+	constant BREAKF    : integer := 4;
+    constant OVERFLOW  : integer := 6;
+    constant NEGATIVE  : integer := 7;
     
     -- Instructions execution cycle
     type State is (IDLE, T0, T1, T2, T3, T5, T6, T7, BREAK);
-    
-       
+     
     -- Instruction_type enumeration defines the instructions decodable by the control path
     type Instruction_type is (  
         LDA, LDX, LDY,
@@ -51,51 +50,36 @@ package P6502_pkg is
     end record;
  
     type Microinstruction is record
-    	wrAI            : std_logic;                        -- Write control for the AI register
-        wrBI            : std_logic;   	                    -- Write control for the BI register
-        wrAC            : std_logic;   	                    -- Write control for the AC register
-        wrS             : std_logic;   	                    -- Write control for the S register
-        wrX             : std_logic;   	                    -- Write control for the X register
-        wrY             : std_logic;   	                    -- Write control for the Y register
-        wrPCH           : std_logic;   	                    -- Write control for the PCH register
-        wrPCL           : std_logic;   	                    -- Write control for the PCL register
-        wrABH           : std_logic;   	                    -- Write control for the ABH register
-        wrABL           : std_logic;   	                    -- Write control for the ABL register
-        mux_bi          : std_logic;                        -- Multiplexer selection input
-        mux_ai          : std_logic_vector(1 downto 0);     -- Multiplexer selection input
-        mux_carry       : std_logic_vector(1 downto 0);     -- Multiplexer selection input
-        mux_abh         : std_logic_vector(1 downto 0);     -- Multiplexer selection input
-        mux_s           : std_logic;                        -- Multiplexer selection input
-        mux_pc          : std_logic;                        -- Multiplexer selection input
-        ac_db           : std_logic;                        -- Tri-state control
-        ac_sb           : std_logic;                        -- Tri-state control
-        alu_sb          : std_logic;                        -- Tri-state control
-        alu_adl         : std_logic;                        -- Tri-state control
-		db_adl         : std_logic;                        -- Tri-state control
-        db_sb           : std_logic;                        -- Tri-state control
-        sb_db           : std_logic;                        -- Tri-state control
-        s_sb            : std_logic;                        -- Tri-state control
-        s_adl           : std_logic;                        -- Tri-state control
-        adh_sb          : std_logic;                        -- Tri-state control
-        sb_adh          : std_logic;                        -- Tri-state control
-		db_adh         : std_logic;                        -- Tri-state control
-        x_sb            : std_logic;                        -- Tri-state control
-        y_sb            : std_logic;                        -- Tri-state control
-        pch_db          : std_logic;                        -- Tri-state control
-        pcl_db          : std_logic;                        -- Tri-state control
-        pc_ad           : std_logic;                        -- Tri-state control
-        ALUoperation    : std_logic_vector(2 downto 0);
-        setP            : std_logic_vector(7 downto 0);
-        rstP            : std_logic_vector(7 downto 0);
-        ceP             : std_logic_vector(7 downto 0);
-        rw              : std_logic;                        -- Memory control (rw = 0: WRITE; rw = 1: READ)
-        ce              : std_logic;                        -- Memory enable
+    	wrAI         : std_logic;                    -- Write control for the AI register
+        wrBI         : std_logic;   	             -- Write control for the BI register
+        wrAC         : std_logic;   	             -- Write control for the AC register
+        wrS          : std_logic;   	             -- Write control for the S register
+        wrX          : std_logic;   	             -- Write control for the X register
+        wrY          : std_logic;   	             -- Write control for the Y register
+        wrPCH        : std_logic;   	             -- Write control for the PCH register
+        wrPCL        : std_logic;   	             -- Write control for the PCL register
+        wrABH        : std_logic;   	             -- Write control for the ABH register
+        wrABL        : std_logic;   	             -- Write control for the ABL register
+		wrMAR		 : std_logic;				     -- Write control for the MAR register
+        mux_bi       : std_logic;                    -- Multiplexer selection input
+		mux_mar		 : std_logic;					 -- Multiplexer selection input
+        mux_ai       : std_logic_vector(1 downto 0); -- Multiplexer selection input
+        mux_carry    : std_logic_vector(1 downto 0); -- Multiplexer selection input
+        mux_s        : std_logic;                    -- Multiplexer selection input
+        mux_pc       : std_logic;                    -- Multiplexer selection input
+        mux_db		 : std_logic_vector(2 downto 0); -- DB Multiplexer selection input
+		mux_sb 		 : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
+		mux_adl 	 : std_logic_vector(1 downto 0); -- ADL Multiplexer selection input 
+		mux_adh 	 : std_logic_vector(1 downto 0); -- ADH Multiplexer selection input 
+        ALUoperation : std_logic_vector(2 downto 0);
+        setP         : std_logic_vector(7 downto 0);
+        rstP         : std_logic_vector(7 downto 0);
+        ceP          : std_logic_vector(7 downto 0);
+        rw           : std_logic;                    -- Memory control (rw = 0: WRITE; rw = 1: READ)
+        ce           : std_logic;                    -- Memory enable
     end record;
     
-    
-    
-    function InstructionDecoder(opcode: in std_logic_vector(7 downto 0)) return DecodedInstruction_type;         
-         
+    function InstructionDecoder(opcode: in std_logic_vector(7 downto 0)) return DecodedInstruction_type;    
 end P6502_pkg;
 
 package body P6502_pkg is
@@ -236,73 +220,73 @@ package body P6502_pkg is
             when x"31" =>   di.instruction := AAND;  di.addressMode := IND_Y;    di.size := 2;
             
             -- EOR
-            when x"4D" =>   di.instruction := EOR;  di.addressMode := AABS;     di.size := 3;
-            when x"45" =>   di.instruction := EOR;  di.addressMode := ZPG;      di.size := 2;
-            when x"49" =>   di.instruction := EOR;  di.addressMode := IMM;      di.size := 2;
-            when x"5D" =>   di.instruction := EOR;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"59" =>   di.instruction := EOR;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"55" =>   di.instruction := EOR;  di.addressMode := ZPG_XY;   di.size := 2;
-            when x"41" =>   di.instruction := EOR;  di.addressMode := IND_X;    di.size := 2;
-            when x"51" =>   di.instruction := EOR;  di.addressMode := IND_Y;    di.size := 2;
+            when x"4D" =>   di.instruction := EOR;  di.addressMode := AABS;      di.size := 3;
+            when x"45" =>   di.instruction := EOR;  di.addressMode := ZPG;       di.size := 2;
+            when x"49" =>   di.instruction := EOR;  di.addressMode := IMM;       di.size := 2;
+            when x"5D" =>   di.instruction := EOR;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"59" =>   di.instruction := EOR;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"55" =>   di.instruction := EOR;  di.addressMode := ZPG_XY;    di.size := 2;
+            when x"41" =>   di.instruction := EOR;  di.addressMode := IND_X;     di.size := 2;
+            when x"51" =>   di.instruction := EOR;  di.addressMode := IND_Y;     di.size := 2;
             
             -- ORA
-            when x"0D" =>   di.instruction := ORA;  di.addressMode := AABS;     di.size := 3;
-            when x"05" =>   di.instruction := ORA;  di.addressMode := ZPG;      di.size := 2;
-            when x"09" =>   di.instruction := ORA;  di.addressMode := IMM;      di.size := 2;
-            when x"1D" =>   di.instruction := ORA;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"19" =>   di.instruction := ORA;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"15" =>   di.instruction := ORA;  di.addressMode := ZPG_XY;   di.size := 2;
-            when x"01" =>   di.instruction := ORA;  di.addressMode := IND_X;    di.size := 2;
-            when x"11" =>   di.instruction := ORA;  di.addressMode := IND_Y;    di.size := 2;
+            when x"0D" =>   di.instruction := ORA;  di.addressMode := AABS;      di.size := 3;
+            when x"05" =>   di.instruction := ORA;  di.addressMode := ZPG;       di.size := 2;
+            when x"09" =>   di.instruction := ORA;  di.addressMode := IMM;       di.size := 2;
+            when x"1D" =>   di.instruction := ORA;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"19" =>   di.instruction := ORA;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"15" =>   di.instruction := ORA;  di.addressMode := ZPG_XY;    di.size := 2;
+            when x"01" =>   di.instruction := ORA;  di.addressMode := IND_X;     di.size := 2;
+            when x"11" =>   di.instruction := ORA;  di.addressMode := IND_Y;     di.size := 2;
             
            
             --------------------------------
             -- Compare and Bit Test Group --
             --------------------------------
             -- CMP
-            when x"CD" =>   di.instruction := CMP;  di.addressMode := AABS;     di.size := 3;
-            when x"C5" =>   di.instruction := CMP;  di.addressMode := ZPG;      di.size := 2;
-            when x"C9" =>   di.instruction := CMP;  di.addressMode := IMM;      di.size := 2;
-            when x"DD" =>   di.instruction := CMP;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"D9" =>   di.instruction := CMP;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"D5" =>   di.instruction := CMP;  di.addressMode := ZPG_XY;   di.size := 2;
-            when x"C1" =>   di.instruction := CMP;  di.addressMode := IND_X;    di.size := 2;
-            when x"D1" =>   di.instruction := CMP;  di.addressMode := IND_Y;    di.size := 2;
+            when x"CD" =>   di.instruction := CMP;  di.addressMode := AABS;      di.size := 3;
+            when x"C5" =>   di.instruction := CMP;  di.addressMode := ZPG;       di.size := 2;
+            when x"C9" =>   di.instruction := CMP;  di.addressMode := IMM;       di.size := 2;
+            when x"DD" =>   di.instruction := CMP;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"D9" =>   di.instruction := CMP;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"D5" =>   di.instruction := CMP;  di.addressMode := ZPG_XY;    di.size := 2;
+            when x"C1" =>   di.instruction := CMP;  di.addressMode := IND_X;     di.size := 2;
+            when x"D1" =>   di.instruction := CMP;  di.addressMode := IND_Y;     di.size := 2;
             
             -- CPX
-            when x"EC" =>   di.instruction := CPX;  di.addressMode := AABS;     di.size := 3;
-            when x"E4" =>   di.instruction := CPX;  di.addressMode := ZPG;      di.size := 2;
-            when x"E0" =>   di.instruction := CPX;  di.addressMode := IMM;      di.size := 2;
-            
+            when x"EC" =>   di.instruction := CPX;  di.addressMode := AABS;      di.size := 3;
+            when x"E4" =>   di.instruction := CPX;  di.addressMode := ZPG;       di.size := 2;
+            when x"E0" =>   di.instruction := CPX;  di.addressMode := IMM;       di.size := 2;
+             
             -- CPY
-            when x"CC" =>   di.instruction := CPY;  di.addressMode := AABS;     di.size := 3;
-            when x"C4" =>   di.instruction := CPY;  di.addressMode := ZPG;      di.size := 2;
-            when x"C0" =>   di.instruction := CPY;  di.addressMode := IMM;      di.size := 2;
+            when x"CC" =>   di.instruction := CPY;  di.addressMode := AABS;      di.size := 3;
+            when x"C4" =>   di.instruction := CPY;  di.addressMode := ZPG;       di.size := 2;
+            when x"C0" =>   di.instruction := CPY;  di.addressMode := IMM;       di.size := 2;
             
             
             ------------------------------
             -- Status Flag Change Group --
             ------------------------------
             -- CLC
-            when x"18" =>   di.instruction := CLC;  di.addressMode := IMP;      di.size := 1;
+            when x"18" =>   di.instruction := CLC;  di.addressMode := IMP;       di.size := 1;
             
             -- CLD
-            when x"D8" =>   di.instruction := CLD;  di.addressMode := IMP;      di.size := 1;
+            when x"D8" =>   di.instruction := CLD;  di.addressMode := IMP;       di.size := 1;
             
             -- CLI
-            when x"58" =>   di.instruction := CLI;  di.addressMode := IMP;      di.size := 1;
+            when x"58" =>   di.instruction := CLI;  di.addressMode := IMP;       di.size := 1;
             
             -- CLV
-            when x"B8" =>   di.instruction := CLV;  di.addressMode := IMP;      di.size := 1;
+            when x"B8" =>   di.instruction := CLV;  di.addressMode := IMP;       di.size := 1;
             
             -- SEC
             when x"38" =>   di.instruction := SECi;  di.addressMode := IMP;      di.size := 1;
             
             -- SED
-            when x"F8" =>   di.instruction := SED;  di.addressMode := IMP;      di.size := 1;
+            when x"F8" =>   di.instruction := SED;  di.addressMode := IMP;       di.size := 1;
             
             -- SEI
-            when x"78" =>   di.instruction := SEI;  di.addressMode := IMP;      di.size := 1;
+            when x"78" =>   di.instruction := SEI;  di.addressMode := IMP;       di.size := 1;
             
             
             
@@ -310,21 +294,21 @@ package body P6502_pkg is
             -- Subroutine and Interrupt Group --
             --------------------------------------
 			-- JSR
-			when x"20" =>    di.instruction := JSR; 		di.addressMode := AABS; 		di.size := 3;
+			when x"20" =>   di.instruction := JSR;  di.addressMode := AABS;      di.size := 3;
 			
 			-- RTS
-			when x"60" =>	  di.instruction := RTS;		di.addressMode := IMP;			di.size := 1;
+			when x"60" =>   di.instruction := RTS;  di.addressMode := IMP;	 	 di.size := 1;
 			           
             -- BRK
-            when x"00" =>   di.instruction := BRK;  		di.addressMode := IMP;			di.size := 1;
+            when x"00" =>   di.instruction := BRK;  di.addressMode := IMP;	 	 di.size := 1;
             
 			--RTI
-			when x"40" =>   di.instruction := RTI; 		di.addressMode := IMP;			di.size := 1;
+			when x"40" =>   di.instruction := RTI;  di.addressMode := IMP;	 	 di.size := 1;
 			
 			--NOP
-			when x"EA" =>   di.instruction := NOP;		di.addressMode := IMP; 			di.size := 1;
+			when x"EA" =>   di.instruction := NOP;  di.addressMode := IMP;	 	 di.size := 1;
             
-            when others =>  di.instruction := invalid_instruction;
+            when others =>   di.instruction := invalid_instruction;
         end case;                     
         return di;
         

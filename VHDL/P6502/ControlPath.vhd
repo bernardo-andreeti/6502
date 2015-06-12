@@ -115,156 +115,76 @@ begin
     begin
              
 		-- Default Values
-		uins <= ('0','0','0','0','0','0','0','0','0','0','0',"00","00","00",'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0',"000",x"00",x"00",x"00",'0','0');
+		uins <= ('0','0','0','0','0','0','0','0','0','0','0','0','0',"00","00",'0','0',"000","000","00","00","000",x"00",x"00",x"00",'0','0');
 			
         if currentState = IDLE then
-            uins.rstP(CARRY) 		<= '1';
-			uins.rstP(ZERO) 		<= '1';
+            uins.rstP(CARRY) 	 <= '1';
+			uins.rstP(ZERO) 	 <= '1';
             uins.rstP(INTERRUPT) <= '1';
-            uins.rstP(DECIMAL) 	<= '1';
-			uins.rstP(BREAKF) 		<= '1';
-			uins.rstP(OVERFLOW) <= '1';
-			uins.rstP(NEGATIVE) 	<= '1';
-			uins.rstP(5) 	<= '1';
-			uins.pc_ad <= '1';
+            uins.rstP(DECIMAL) 	 <= '1';
+			uins.rstP(BREAKF) 	 <= '1';
+			uins.rstP(OVERFLOW)  <= '1';
+			uins.rstP(NEGATIVE)  <= '1';
+			uins.rstP(5) 	     <= '1';
 						            
         -- Fetch
-        -- T0: AB <- PC; PC++; IR <- DB; (all instructions)
-        -- T1: AB <- PC; PC++; (all instructions except one byte ones)
-        -- T1: AB <- PC; IR <- MEM[AB] (One byte instructions)
+        -- T0: MAR <- PC; IR <- MEM[MAR]; PC++; (all instructions)
+        -- T1: MAR <- PC; PC++; (all instructions except one byte ones)
         elsif currentState = T0 or (currentState = T1 and decIns.size > 1)  then  
-            -- AB <- PC
-            uins.pc_ad <= '1';
-            uins.mux_abh <= "00";
-            uins.wrABH <= '1';
-            uins.wrABL <= '1';
+            -- MAR <- PC
+            uins.mux_mar <= '0';  -- MAR <- PCH_q & PCL_q
+            uins.wrMAR 	 <= '1';
 						
             -- PC++
 			uins.mux_pc <= '0';
-            uins.wrPCH <= '1';
-            uins.wrPCL <= '1';
-			-- read instruction (MEM[AB])
+            uins.wrPCH  <= '1';
+            uins.wrPCL  <= '1';
+			
+			-- Enable Memory Read Mode
 			uins.ce <= '1';
 			uins.rw <= '1';
-			
+		
+		-- T1: MAR <- PC; P(i) <- 1 for sets, 0 for rst (One byte instructions)	
 		-- Clear carry flag
         elsif decIns.instruction=CLC and currentState=T1 then
             uins.rstP(CARRY) <= '1';
-            
+			uins.wrMAR <= '1'; 
+           
         -- Set carry flag
         elsif decIns.instruction=SECi and currentState=T1 then
 			uins.setP(CARRY) <= '1';
+			uins.wrMAR <= '1';
 			
 		-- Clear decimal flag
         elsif decIns.instruction=CLD and currentState=T1 then
             uins.rstP(DECIMAL) <= '1';
+			uins.wrMAR <= '1';
             
         -- Set decimal flag
         elsif decIns.instruction=SED and currentState=T1 then
-            uins.setP(DECIMAL) <= '1';	
+            uins.setP(DECIMAL) <= '1';
+			uins.wrMAR <= '1';			
         
 		-- Clear interrupt flag
         elsif decIns.instruction=CLI and currentState=T1 then
             uins.rstP(INTERRUPT) <= '1';
+			uins.wrMAR <= '1';
             
         -- Set interrupt flag
         elsif decIns.instruction=SEI and currentState=T1 then
             uins.setP(INTERRUPT) <= '1';
+			uins.wrMAR <= '1';
 			
 		-- Clear overflow flag
         elsif decIns.instruction=CLV and currentState=T1 then
             uins.rstP(OVERFLOW) <= '1';
+			uins.wrMAR <= '1';
 		
 		-- working till here
 			
-        -- BI <- MEM[AB]; AI <- 0
-        elsif   ( (decIns.instruction=LDA or decIns.instruction=LDX or decIns.instruction=LDY) and 
-                  (decIns.addressMode=IMM or decIns.addressMode=ZPG) and currentState=T2 ) 
-                  or 
-                ( (decIns.instruction=ADC or decIns.instruction=SBC or decIns.instruction=AAND or decIns.instruction=ORA or decIns.instruction=EOR ) and 
-                  decIns.addressMode=ZPG and currentState=T2 ) then 
-            -- BI <- MEM[AB]
-            uins.ce <= '1';
-            uins.rw <= '1';
-            uins.mux_bi <= '0';
-            uins.wrBI <= '1';            
-            
-            -- AI <- 0
-            uins.mux_ai <= "10";
-            uins.wrAI <= '1';
         
-        -- LDA_IMM T3: AC <- AI + BI + 0; wrn; wrz
-        -- LDX_IMM T3: X <- AI + BI + 0; wrn; wrz
-        -- LDY_IMM T3: Y <- AI + BI + 0; wrn; wrz
-        -- AND_IMM T3: AC <- AI & BI; wrn; wrz
-        -- ORA_IMM T3: AC <- AI | BI; wrn; wrz
-        -- EOR_IMM T3: AC <- AI ^ BI; wrn; wrz
-        elsif (decIns.instruction=LDA or decIns.instruction=LDX or decIns.instruction=LDY or decIns.instruction=AAND or decIns.instruction=ORA or decIns.instruction=EOR) and 
-               decIns.addressMode=IMM and currentState=T3 then
-            
-            if decIns.instruction=AAND then
-                uins.ALUoperation <= "000";     -- AI & BI
-            elsif decIns.instruction=ORA then
-                uins.ALUoperation <= "001";     -- AI | BI
-            elsif decIns.instruction=EOR then
-                uins.ALUoperation <= "010";     -- AI ^ BI
-            else -- LDA, LDX, LDY
-                uins.ALUoperation <= "110";     -- A + B + 0
-            end if; 
-            
-            uins.alu_sb <= '1';
-            uins.ceP(NEGATIVE) <= '1';      -- wrn
-            uins.ceP(ZERO) <= '1';          -- wrz
-            
-            if decIns.instruction=LDA or decIns.instruction=AAND or decIns.instruction=ORA or decIns.instruction=EOR then
-                uins.wrAC <= '1';
-            elsif decIns.instruction=LDX then
-                uins.wrX <= '1';
-            else -- LDY
-                uins.wrY <= '1';
-            end if;
- 
-            
-        -- BI <- MEM[AB]; AI <- AC
-        -- BI <- !MEM[AB]; AI <- AC (SBC)
-        elsif   (decIns.instruction=ADC or decIns.instruction=SBC or decIns.instruction=AAND or decIns.instruction=ORA or decIns.instruction=EOR) and
-                decIns.addressMode=IMM and currentState=T2 then           
-            
-            uins.ce <= '1';
-            uins.rw <= '1';
-            
-            if decIns.instruction=SBC then
-                uins.mux_bi <= '1'; -- BI <- !MEM[AB]
-            else
-                uins.mux_bi <= '0'; -- BI <- MEM[AB]
-            end if;
-            uins.wrBI <= '1';
-            
-            -- AI <- AC
-            uins.ac_sb <= '1';
-            uins.mux_ai <= "01";
-            uins.wrAI <= '1';
-            
-        -- JUNTAR COM O T3 DAS LDs E LÓGICAS
-        -- AC <- AI + BI + c; wrn; wrz; wrc; wrv; 
-        elsif (decIns.instruction=ADC or decIns.instruction=SBC) and decIns.addressMode=IMM and currentState=T3  then
-            
-            -- AC <- AI + BI + c
-            uins.ALUoperation <= "101";     -- A + B + c
-            
-            if decIns.instruction=SBC then
-                uins.mux_carry <= "10";     -- !c
-            else
-                uins.mux_carry <= "01";     -- c
-            end if;
-            uins.alu_sb <= '1';
-            uins.wrAC <= '1';
-            uins.ceP(NEGATIVE) <= '1';      -- wrn
-            uins.ceP(ZERO) <= '1';          -- wrz
-            uins.ceP(CARRY) <= '1';         -- wrc
-            uins.ceP(OVERFLOW) <= '1';      -- wrv
         
-        -- else
+        else
         end if;
                 
     end process;

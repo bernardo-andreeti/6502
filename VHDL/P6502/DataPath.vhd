@@ -27,19 +27,19 @@ architecture structural of DataPath is
     signal DB, SB, ADL, ADH: std_logic_vector(7 downto 0);
     
     -- Registers nets
-    signal AI_d, AI_q, BI_d, BI_q, AC_q, S_d, S_q, X_q, Y_q, PCH_q, PCL_q, ABH_d, P_d, P_q: std_logic_vector(7 downto 0);
+    signal AI_d, AI_q, BI_d, BI_q, AC_q, S_d, S_q, X_q, Y_q, PCH_q, PCL_q, ABL_q, ABH_q, P_d, P_q: std_logic_vector(7 downto 0);
      
     -- Internal nets
     signal ALUresult: std_logic_vector(7 downto 0);
     signal negativeFlag, zeroFlag, carryFlag, overflowFlag, ALUcarry_in, halfCarry: std_logic;
-    signal inPC: std_logic_vector(15 downto 0);
+    signal inPC, MAR_d: std_logic_vector(15 downto 0);
      
     -- Avoid logic trimming by XST
-    attribute KEEP : string;
-    attribute KEEP of  DB: signal is "TRUE";
-    attribute KEEP of  SB: signal is "TRUE";
-    attribute KEEP of  ADL: signal is "TRUE";
-    attribute KEEP of  ADH: signal is "TRUE";
+    --attribute KEEP : string;
+    --attribute KEEP of  DB: signal is "TRUE";
+    --attribute KEEP of  SB: signal is "TRUE";
+    --attribute KEEP of  ADL: signal is "TRUE";
+    --attribute KEEP of  ADH: signal is "TRUE";
     
 begin
 
@@ -105,34 +105,38 @@ begin
             q       => AC_q,
             ce      => uins.wrAC
         );
-        
-        
+                
     -- DB bus
-    DB <= AC_q when uins.ac_db = '1' else (others=>'Z');
-    DB <= PCH_q when uins.pch_db = '1' else (others=>'Z');
-    DB <= PCL_q when uins.pcl_db = '1' else (others=>'Z');
-    DB <= SB when uins.sb_db = '1' else (others=>'Z');
-    DB <= data when uins.ce = '1' and uins.rw = '1' else (others=>'Z');
-    
+    MUX_DB: DB <= AC_q when uins.mux_db = "000" else 
+				  SB when uins.mux_db = "001" else
+		          PCL_q when uins.mux_db = "010" else
+				  PCH_q when uins.mux_db = "011" else
+				  data when uins.mux_db = "100" else 
+				  (others=>'Z');   
+							  
     -- SB bus
-    SB <= AC_q when uins.ac_sb = '1' else (others=>'Z');
-    SB <= ALUresult when uins.alu_sb = '1' else (others=>'Z');
-    SB <= DB when uins.db_sb = '1' else (others=>'Z');
-    SB <= S_q when uins.s_sb = '1' else (others=>'Z');
-    SB <= ADH when uins.adh_sb = '1' else (others=>'Z');
-    SB <= X_q when uins.x_sb = '1' else (others=>'Z');
-    SB <= Y_q when uins.y_sb = '1' else (others=>'Z');
-    
+	MUX_SB: SB <= S_q when uins.mux_sb = "000" else
+				  ALUresult when uins.mux_sb = "001" else 
+				  ADH when uins.mux_sb = "010" else
+				  X_q when uins.mux_sb = "011" else
+				  Y_q when uins.mux_sb = "100" else
+				  AC_q when uins.mux_sb = "101" else
+				  DB when uins.mux_sb = "110" else
+				  (others=>'Z');
+	      
     -- ADL bus
-    ADL <= ALUresult when uins.alu_adl = '1' else (others=>'Z');
-    ADL <= S_q when uins.s_adl = '1' else (others=>'Z');
-    ADL <= PCL_q when uins.pc_ad = '1' else (others=>'Z');
-	ADL <= DB when uins.db_adl = '1' else (others=>'Z');
+	MUX_ADL: ADL <= ALUresult when uins.mux_adl = "00" else
+					S_q when uins.mux_adl = "01" else
+					DB when uins.mux_adl = "10" else
+					(others=>'Z');
     
+	
     -- ADH bus
-	ADH <= SB when uins.sb_adh = '1' else (others=>'Z');
-    ADH <= PCH_q when uins.pc_ad = '1' else (others=>'Z');
-	ADH <= DB when uins.db_adh = '1' else (others=>'Z');
+	MUX_ADH: ADH <= DB when uins.mux_adh = "00" else
+					SB when uins.mux_adh = "01" else
+					"00" when uins.mux_adh = "10" else
+					"01" when uins.mux_adh = "11" else
+					(others=>'Z');
     
     StackPointer: entity work.RegisterNbits
         generic map (
@@ -208,7 +212,7 @@ begin
             clk     => clk,
             rst     => rst,
             d       => ADL,
-            q       => address(7 downto 0),
+            q       => ABL_q,
             ce      => uins.wrABL
         );
         
@@ -219,16 +223,27 @@ begin
         port map (
             clk     => clk,
             rst     => rst,
-            d       => ABH_d,
-            q       => address(15 downto 8),
+            d       => ADH,
+            q       => ABH_q,
             ce      => uins.wrABH
         );
+		
+	MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = '0' else
+					  (ABH_q & ABL_q) when uins.mux_mar = '1' else
+					  (others=>'Z');
+		
+	MAR: entity work.RegisterNbits
+        generic map (
+            WIDTH   => 16
+        )
+        port map (
+            clk     => clk,
+            rst     => rst,
+            d       => MAR_d,
+            q       => address,
+            ce      => uins.wrMAR
+        );	
         
-    -- Multiplexer connected to the ABH register input
-    MUX_ABH: ABH_d <=   x"00" when uins.mux_abh = "00" else
-                        x"01" when uins.mux_abh = "01" else
-                        ADH;
-
     data <= DB when uins.ce = '1' and uins.rw = '0' else (others=>'Z');
     
     P_d(0) <= carryFlag;
