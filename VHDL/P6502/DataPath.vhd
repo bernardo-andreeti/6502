@@ -108,37 +108,37 @@ begin
                 
     -- DB bus
     MUX_DB: DB <= AC_q when uins.mux_db = "000" else 
-				  SB when uins.mux_db = "001" else
-		          PCL_q when uins.mux_db = "010" else
-				  PCH_q when uins.mux_db = "011" else
-				  data when uins.mux_db = "100" else 
-				  (others=>'Z');   
-							  
+                  SB when uins.mux_db = "001" else
+                  PCL_q when uins.mux_db = "010" else
+                  PCH_q when uins.mux_db = "011" else
+                  data when uins.mux_db = "100" else 
+                  (others=>'Z');   
+                              
     -- SB bus
-	MUX_SB: SB <= S_q when uins.mux_sb = "000" else
-				  ALUresult when uins.mux_sb = "001" else 
-				  ADH when uins.mux_sb = "010" else
-				  X_q when uins.mux_sb = "011" else
-				  Y_q when uins.mux_sb = "100" else
-				  AC_q when uins.mux_sb = "101" else
-				  DB when uins.mux_sb = "110" else
-				  (others=>'Z');
-	      
+    MUX_SB: SB <= S_q when uins.mux_sb = "000" else
+                  ALUresult when uins.mux_sb = "001" else 
+                  ADH when uins.mux_sb = "010" else
+                  X_q when uins.mux_sb = "011" else
+                  Y_q when uins.mux_sb = "100" else
+                  AC_q when uins.mux_sb = "101" else
+                  DB when uins.mux_sb = "110" else
+                  (others=>'Z');
+          
     -- ADL bus
-	MUX_ADL: ADL <= ALUresult when uins.mux_adl = "00" else
-					S_q when uins.mux_adl = "01" else
-					DB when uins.mux_adl = "10" else
-					(others=>'Z');
+    MUX_ADL: ADL <= ALUresult when uins.mux_adl = "00" else
+                    S_q when uins.mux_adl = "01" else
+                    DB when uins.mux_adl = "10" else
+                    (others=>'Z');
     
-	
+    
     -- ADH bus
-	MUX_ADH: ADH <= DB when uins.mux_adh = "00" else
-					SB when uins.mux_adh = "01" else
-					"00" when uins.mux_adh = "10" else
-					"01" when uins.mux_adh = "11" else
-					(others=>'Z');
+    MUX_ADH: ADH <= DB when uins.mux_adh = "00" else
+                    SB when uins.mux_adh = "01" else
+                    "00" when uins.mux_adh = "10" else
+                    "01" when uins.mux_adh = "11" else
+                    (others=>'Z');
     
-    StackPointer: entity work.RegisterNbits
+    S: entity work.RegisterNbits
         generic map (
             WIDTH   => 8
         )
@@ -227,12 +227,12 @@ begin
             q       => ABH_q,
             ce      => uins.wrABH
         );
-		
-	MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = '0' else
-					  (ABH_q & ABL_q) when uins.mux_mar = '1' else
-					  (others=>'Z');
-		
-	MAR: entity work.RegisterNbits
+        
+    MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = '0' else
+                      (ABH_q & ABL_q) when uins.mux_mar = '1' else
+                      (others=>'Z');
+        
+    MAR: entity work.RegisterNbits
         generic map (
             WIDTH   => 16
         )
@@ -242,7 +242,7 @@ begin
             d       => MAR_d,
             q       => address,
             ce      => uins.wrMAR
-        );	
+        );    
         
     data <= DB when uins.ce = '1' and uins.rw = '0' else (others=>'Z');
     
