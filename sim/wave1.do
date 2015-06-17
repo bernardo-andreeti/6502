@@ -6,7 +6,8 @@ add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/con
 add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/duv/P6502/uins
 add wave -noupdate -format Literal P6502_RAM_tb/duv/P6502/control_path/decins
 add wave -noupdate -divider Datapath
-add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/data
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/data_in
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/data_out
 add wave -noupdate -format Literal P6502_RAM_tb/duv/P6502/data_path/p_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/db
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/sb

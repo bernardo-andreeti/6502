@@ -20,15 +20,15 @@ Z10 n@_opt1
 R6
 R7
 T_opt2
-V_WRa`T5LdcQ]Yizi079ac0
+VZTUCiaP@80X4c74:D<V>V1
 R2
-Z11 =1-94de80a56f00-558112ba-1de-d64
+Z11 =1-e069956db075-5581cb14-108-1d74
 R4
 Z12 n@_opt2
 R6
 R7
 Ealu
-Z13 w1433621841
+Z13 w1434563501
 Z14 DPx4 ieee 15 std_logic_arith 0 22 4`Y?g_lkdn;7UL9IiJck01
 Z15 DPx4 ieee 18 std_logic_unsigned 0 22 RYmj;=TK`k=k>D@Cz`zoB3
 Z16 DPx3 std 6 textio 0 22 G^o2zK;Vh4eVdKTVo98653
@@ -41,7 +41,7 @@ L14
 Z21 VmmERQ]L;`gOAdA:XRC?Oh2
 Z22 OE;C;10.0b;49
 32
-Z23 !s108 1434522297.900000
+Z23 !s108 1434569488.363000
 Z24 !s90 -reportprogress|300|../VHDL/P6502/ALU.vhd|
 Z25 !s107 ../VHDL/P6502/ALU.vhd|
 Z26 tExplicit 1
@@ -63,7 +63,7 @@ R25
 R26
 Z30 !s100 F<i1<ZU^hWBXKck=3cjT21
 Econtrolpath
-Z31 w1434522276
+Z31 w1434569428
 Z32 DPx4 work 9 p6502_pkg 0 22 b:@<3Z^JB@c?MT5c<BFnn2
 R16
 R17
@@ -75,7 +75,7 @@ L14
 Z35 VHzNcAKQ>bb<83kC0zHUXV3
 R22
 32
-Z36 !s108 1434522297.994000
+Z36 !s108 1434569488.857000
 Z37 !s90 -reportprogress|300|../VHDL/P6502/ControlPath.vhd|
 Z38 !s107 ../VHDL/P6502/ControlPath.vhd|
 R26
@@ -87,16 +87,16 @@ R17
 Z40 DEx4 work 11 controlpath 0 22 HzNcAKQ>bb<83kC0zHUXV3
 l33
 L22
-Z41 ViTL9Um65a`aU<K_m<2R1n3
+Z41 V@7LAC1lk0`Om55C50hJe]0
 R22
 32
 R36
 R37
 R38
 R26
-Z42 !s100 U]GfF4RYG[h0h_RB=:2732
+Z42 !s100 YImlfa;20de=7^@jkJzWW2
 Edatapath
-Z43 w1434520722
+Z43 w1434567140
 R32
 Z44 DPx4 ieee 11 numeric_std 0 22 k7B<7GmYYYmX;0X]XHFD10
 R16
@@ -106,14 +106,14 @@ Z45 8../VHDL/P6502/DataPath.vhd
 Z46 F../VHDL/P6502/DataPath.vhd
 l0
 L15
-Z47 VVA;fLRmm7HGlndf[Q[NQH0
+Z47 VW2@WF^MZm4FFodWFX<aU_2
 R22
 32
-Z48 !s108 1434522297.947000
+Z48 !s108 1434569488.571000
 Z49 !s90 -reportprogress|300|../VHDL/P6502/DataPath.vhd|
 Z50 !s107 ../VHDL/P6502/DataPath.vhd|
 R26
-Z51 !s100 b[8<icYg7jbCYj7oQEDB22
+Z51 !s100 eM`[XN2MgXn6oOiOG5UdX0
 Astructural
 Z52 DEx4 work 12 flipflopd_sr 0 22 RjS>`Fak@4oaLWY6In2bA2
 R14
@@ -124,152 +124,152 @@ R32
 R44
 R16
 R17
-Z54 DEx4 work 8 datapath 0 22 VA;fLRmm7HGlndf[Q[NQH0
-l44
-L24
-Z55 VQ<Ya4X4ca>>c@SCRXYQRK3
+Z54 DEx4 work 8 datapath 0 22 W2@WF^MZm4FFodWFX<aU_2
+l38
+L25
+Z55 V]CfZzG?Yf^n@b:>hKZoi[0
 R22
 32
 R48
 R49
 R50
 R26
-Z56 !s100 BYd8;LMFbdC9XgVOahVLI1
+Z56 !s100 i:R=c<fUf]i<U^DQO]k]W2
 Edisplayctrl
-Z57 w1433880064
+R13
 R14
 R15
 R16
 R17
 R18
-Z58 8../VHDL/DisplayCtrl.vhd
-Z59 F../VHDL/DisplayCtrl.vhd
+Z57 8../VHDL/DisplayCtrl.vhd
+Z58 F../VHDL/DisplayCtrl.vhd
 l0
 L12
-Z60 VE;@:UVHXHJVL93IA`[eR`1
+Z59 VE;@:UVHXHJVL93IA`[eR`1
 R22
 32
-Z61 !s108 1434522298.197000
-Z62 !s90 -reportprogress|300|../VHDL/DisplayCtrl.vhd|
-Z63 !s107 ../VHDL/DisplayCtrl.vhd|
+Z60 !s108 1434569490.095000
+Z61 !s90 -reportprogress|300|../VHDL/DisplayCtrl.vhd|
+Z62 !s107 ../VHDL/DisplayCtrl.vhd|
 R26
-Z64 !s100 :FBXVY_::ILEe2QbJ0R;G0
+Z63 !s100 :FBXVY_::ILEe2QbJ0R;G0
 Aarch1
 R14
 R15
 R16
 R17
-Z65 DEx4 work 11 displayctrl 0 22 E;@:UVHXHJVL93IA`[eR`1
+Z64 DEx4 work 11 displayctrl 0 22 E;@:UVHXHJVL93IA`[eR`1
 l37
 L31
-Z66 VSa3PJgia=aE4N@g[U_jXS0
+Z65 VSa3PJgia=aE4N@g[U_jXS0
 R22
 32
+R60
 R61
 R62
-R63
 R26
-Z67 !s100 KgaK1Z3?2eP^cfS2jQYF?1
+Z66 !s100 KgaK1Z3?2eP^cfS2jQYF?1
 Eflipflopd_sr
-Z68 w1433953628
+R13
 R16
 R17
 R18
-Z69 8../VHDL/P6502/FlipFlopD_sr.vhd
-Z70 F../VHDL/P6502/FlipFlopD_sr.vhd
+Z67 8../VHDL/P6502/FlipFlopD_sr.vhd
+Z68 F../VHDL/P6502/FlipFlopD_sr.vhd
 l0
 L10
-Z71 VRjS>`Fak@4oaLWY6In2bA2
+Z69 VRjS>`Fak@4oaLWY6In2bA2
 R22
 32
-Z72 !s108 1434522297.822000
-Z73 !s90 -reportprogress|300|../VHDL/P6502/FlipFlopD_sr.vhd|
-Z74 !s107 ../VHDL/P6502/FlipFlopD_sr.vhd|
+Z70 !s108 1434569487.843000
+Z71 !s90 -reportprogress|300|../VHDL/P6502/FlipFlopD_sr.vhd|
+Z72 !s107 ../VHDL/P6502/FlipFlopD_sr.vhd|
 R26
-Z75 !s100 V6NF[3=4D2EbhC:1z5BbF3
+Z73 !s100 V6NF[3=4D2EbhC:1z5BbF3
 Abeharioral
 R16
 R17
 R52
 l22
 L21
-Z76 VL`Mm7>Zi9`;;n;g0n4Ffe3
+Z74 VL`Mm7>Zi9`;;n;g0n4Ffe3
 R22
 32
+R70
+R71
 R72
-R73
-R74
 R26
-Z77 !s100 N^Koea3?ni@iGl>T7YRCQ1
+Z75 !s100 N^Koea3?ni@iGl>T7YRCQ1
 Ememory
-Z78 w1434520375
-Z79 DPx4 work 12 util_package 0 22 86M;9H:iaY6m9O=VXBGol1
+R13
+Z76 DPx4 work 12 util_package 0 22 86M;9H:iaY6m9O=VXBGol1
 R44
 R16
 R17
 R18
-Z80 8../VHDL/Memory.vhd
-Z81 F../VHDL/Memory.vhd
+Z77 8../VHDL/Memory.vhd
+Z78 F../VHDL/Memory.vhd
 l0
 L14
-Z82 V9;ZWc;@en?SKm2;:FbZYU0
+Z79 V9;ZWc;@en?SKm2;:FbZYU0
 R22
 32
-Z83 !s108 1434522298.150000
-Z84 !s90 -reportprogress|300|../VHDL/Memory.vhd|
-Z85 !s107 ../VHDL/Memory.vhd|
+Z80 !s108 1434569489.706000
+Z81 !s90 -reportprogress|300|../VHDL/Memory.vhd|
+Z82 !s107 ../VHDL/Memory.vhd|
 R26
-Z86 !s100 m=MQD_7UM2c5]g:jc^:kN2
+Z83 !s100 m=MQD_7UM2c5]g:jc^:kN2
 Ablock_ram
-R79
+R76
 R44
 R16
 R17
-Z87 DEx4 work 6 memory 0 22 9;ZWc;@en?SKm2;:FbZYU0
+Z84 DEx4 work 6 memory 0 22 9;ZWc;@en?SKm2;:FbZYU0
 l141
 L130
-Z88 VAck^Ij1ldeR:eKdSMfzNK1
+Z85 VAck^Ij1ldeR:eKdSMfzNK1
 R22
 32
-R83
-R84
-R85
+R80
+R81
+R82
 R26
-Z89 !s100 zRM`<dH0alSP@6=iC>7Sc1
+Z86 !s100 zRM`<dH0alSP@6=iC>7Sc1
 Asimulation
-R79
+R76
 R44
 R16
 R17
-R87
+R84
 l101
 L30
-Z90 VP?;8kSZo]zO6GI>zz0>Uf0
+Z87 VP?;8kSZo]zO6GI>zz0>Uf0
 R22
 32
-R83
-R84
-R85
+R80
+R81
+R82
 R26
-Z91 !s100 4Q`e<lScL6[2`BJSE]]kf1
+Z88 !s100 4Q`e<lScL6[2`BJSE]]kf1
 Ep6502
-Z92 w1434519887
+Z89 w1434564126
 R32
 R16
 R17
 R18
-Z93 8../VHDL/P6502/P6502.vhd
-Z94 F../VHDL/P6502/P6502.vhd
+Z90 8../VHDL/P6502/P6502.vhd
+Z91 F../VHDL/P6502/P6502.vhd
 l0
 L14
-Z95 VcYkYiczE:D@^15[oV1g]S2
+Z92 V[B7_VlAFekGc:mCHVHCTF1
 R22
 32
-Z96 !s108 1434522298.040000
-Z97 !s90 -reportprogress|300|../VHDL/P6502/P6502.vhd|
-Z98 !s107 ../VHDL/P6502/P6502.vhd|
+Z93 !s108 1434569489.195000
+Z94 !s90 -reportprogress|300|../VHDL/P6502/P6502.vhd|
+Z95 !s107 ../VHDL/P6502/P6502.vhd|
 R26
-Z99 !s100 bAEY2[0@INMlXRochUBjn2
+Z96 !s100 <@jaFzPDc^QkBW0:zoG>l3
 Astructural
 R40
 R44
@@ -277,141 +277,141 @@ R54
 R32
 R16
 R17
-Z100 DEx4 work 5 p6502 0 22 cYkYiczE:D@^15[oV1g]S2
-l30
-L24
-Z101 V>oM9ZB02Q_6aF5oIRc?]C0
+Z97 DEx4 work 5 p6502 0 22 [B7_VlAFekGc:mCHVHCTF1
+l31
+L25
+Z98 V:a1`fiDdgEo`?7gGa_J]V1
 R22
 32
-R96
-R97
-R98
+R93
+R94
+R95
 R26
-Z102 !s100 _z[bBV@hd?cR1Yz>[ho_m2
+Z99 !s100 GD>M;^kU2g:I;BVCaW2;c3
 Pp6502_pkg
 R16
 R17
-Z103 w1434520750
+R13
 R18
-Z104 8../VHDL/P6502/P6502_pkg.vhd
-Z105 F../VHDL/P6502/P6502_pkg.vhd
+Z100 8../VHDL/P6502/P6502_pkg.vhd
+Z101 F../VHDL/P6502/P6502_pkg.vhd
 l0
 L11
-Z106 Vb:@<3Z^JB@c?MT5c<BFnn2
+Z102 Vb:@<3Z^JB@c?MT5c<BFnn2
 R22
 32
 b1
-Z107 !s108 1434522297.775000
-Z108 !s90 -reportprogress|300|../VHDL/P6502/P6502_pkg.vhd|
-Z109 !s107 ../VHDL/P6502/P6502_pkg.vhd|
+Z103 !s108 1434569487.621000
+Z104 !s90 -reportprogress|300|../VHDL/P6502/P6502_pkg.vhd|
+Z105 !s107 ../VHDL/P6502/P6502_pkg.vhd|
 R26
-Z110 !s100 NM:gbC:8YO4GU`0[oALd[1
+Z106 !s100 NM:gbC:8YO4GU`0[oALd[1
 Bbody
 R32
 R16
 R17
 l0
 L85
-Z111 V[5^]2D1:S@]8:A_Zk:X5_2
+Z107 V[5^]2D1:S@]8:A_Zk:X5_2
 R22
 32
-R107
-R108
-R109
+R103
+R104
+R105
 R26
 nbody
-Z112 !s100 zfU[@=AWl>OkNOHYTW@jH3
+Z108 !s100 zfU[@=AWl>OkNOHYTW@jH3
 Ep6502_ram
-Z113 w1434520271
+Z109 w1434568209
 R16
 R17
 R18
-Z114 8../VHDL/P6502_RAM.vhd
-Z115 F../VHDL/P6502_RAM.vhd
+Z110 8../VHDL/P6502_RAM.vhd
+Z111 F../VHDL/P6502_RAM.vhd
 l0
 L6
-Z116 VLC9K=Aa@Be;]G4hLZA14[2
+Z112 VLC9K=Aa@Be;]G4hLZA14[2
 R22
 32
-Z117 !s108 1434522298.244000
-Z118 !s90 -reportprogress|300|../VHDL/P6502_RAM.vhd|
-Z119 !s107 ../VHDL/P6502_RAM.vhd|
+Z113 !s108 1434569490.502000
+Z114 !s90 -reportprogress|300|../VHDL/P6502_RAM.vhd|
+Z115 !s107 ../VHDL/P6502_RAM.vhd|
 R26
-Z120 !s100 Cc]7j<:PR1b[8X1gdgak>1
+Z116 !s100 Cc]7j<:PR1b[8X1gdgak>1
 Abehavioral
 R14
 R15
-R65
-R79
+R64
+R76
 R44
-R87
+R84
 R32
-R100
+R97
 R16
 R17
-Z121 DEx4 work 9 p6502_ram 0 22 LC9K=Aa@Be;]G4hLZA14[2
+Z117 DEx4 work 9 p6502_ram 0 22 LC9K=Aa@Be;]G4hLZA14[2
 l51
 L17
-Z122 V:gah8;dValXm5o9<Um?mo1
+Z118 VA6h;;9DNl7_X:E:`Lf`1W0
 R22
 32
-R117
-R118
-R119
+R113
+R114
+R115
 R26
-Z123 !s100 Xf=YmUXZGh]BW`[KLZK1[2
+Z119 !s100 3]LV]VjBUNJh`bQebEckS1
 Ep6502_ram_tb
-Z124 w1433938982
+R13
 R14
 R16
 R17
 R18
-Z125 8../VHDL/P6502_RAM_tb.vhd
-Z126 F../VHDL/P6502_RAM_tb.vhd
+Z120 8../VHDL/P6502_RAM_tb.vhd
+Z121 F../VHDL/P6502_RAM_tb.vhd
 l0
 L6
-Z127 Vnbbc4;Pz]=Pz;@;<8J[M52
+Z122 Vnbbc4;Pz]=Pz;@;<8J[M52
 R22
 32
-Z128 !s108 1434522298.290000
-Z129 !s90 -reportprogress|300|../VHDL/P6502_RAM_tb.vhd|
-Z130 !s107 ../VHDL/P6502_RAM_tb.vhd|
+Z123 !s108 1434569490.832000
+Z124 !s90 -reportprogress|300|../VHDL/P6502_RAM_tb.vhd|
+Z125 !s107 ../VHDL/P6502_RAM_tb.vhd|
 R26
-Z131 !s100 T;m[Vcz6emHU35GbULY:@3
+Z126 !s100 T;m[Vcz6emHU35GbULY:@3
 Abehavioral
-R121
+R117
 R14
 R16
 R17
-Z132 DEx4 work 12 p6502_ram_tb 0 22 nbbc4;Pz]=Pz;@;<8J[M52
+Z127 DEx4 work 12 p6502_ram_tb 0 22 nbbc4;Pz]=Pz;@;<8J[M52
 l23
 L11
-Z133 Vi4jToOzdeeW@Na::?;=IK0
+Z128 Vi4jToOzdeeW@Na::?;=IK0
 R22
 32
-R128
-R129
-R130
+R123
+R124
+R125
 R26
-Z134 !s100 66WWQ20JT[AbKcIPQE]Z>1
+Z129 !s100 66WWQ20JT[AbKcIPQE]Z>1
 Eregisternbits
-Z135 w1433952617
+R13
 R44
 R16
 R17
 R18
-Z136 8../VHDL/P6502/RegisterNbits.vhd
-Z137 F../VHDL/P6502/RegisterNbits.vhd
+Z130 8../VHDL/P6502/RegisterNbits.vhd
+Z131 F../VHDL/P6502/RegisterNbits.vhd
 l0
 L14
-Z138 Vge[Y=YThn^cPTaHn7Y2F23
+Z132 Vge[Y=YThn^cPTaHn7Y2F23
 R22
 32
-Z139 !s108 1434522297.853000
-Z140 !s90 -reportprogress|300|../VHDL/P6502/RegisterNbits.vhd|
-Z141 !s107 ../VHDL/P6502/RegisterNbits.vhd|
+Z133 !s108 1434569488.086000
+Z134 !s90 -reportprogress|300|../VHDL/P6502/RegisterNbits.vhd|
+Z135 !s107 ../VHDL/P6502/RegisterNbits.vhd|
 R26
-Z142 !s100 fhl0NR^VC7QI;BH@jJY1`3
+Z136 !s100 fhl0NR^VC7QI;BH@jJY1`3
 Abehavioral
 R44
 R16
@@ -419,44 +419,44 @@ R17
 R53
 l30
 L29
-Z143 V9]ofcfEi>e2Rl?lkLfj2B2
+Z137 V9]ofcfEi>e2Rl?lkLfj2B2
 R22
 32
-R139
-R140
-R141
+R133
+R134
+R135
 R26
-Z144 !s100 kk4ZDkME=m?]MhfzhYi`i2
+Z138 !s100 kk4ZDkME=m?]MhfzhYi`i2
 Putil_package
 R16
 R17
-R113
+R13
 R18
-Z145 8../VHDL/Util_package.vhd
-Z146 F../VHDL/Util_package.vhd
+Z139 8../VHDL/Util_package.vhd
+Z140 F../VHDL/Util_package.vhd
 l0
 L9
-Z147 V86M;9H:iaY6m9O=VXBGol1
+Z141 V86M;9H:iaY6m9O=VXBGol1
 R22
 32
 b1
-Z148 !s108 1434522298.103000
-Z149 !s90 -reportprogress|300|../VHDL/Util_package.vhd|
-Z150 !s107 ../VHDL/Util_package.vhd|
+Z142 !s108 1434569489.436000
+Z143 !s90 -reportprogress|300|../VHDL/Util_package.vhd|
+Z144 !s107 ../VHDL/Util_package.vhd|
 R26
-Z151 !s100 cPT:l=_cRFKZnR2>W^90N3
+Z145 !s100 cPT:l=_cRFKZnR2>W^90N3
 Bbody
-R79
+R76
 R16
 R17
 l0
 L22
-Z152 V?[ELNijF=Lo0aQ5ZangU<0
+Z146 V?[ELNijF=Lo0aQ5ZangU<0
 R22
 32
-R148
-R149
-R150
+R142
+R143
+R144
 R26
 nbody
-Z153 !s100 foU0>ALQz_>^efYdBDSB`3
+Z147 !s100 foU0>ALQz_>^efYdBDSB`3

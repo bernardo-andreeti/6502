@@ -16,8 +16,9 @@ entity DataPath is
     port(  
         clk, rst    : in std_logic;
         address     : out std_logic_vector(15 downto 0);    -- Address bus to memory
-        data        : inout std_logic_vector(7 downto 0);   -- Data from/to memory
-        uins        : in Microinstruction                  -- Control signals
+        data_in     : in std_logic_vector(7 downto 0);      -- Data from memory
+        data_out    : out std_logic_vector(7 downto 0);     -- Data to memory
+        uins        : in Microinstruction                   -- Control signals
       );
 end DataPath;
 
@@ -62,8 +63,7 @@ begin
         
     -- Multiplexer connected to the AI register input
     MUX_AI: AI_d <= ADL when uins.mux_ai = "00" else 
-                    SB when uins.mux_ai = "01" else
-                    (others=>'0');
+                    SB;
     
     -- Multiplexer connected to the BI register input
     MUX_BI: BI_d <= DB when uins.mux_bi = '0' else not DB;
@@ -104,8 +104,7 @@ begin
                   SB when uins.mux_db = "001" else
                   PCL_q when uins.mux_db = "010" else
                   PCH_q when uins.mux_db = "011" else
-                  data when uins.mux_db = "100" else 
-                  (others=>'Z');   
+                  data_in;   
                               
     -- SB bus
     MUX_SB: SB <= S_q when uins.mux_sb = "000" else
@@ -114,22 +113,19 @@ begin
                   X_q when uins.mux_sb = "011" else
                   Y_q when uins.mux_sb = "100" else
                   AC_q when uins.mux_sb = "101" else
-                  DB when uins.mux_sb = "110" else
-                  (others=>'Z');
+                  DB;
           
     -- ADL bus
     MUX_ADL: ADL <= ALUresult when uins.mux_adl = "00" else
                     S_q when uins.mux_adl = "01" else
-                    DB when uins.mux_adl = "10" else
-                    (others=>'Z');
+                    DB;
     
     
     -- ADH bus
     MUX_ADH: ADH <= DB when uins.mux_adh = "00" else
                     SB when uins.mux_adh = "01" else
                     (x"00") when uins.mux_adh = "10" else
-                    (x"01") when uins.mux_adh = "11" else
-                    (others=>'Z');
+                    (x"01");
     
     S: entity work.RegisterNbits
         generic map (
@@ -224,8 +220,7 @@ begin
     MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "00" else
                       (ABH_q & ABL_q) when uins.mux_mar = "01" else
                       (x"00" & DB) when uins.mux_mar = "10" else
-                      (SB & x"00") when uins.mux_mar = "11" else
-                      (others=>'Z');
+                      (SB & x"00");
         
     MAR: entity work.RegisterNbits
 
@@ -240,7 +235,7 @@ begin
             ce      => uins.wrMAR
         );    
         
-    data <= DB when uins.ce = '1' and uins.rw = '0' else (others=>'Z');
+    data_out <= DB; --when uins.ce = '1' and uins.rw = '0' else (others=>'Z');
     
     P_d(0) <= carryFlag;
     P_d(1) <= zeroFlag;

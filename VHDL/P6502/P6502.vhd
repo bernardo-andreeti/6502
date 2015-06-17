@@ -17,7 +17,8 @@ entity P6502 is
         ce          : out std_logic;    -- Chip enable to data memory
         rw          : out std_logic;    -- Access control to data memory (rw =0 : WRITE, rw = 1: READ)
         address     : out std_logic_vector(15 downto 0);    -- Address bus to memory
-        data        : inout std_logic_vector(7 downto 0)    -- Data to/from data memory
+        data_in     : in std_logic_vector(7 downto 0);      -- Data from memory
+        data_out    : out std_logic_vector(7 downto 0)      -- Data to memory
       );
 end P6502;
 
@@ -38,7 +39,8 @@ begin
             clk         => clk_n,
             rst         => rst,
             address     => address,
-            data        => data,
+            data_in     => data_in,
+            data_out    => data_out,
             uins        => uins
         );
         
@@ -47,7 +49,7 @@ begin
             clk         => clk,
             rst         => rst,
             uins        => uins,
-            instruction => data            
+            instruction => data_in            
         );
         
     ce <= uins.ce;

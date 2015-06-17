@@ -16,9 +16,9 @@ end P6502_RAM;
 -- Instantiate the components and generates the stimuli.
 architecture behavioral of P6502_RAM is  
     
-    signal rw, ce, we                       : std_logic;
-    signal address                          : std_logic_vector(15 downto 0);
-    signal RAMdata_in, RAMdata_out, dataBus : std_logic_vector(7 downto 0);
+    signal rw, ce, we                : std_logic;
+    signal address                   : std_logic_vector(15 downto 0);
+    signal RAMdata_in, RAMdata_out   : std_logic_vector(7 downto 0);
      
     signal reg1, reg2: std_logic_vector(7 downto 0);
     signal display0, display1, display2, display3: std_logic_vector(7 downto 0);
@@ -57,7 +57,8 @@ begin
             rst         => rst,
             ce          => ce,
             rw          => rw,
-            data        => dataBus,
+            data_in     => RAMdata_out,
+            data_out    => RAMdata_in,
             address     => address
         );
         
@@ -71,7 +72,7 @@ begin
         port map (
             clk         => clk,
             we          => we,
-            data_in     => dataBus,
+            data_in     => RAMdata_in,
             data_out    => RAMdata_out,
             address     => address
         );
@@ -87,10 +88,8 @@ begin
             display2        => display2,  
             display3        => display3   -- Right most display
         );
-     
-     
-    we <= '1' when ce = '1' and rw = '0' else '0';
-    dataBus <= RAMdata_out when ce = '1' and rw = '1' else (others=>'Z');
+        
+    we <= '1' when ce = '1' and rw = '0' else '0'; -- Mode Select (Read/Write)
     
     process(clk,rst)
     begin
@@ -100,11 +99,11 @@ begin
         
         elsif rising_edge(clk) then
             if address = x"1000" and we = '1' then
-                reg1 <= dataBus;
+                reg1 <= RAMdata_in;
             end if;
             
             if address = x"1001" and we = '1' then
-                reg2 <= dataBus;
+                reg2 <= RAMdata_in;
             end if;
         end if;
     end process;

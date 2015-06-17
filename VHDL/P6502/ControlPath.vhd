@@ -33,7 +33,7 @@ architecture ControlPath of ControlPath is
 begin  
 
     
-    opcode <= instruction when currentState = T0 else IR;          
+    opcode <= instruction when currentState = T1 else IR;          
     decIns <= InstructionDecoder(opcode);
 
     ------------------------
@@ -62,14 +62,10 @@ begin
                 nextState <= T0;
                 
             when T0 =>
-                if decIns.instruction = BRK then  -- BRK instruction
-                    nextState <= BREAK;    
-                else
                     nextState <= T1;
-                end if;
-                
+                    
             when T1 =>  
-                if (decIns.instruction=CLC or decIns.instruction=CLD or decIns.instruction=CLI or decIns.instruction=CLV or decIns.instruction=SECi or decIns.instruction=SED or decIns.instruction=SEI) then
+                if (decIns.instruction=CLC or decIns.instruction=CLD or decIns.instruction=CLI or decIns.instruction=CLV or decIns.instruction=SECi or decIns.instruction=SED or decIns.instruction=SEI or decIns.instruction=BRK) then
                     nextState <= T0;
                 else
                     nextState <= T2;
@@ -118,7 +114,7 @@ begin
             IR <= (others=>'0');
             
         elsif rising_edge(clk) then
-            if currentState = T0 then
+            if currentState = T1 then
                 IR <= instruction;
             end if;
         end if;
@@ -143,9 +139,9 @@ begin
             uins.rstP(5)         <= '1';
                                     
     -- Fetch
-    -- T0: MAR <- PC; IR <- MEM[MAR]; PC++; (all instructions)
+    -- T0: MAR <- PC; PC++; (all instructions)
     -- Decode:
-    -- T1: MAR <- PC; PC++; (all instructions except one byte ones)
+    -- T1: MAR <- PC; IR <- MEM[MAR]; PC++; (all instructions except one byte ones)
         elsif currentState = T0 or (currentState = T1 and decIns.size > 1) then  
             -- MAR <- PC
             uins.mux_mar <= "00";  
@@ -158,55 +154,36 @@ begin
             
             -- Enable Memory Read Mode
             uins.ce <= '1';
-            uins.rw <= '1';
+            uins.rw <= '1';        
             
-            -- Decode steps for Absolute addressing mode -> se address mudar junto com pc
-            --if (decIns.addressMode = AABS and currentState = T1) then
-            --  uins.mux_db <= "100";  -- DB <- MEM[MAR]
-            --  uins.mux_adl <= "10";  
-            --  uins.wrABL <= '1';     -- ABL <- DB
-            --elsif (currentState = T2) then
-            --  uins.mux_db <= "100";  -- DB <- MEM[MAR]
-            --  uins.mux_adh <= "00";  
-            --  uins.wrABH <= '1';     -- ABH <- DB
-            --  uins.mux_mar <= "01";  -- MAR <- [ABH/ABL]
-            --end if;
-            
-    -- T1: MAR <- PC; P(i) <- 1 for sets, 0 for rst (One byte instructions)    
+    -- T1: IR <- MEM[MAR]; P(i) <- 1 for sets, 0 for rst (One byte instructions)    
         -- Clear carry flag
         elsif decIns.instruction=CLC and currentState=T1 then
             uins.rstP(CARRY) <= '1';
-            uins.wrMAR <= '1'; 
            
         -- Set carry flag
         elsif decIns.instruction=SECi and currentState=T1 then
             uins.setP(CARRY) <= '1';
-            uins.wrMAR <= '1';
             
         -- Clear decimal flag
         elsif decIns.instruction=CLD and currentState=T1 then
             uins.rstP(DECIMAL) <= '1';
-            uins.wrMAR <= '1';
             
         -- Set decimal flag
         elsif decIns.instruction=SED and currentState=T1 then
-            uins.setP(DECIMAL) <= '1';
-            uins.wrMAR <= '1';            
+            uins.setP(DECIMAL) <= '1';           
         
         -- Clear interrupt flag
         elsif decIns.instruction=CLI and currentState=T1 then
             uins.rstP(INTERRUPT) <= '1';
-            uins.wrMAR <= '1';
             
         -- Set interrupt flag
         elsif decIns.instruction=SEI and currentState=T1 then
             uins.setP(INTERRUPT) <= '1';
-            uins.wrMAR <= '1';
             
         -- Clear overflow flag
         elsif decIns.instruction=CLV and currentState=T1 then
             uins.rstP(OVERFLOW) <= '1';
-            uins.wrMAR <= '1';
                     
     -- T2 or T3: AC <- MEM[MAR]; wrn, wrz   - Execute step for Immediate (T2) and ZPG (T3) addressing mode
         elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG)) then
@@ -215,15 +192,27 @@ begin
                 uins.rw <= '1';        -- Enable Read Mode
                 uins.mux_db <= "100";  -- DB <- MEM[MAR] 
                 uins.mux_sb <= "110";  -- SB <- DB
-                uins.wrAC <= '1';      -- AC <- SB
+                if decIns.instruction = LDA then
+                    uins.wrAC <= '1';  -- AC <- SB
+                elsif decIns.instruction = LDX then
+                    uins.wrX <= '1';   -- X <- SB
+                else  -- LDY
+                    uins.wrY <= '1';   -- Y <- SB
+                end if;
             else -- STA, STX and STY
-                uins.mux_db <= "000";  -- DB <- AC
+                if decIns.instruction = STA then
+                    uins.mux_db <= "000";  -- DB <- AC
+                elsif decIns.instruction = STX then 
+                    uins.mux_sb <= "011";  -- SB <- X
+                    uins.mux_db <= "001";  -- DB <- SB
+                else  -- STY    
+                    uins.mux_sb <= "100";  -- SB <- Y
+                    uins.mux_db <= "001";  -- DB <- SB
+                 end if;   
                 uins.ce <= '1';
                 uins.rw <= '0';        -- Enable Write Mode : MEM[MAR] <- AC
             end if;
-            
-            uins.wrMAR <= '1'; 
-                    
+                                            
     -- T2: MAR <- MEM[MAR];     - Decode step for Zero Page addressing mode
         elsif (currentState = T2 and decIns.addressMode=ZPG)  then
             uins.ce <= '1';
@@ -239,5 +228,4 @@ begin
                 
     end process;
    
-
 end ControlPath;
