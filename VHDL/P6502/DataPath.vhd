@@ -134,8 +134,8 @@ begin
     -- ADH bus
     MUX_ADH: ADH <= DB when uins.mux_adh = "00" else
                     SB when uins.mux_adh = "01" else
-                    "00" when uins.mux_adh = "10" else
-                    "01" when uins.mux_adh = "11" else
+                    (x"00") when uins.mux_adh = "10" else
+                    (x"01") when uins.mux_adh = "11" else
                     (others=>'Z');
     
     S: entity work.RegisterNbits
