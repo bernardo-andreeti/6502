@@ -33,13 +33,6 @@ architecture structural of DataPath is
     signal ALUresult: std_logic_vector(7 downto 0);
     signal negativeFlag, zeroFlag, carryFlag, overflowFlag, ALUcarry_in, halfCarry: std_logic;
     signal inPC, MAR_d: std_logic_vector(15 downto 0);
-     
-    -- Avoid logic trimming by XST
-    --attribute KEEP : string;
-    --attribute KEEP of  DB: signal is "TRUE";
-    --attribute KEEP of  SB: signal is "TRUE";
-    --attribute KEEP of  ADL: signal is "TRUE";
-    --attribute KEEP of  ADH: signal is "TRUE";
     
 begin
 
