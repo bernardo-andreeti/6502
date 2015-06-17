@@ -227,14 +227,14 @@ begin
             q       => ABH_q,
             ce      => uins.wrABH
         );
-		
-	MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "00" else
-					  (ABH_q & ABL_q) when uins.mux_mar = "01" else
-					  (x"00" & DB) when uins.mux_mar = "10" else
-					  (SB & x"00") when uins.mux_mar = "11" else
-					  (others=>'Z');
-		
-	MAR: entity work.RegisterNbits
+        
+    MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "00" else
+                      (ABH_q & ABL_q) when uins.mux_mar = "01" else
+                      (x"00" & DB) when uins.mux_mar = "10" else
+                      (SB & x"00") when uins.mux_mar = "11" else
+                      (others=>'Z');
+        
+    MAR: entity work.RegisterNbits
 
         generic map (
             WIDTH   => 16
