@@ -1,0 +1,462 @@
+m255
+K3
+13
+cModel Technology
+Z0 dC:\Users\Bernardo\src\sim
+T_opt
+Z1 VDkC1VlOS=cIlZik^RE_>;3
+Z2 04 12 10 work P6502_RAM_tb behavioral 1
+Z3 =1-94de80a56f00-5579001a-d0-1040
+Z4 o-quiet -auto_acc_if_foreign -work work
+Z5 n@_opt
+Z6 OE;O;10.0b;49
+Z7 dC:\Users\Bernardo\src\sim
+T_opt1
+Z8 VKKf>bZ8[JEBd7Fk`lZBRH3
+R2
+Z9 =1-94de80a56f00-55810cf0-0-cc
+R4
+Z10 n@_opt1
+R6
+R7
+T_opt2
+Z11 V_WRa`T5LdcQ]Yizi079ac0
+R2
+Z12 =1-94de80a56f00-558112ba-1de-d64
+R4
+Z13 n@_opt2
+R6
+R7
+Ealu
+Z14 w1433621841
+Z15 DPx4 ieee 15 std_logic_arith 0 22 4`Y?g_lkdn;7UL9IiJck01
+Z16 DPx4 ieee 18 std_logic_unsigned 0 22 RYmj;=TK`k=k>D@Cz`zoB3
+Z17 DPx3 std 6 textio 0 22 G^o2zK;Vh4eVdKTVo98653
+Z18 DPx4 ieee 14 std_logic_1164 0 22 5=aWaoGZSMWIcH0i^f`XF1
+Z19 dC:\Users\Bernardo\Documents\GitHub\6502\sim
+Z20 8../VHDL/P6502/ALU.vhd
+Z21 F../VHDL/P6502/ALU.vhd
+l0
+L14
+Z22 VmmERQ]L;`gOAdA:XRC?Oh2
+Z23 OE;C;10.0b;49
+32
+Z24 !s108 1434522297.900000
+Z25 !s90 -reportprogress|300|../VHDL/P6502/ALU.vhd|
+Z26 !s107 ../VHDL/P6502/ALU.vhd|
+Z27 tExplicit 1
+Z28 !s100 VM0eXTT3PmfCQTP>8nmdl0
+Abehavioral
+R15
+R16
+R17
+R18
+Z29 DEx4 work 3 alu 0 22 mmERQ]L;`gOAdA:XRC?Oh2
+l34
+L27
+Z30 V?flARf<S:_dmcnaXmbAc62
+R23
+32
+R24
+R25
+R26
+R27
+Z31 !s100 F<i1<ZU^hWBXKck=3cjT21
+Econtrolpath
+Z32 w1434522276
+Z33 DPx4 work 9 p6502_pkg 0 22 b:@<3Z^JB@c?MT5c<BFnn2
+R17
+R18
+R19
+Z34 8../VHDL/P6502/ControlPath.vhd
+Z35 F../VHDL/P6502/ControlPath.vhd
+l0
+L14
+Z36 VHzNcAKQ>bb<83kC0zHUXV3
+R23
+32
+Z37 !s108 1434522297.994000
+Z38 !s90 -reportprogress|300|../VHDL/P6502/ControlPath.vhd|
+Z39 !s107 ../VHDL/P6502/ControlPath.vhd|
+R27
+Z40 !s100 485l@=MNh5;WmFO:4Vkgh0
+Acontrolpath
+R33
+R17
+R18
+Z41 DEx4 work 11 controlpath 0 22 HzNcAKQ>bb<83kC0zHUXV3
+l33
+L22
+Z42 ViTL9Um65a`aU<K_m<2R1n3
+R23
+32
+R37
+R38
+R39
+R27
+Z43 !s100 U]GfF4RYG[h0h_RB=:2732
+Edatapath
+Z44 w1434520722
+R33
+Z45 DPx4 ieee 11 numeric_std 0 22 k7B<7GmYYYmX;0X]XHFD10
+R17
+R18
+R19
+Z46 8../VHDL/P6502/DataPath.vhd
+Z47 F../VHDL/P6502/DataPath.vhd
+l0
+L15
+Z48 VVA;fLRmm7HGlndf[Q[NQH0
+R23
+32
+Z49 !s108 1434522297.947000
+Z50 !s90 -reportprogress|300|../VHDL/P6502/DataPath.vhd|
+Z51 !s107 ../VHDL/P6502/DataPath.vhd|
+R27
+Z52 !s100 b[8<icYg7jbCYj7oQEDB22
+Astructural
+Z53 DEx4 work 12 flipflopd_sr 0 22 RjS>`Fak@4oaLWY6In2bA2
+R15
+R16
+R29
+Z54 DEx4 work 13 registernbits 0 22 ge[Y=YThn^cPTaHn7Y2F23
+R33
+R45
+R17
+R18
+Z55 DEx4 work 8 datapath 0 22 VA;fLRmm7HGlndf[Q[NQH0
+l44
+L24
+Z56 VQ<Ya4X4ca>>c@SCRXYQRK3
+R23
+32
+R49
+R50
+R51
+R27
+Z57 !s100 BYd8;LMFbdC9XgVOahVLI1
+Edisplayctrl
+Z58 w1433880064
+R15
+R16
+R17
+R18
+R19
+Z59 8../VHDL/DisplayCtrl.vhd
+Z60 F../VHDL/DisplayCtrl.vhd
+l0
+L12
+Z61 VE;@:UVHXHJVL93IA`[eR`1
+R23
+32
+Z62 !s108 1434522298.197000
+Z63 !s90 -reportprogress|300|../VHDL/DisplayCtrl.vhd|
+Z64 !s107 ../VHDL/DisplayCtrl.vhd|
+R27
+Z65 !s100 :FBXVY_::ILEe2QbJ0R;G0
+Aarch1
+R15
+R16
+R17
+R18
+Z66 DEx4 work 11 displayctrl 0 22 E;@:UVHXHJVL93IA`[eR`1
+l37
+L31
+Z67 VSa3PJgia=aE4N@g[U_jXS0
+R23
+32
+R62
+R63
+R64
+R27
+Z68 !s100 KgaK1Z3?2eP^cfS2jQYF?1
+Eflipflopd_sr
+Z69 w1433953628
+R17
+R18
+R19
+Z70 8../VHDL/P6502/FlipFlopD_sr.vhd
+Z71 F../VHDL/P6502/FlipFlopD_sr.vhd
+l0
+L10
+Z72 VRjS>`Fak@4oaLWY6In2bA2
+R23
+32
+Z73 !s108 1434522297.822000
+Z74 !s90 -reportprogress|300|../VHDL/P6502/FlipFlopD_sr.vhd|
+Z75 !s107 ../VHDL/P6502/FlipFlopD_sr.vhd|
+R27
+Z76 !s100 V6NF[3=4D2EbhC:1z5BbF3
+Abeharioral
+R17
+R18
+R53
+l22
+L21
+Z77 VL`Mm7>Zi9`;;n;g0n4Ffe3
+R23
+32
+R73
+R74
+R75
+R27
+Z78 !s100 N^Koea3?ni@iGl>T7YRCQ1
+Ememory
+Z79 w1434520375
+Z80 DPx4 work 12 util_package 0 22 86M;9H:iaY6m9O=VXBGol1
+R45
+R17
+R18
+R19
+Z81 8../VHDL/Memory.vhd
+Z82 F../VHDL/Memory.vhd
+l0
+L14
+Z83 V9;ZWc;@en?SKm2;:FbZYU0
+R23
+32
+Z84 !s108 1434522298.150000
+Z85 !s90 -reportprogress|300|../VHDL/Memory.vhd|
+Z86 !s107 ../VHDL/Memory.vhd|
+R27
+Z87 !s100 m=MQD_7UM2c5]g:jc^:kN2
+Ablock_ram
+R80
+R45
+R17
+R18
+Z88 DEx4 work 6 memory 0 22 9;ZWc;@en?SKm2;:FbZYU0
+l141
+L130
+Z89 VAck^Ij1ldeR:eKdSMfzNK1
+R23
+32
+R84
+R85
+R86
+R27
+Z90 !s100 zRM`<dH0alSP@6=iC>7Sc1
+Asimulation
+R80
+R45
+R17
+R18
+R88
+l101
+L30
+Z91 VP?;8kSZo]zO6GI>zz0>Uf0
+R23
+32
+R84
+R85
+R86
+R27
+Z92 !s100 4Q`e<lScL6[2`BJSE]]kf1
+Ep6502
+Z93 w1434519887
+R33
+R17
+R18
+R19
+Z94 8../VHDL/P6502/P6502.vhd
+Z95 F../VHDL/P6502/P6502.vhd
+l0
+L14
+Z96 VcYkYiczE:D@^15[oV1g]S2
+R23
+32
+Z97 !s108 1434522298.040000
+Z98 !s90 -reportprogress|300|../VHDL/P6502/P6502.vhd|
+Z99 !s107 ../VHDL/P6502/P6502.vhd|
+R27
+Z100 !s100 bAEY2[0@INMlXRochUBjn2
+Astructural
+R41
+R45
+R55
+R33
+R17
+R18
+Z101 DEx4 work 5 p6502 0 22 cYkYiczE:D@^15[oV1g]S2
+l30
+L24
+Z102 V>oM9ZB02Q_6aF5oIRc?]C0
+R23
+32
+R97
+R98
+R99
+R27
+Z103 !s100 _z[bBV@hd?cR1Yz>[ho_m2
+Pp6502_pkg
+R17
+R18
+Z104 w1434520750
+R19
+Z105 8../VHDL/P6502/P6502_pkg.vhd
+Z106 F../VHDL/P6502/P6502_pkg.vhd
+l0
+L11
+Z107 Vb:@<3Z^JB@c?MT5c<BFnn2
+R23
+32
+b1
+Z108 !s108 1434522297.775000
+Z109 !s90 -reportprogress|300|../VHDL/P6502/P6502_pkg.vhd|
+Z110 !s107 ../VHDL/P6502/P6502_pkg.vhd|
+R27
+Z111 !s100 NM:gbC:8YO4GU`0[oALd[1
+Bbody
+R33
+R17
+R18
+l0
+L85
+Z112 V[5^]2D1:S@]8:A_Zk:X5_2
+R23
+32
+R108
+R109
+R110
+R27
+nbody
+Z113 !s100 zfU[@=AWl>OkNOHYTW@jH3
+Ep6502_ram
+Z114 w1434520271
+R17
+R18
+R19
+Z115 8../VHDL/P6502_RAM.vhd
+Z116 F../VHDL/P6502_RAM.vhd
+l0
+L6
+Z117 VLC9K=Aa@Be;]G4hLZA14[2
+R23
+32
+Z118 !s108 1434522298.244000
+Z119 !s90 -reportprogress|300|../VHDL/P6502_RAM.vhd|
+Z120 !s107 ../VHDL/P6502_RAM.vhd|
+R27
+Z121 !s100 Cc]7j<:PR1b[8X1gdgak>1
+Abehavioral
+R15
+R16
+R66
+R80
+R45
+R88
+R33
+R101
+R17
+R18
+Z122 DEx4 work 9 p6502_ram 0 22 LC9K=Aa@Be;]G4hLZA14[2
+l51
+L17
+Z123 V:gah8;dValXm5o9<Um?mo1
+R23
+32
+R118
+R119
+R120
+R27
+Z124 !s100 Xf=YmUXZGh]BW`[KLZK1[2
+Ep6502_ram_tb
+Z125 w1433938982
+R15
+R17
+R18
+R19
+Z126 8../VHDL/P6502_RAM_tb.vhd
+Z127 F../VHDL/P6502_RAM_tb.vhd
+l0
+L6
+Z128 Vnbbc4;Pz]=Pz;@;<8J[M52
+R23
+32
+Z129 !s108 1434522298.290000
+Z130 !s90 -reportprogress|300|../VHDL/P6502_RAM_tb.vhd|
+Z131 !s107 ../VHDL/P6502_RAM_tb.vhd|
+R27
+Z132 !s100 T;m[Vcz6emHU35GbULY:@3
+Abehavioral
+R122
+R15
+R17
+R18
+Z133 DEx4 work 12 p6502_ram_tb 0 22 nbbc4;Pz]=Pz;@;<8J[M52
+l23
+L11
+Z134 Vi4jToOzdeeW@Na::?;=IK0
+R23
+32
+R129
+R130
+R131
+R27
+Z135 !s100 66WWQ20JT[AbKcIPQE]Z>1
+Eregisternbits
+Z136 w1433952617
+R45
+R17
+R18
+R19
+Z137 8../VHDL/P6502/RegisterNbits.vhd
+Z138 F../VHDL/P6502/RegisterNbits.vhd
+l0
+L14
+Z139 Vge[Y=YThn^cPTaHn7Y2F23
+R23
+32
+Z140 !s108 1434522297.853000
+Z141 !s90 -reportprogress|300|../VHDL/P6502/RegisterNbits.vhd|
+Z142 !s107 ../VHDL/P6502/RegisterNbits.vhd|
+R27
+Z143 !s100 fhl0NR^VC7QI;BH@jJY1`3
+Abehavioral
+R45
+R17
+R18
+R54
+l30
+L29
+Z144 V9]ofcfEi>e2Rl?lkLfj2B2
+R23
+32
+R140
+R141
+R142
+R27
+Z145 !s100 kk4ZDkME=m?]MhfzhYi`i2
+Putil_package
+R17
+R18
+R114
+R19
+Z146 8../VHDL/Util_package.vhd
+Z147 F../VHDL/Util_package.vhd
+l0
+L9
+Z148 V86M;9H:iaY6m9O=VXBGol1
+R23
+32
+b1
+Z149 !s108 1434522298.103000
+Z150 !s90 -reportprogress|300|../VHDL/Util_package.vhd|
+Z151 !s107 ../VHDL/Util_package.vhd|
+R27
+Z152 !s100 cPT:l=_cRFKZnR2>W^90N3
+Bbody
+R80
+R17
+R18
+l0
+L22
+Z153 V?[ELNijF=Lo0aQ5ZangU<0
+R23
+32
+R149
+R150
+R151
+R27
+nbody
+Z154 !s100 foU0>ALQz_>^efYdBDSB`3

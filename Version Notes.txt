@@ -1,6 +1,5 @@
  -- Changes:
  
-	Added support for LDA with Immediate and Zero Page addressing modes
-	and STA with ZPG addressing mode (address issue);
+	Added support for LDA with Immediate and Zero Page addressing modes and STA with ZPG addressing mode (address issue);
 	
 		
