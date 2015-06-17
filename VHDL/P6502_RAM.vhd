@@ -66,7 +66,7 @@ begin
         generic map (
             DATA_WIDTH    => 8,
             ADDR_WIDTH    => 16,
-			IMAGE 		=> "image1.txt" -- only for simulation description
+            IMAGE         => "image1.txt" -- only for simulation description
         )
         port map (
             clk         => clk,

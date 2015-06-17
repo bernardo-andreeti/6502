@@ -1,9 +1,9 @@
 ------------------------------------------------------------------------------------------------
--- DESIGN UNIT  : 6502 Package                                                                            --
--- DESCRIPTION  : Decodable instructions enumeration and control signals grouping   --
--- AUTHOR       : Everton Alceu Carara and Bernardo Favero Andreeti                        --
--- CREATED      : June 3rd, 2015                                                                             --
--- VERSION      : 0.5                                                                                              --
+-- DESIGN UNIT  : 6502 Package                                                                --
+-- DESCRIPTION  : Decodable instructions enumeration and control signals grouping             --
+-- AUTHOR       : Everton Alceu Carara and Bernardo Favero Andreeti                           --
+-- CREATED      : June 3rd, 2015                                                              --
+-- VERSION      : 0.5                                                                         --
 ------------------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.Std_Logic_1164.all;
@@ -13,14 +13,14 @@ package P6502_pkg is
     -- Constant flags
     constant CARRY     : integer := 0;
     constant ZERO      : integer := 1;
-	constant INTERRUPT : integer := 2;
-	constant DECIMAL   : integer := 3;
-	constant BREAKF    : integer := 4;
+    constant INTERRUPT : integer := 2;
+    constant DECIMAL   : integer := 3;
+    constant BREAKF    : integer := 4;
     constant OVERFLOW  : integer := 6;
     constant NEGATIVE  : integer := 7;
     
     -- Instructions execution cycle
-    type State is (IDLE, T0, T1, T2, T3, T5, T6, T7, BREAK);
+    type State is (IDLE, T0, T1, T2, T3, T4, T5, T6, T7, BREAK);
      
     -- Instruction_type enumeration defines the instructions decodable by the control path
     type Instruction_type is (  
@@ -38,39 +38,39 @@ package P6502_pkg is
         CLC, CLD, CLI, CLV, SECi, SED, SEI,
         JSR, RTS, BRK, RTI, NOP,
 
-		invalid_instruction
-	);
+        invalid_instruction
+    );
     
     type AddressMode_type is (IMM, ZPG, ZPG_XY, IND_X, IND_Y, AABS, ABS_XY, IMP);
     
     type DecodedInstruction_type is record
-		instruction		: Instruction_type;
-		addressMode	    : AddressMode_type; 
-		size 	        : integer range 1 to 3;            
+        instruction        : Instruction_type;
+        addressMode        : AddressMode_type; 
+        size             : integer range 1 to 3;            
     end record;
  
     type Microinstruction is record
-    	wrAI         : std_logic;                    -- Write control for the AI register
-        wrBI         : std_logic;   	             -- Write control for the BI register
-        wrAC         : std_logic;   	             -- Write control for the AC register
-        wrS          : std_logic;   	             -- Write control for the S register
-        wrX          : std_logic;   	             -- Write control for the X register
-        wrY          : std_logic;   	             -- Write control for the Y register
-        wrPCH        : std_logic;   	             -- Write control for the PCH register
-        wrPCL        : std_logic;   	             -- Write control for the PCL register
-        wrABH        : std_logic;   	             -- Write control for the ABH register
-        wrABL        : std_logic;   	             -- Write control for the ABL register
-		wrMAR		 : std_logic;				     -- Write control for the MAR register
+        wrAI         : std_logic;                    -- Write control for the AI register
+        wrBI         : std_logic;                    -- Write control for the BI register
+        wrAC         : std_logic;                    -- Write control for the AC register
+        wrS          : std_logic;                    -- Write control for the S register
+        wrX          : std_logic;                    -- Write control for the X register
+        wrY          : std_logic;                    -- Write control for the Y register
+        wrPCH        : std_logic;                    -- Write control for the PCH register
+        wrPCL        : std_logic;                    -- Write control for the PCL register
+        wrABH        : std_logic;                    -- Write control for the ABH register
+        wrABL        : std_logic;                    -- Write control for the ABL register
+        wrMAR         : std_logic;                   -- Write control for the MAR register
         mux_bi       : std_logic;                    -- Multiplexer selection input
-		mux_mar		 : std_logic;					 -- Multiplexer selection input
+		mux_mar		 : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_ai       : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_carry    : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_s        : std_logic;                    -- Multiplexer selection input
         mux_pc       : std_logic;                    -- Multiplexer selection input
-        mux_db		 : std_logic_vector(2 downto 0); -- DB Multiplexer selection input
-		mux_sb 		 : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
-		mux_adl 	 : std_logic_vector(1 downto 0); -- ADL Multiplexer selection input 
-		mux_adh 	 : std_logic_vector(1 downto 0); -- ADH Multiplexer selection input 
+        mux_db         : std_logic_vector(2 downto 0); -- DB Multiplexer selection input
+        mux_sb          : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
+        mux_adl      : std_logic_vector(1 downto 0); -- ADL Multiplexer selection input 
+        mux_adh      : std_logic_vector(1 downto 0); -- ADH Multiplexer selection input 
         ALUoperation : std_logic_vector(2 downto 0);
         setP         : std_logic_vector(7 downto 0);
         rstP         : std_logic_vector(7 downto 0);
@@ -293,20 +293,20 @@ package body P6502_pkg is
             --------------------------------------
             -- Subroutine and Interrupt Group --
             --------------------------------------
-			-- JSR
-			when x"20" =>   di.instruction := JSR;  di.addressMode := AABS;      di.size := 3;
-			
-			-- RTS
-			when x"60" =>   di.instruction := RTS;  di.addressMode := IMP;	 	 di.size := 1;
-			           
-            -- BRK
-            when x"00" =>   di.instruction := BRK;  di.addressMode := IMP;	 	 di.size := 1;
+            -- JSR
+            when x"20" =>   di.instruction := JSR;  di.addressMode := AABS;      di.size := 3;
             
-			--RTI
-			when x"40" =>   di.instruction := RTI;  di.addressMode := IMP;	 	 di.size := 1;
-			
-			--NOP
-			when x"EA" =>   di.instruction := NOP;  di.addressMode := IMP;	 	 di.size := 1;
+            -- RTS
+            when x"60" =>   di.instruction := RTS;  di.addressMode := IMP;          di.size := 1;
+                       
+            -- BRK
+            when x"00" =>   di.instruction := BRK;  di.addressMode := IMP;          di.size := 1;
+            
+            --RTI
+            when x"40" =>   di.instruction := RTI;  di.addressMode := IMP;          di.size := 1;
+            
+            --NOP
+            when x"EA" =>   di.instruction := NOP;  di.addressMode := IMP;          di.size := 1;
             
             when others =>   di.instruction := invalid_instruction;
         end case;                     
