@@ -1,6 +1,10 @@
  -- Changes:
  
-	Added support for LDA with Immediate and Zero Page addressing modes
-	and STA with ZPG addressing mode (address issue);
-	
-		
+	Support for synthesis and simulation;
+	Memory structured with two architectures, block ram for synthesis, common description for simulation;
+	Data Path now sensitive to falling edge clock (clk_n);
+	Bus control is now done with multiplexers instead of tri-states (better for synthesis);
+	Added Memory Address Register(MAR) to Data Path, ADL and ADH are now used as temporary registers;
+	Removed "instruction" port from data path;
+	Removed uins.wrIR control signal, no longer necessary;
+	Added support for al status flag change group instructions (2 cycles);
