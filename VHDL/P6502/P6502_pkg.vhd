@@ -20,7 +20,7 @@ package P6502_pkg is
     constant NEGATIVE  : integer := 7;
     
     -- Instructions execution cycle
-    type State is (IDLE, T0, T1, T2, T3, T5, T6, T7, BREAK);
+    type State is (IDLE, T0, T1, T2, T3, T4, T5, T6, T7, BREAK);
      
     -- Instruction_type enumeration defines the instructions decodable by the control path
     type Instruction_type is (  
@@ -62,7 +62,7 @@ package P6502_pkg is
         wrABL        : std_logic;   	             -- Write control for the ABL register
 		wrMAR		 : std_logic;				     -- Write control for the MAR register
         mux_bi       : std_logic;                    -- Multiplexer selection input
-		mux_mar		 : std_logic;					 -- Multiplexer selection input
+		mux_mar		 : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_ai       : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_carry    : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_s        : std_logic;                    -- Multiplexer selection input

@@ -24,6 +24,7 @@ add wave -noupdate -divider RAM
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/address
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/data_in
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/data_out
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/RAM/ram
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {2014 ns} 0}
 configure wave -namecolwidth 150
