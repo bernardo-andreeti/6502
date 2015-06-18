@@ -65,8 +65,11 @@ begin
                     nextState <= T1;
                     
             when T1 =>  
-                if (decIns.instruction=CLC or decIns.instruction=CLD or decIns.instruction=CLI or decIns.instruction=CLV or decIns.instruction=SECi or decIns.instruction=SED or decIns.instruction=SEI or decIns.instruction=BRK) then
+                if (decIns.instruction=CLC or decIns.instruction=CLD or decIns.instruction=CLI or decIns.instruction=CLV or decIns.instruction=SECi or decIns.instruction=SED or decIns.instruction=SEI) then
                     nextState <= T0;
+                
+                elsif decIns.instruction=BRK then  
+                    nextState <= BREAK;
                 else
                     nextState <= T2;
                 end if;
