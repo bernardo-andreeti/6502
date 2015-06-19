@@ -63,7 +63,7 @@ begin
         elsif rising_edge(clk) then
             count <= count + 1;
         end if;
-    end if;
+    end process;
     
     
     -- 6502 processor
