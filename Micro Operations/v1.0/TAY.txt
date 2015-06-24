@@ -1,0 +1,10 @@
+TAY
+---
+    - IMPLIED: TAY (a8)                      # Y <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- AC; AI <- 0
+        T3: Y <- AI + BI; wrn; wrz
+        
+   

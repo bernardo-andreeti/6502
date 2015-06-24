@@ -60,15 +60,16 @@ package P6502_pkg is
         wrPCL        : std_logic;                    -- Write control for the PCL register
         wrABH        : std_logic;                    -- Write control for the ABH register
         wrABL        : std_logic;                    -- Write control for the ABL register
-        wrMAR         : std_logic;                   -- Write control for the MAR register
+        wrMAR        : std_logic;                    -- Write control for the MAR register
         mux_bi       : std_logic;                    -- Multiplexer selection input
+        mux_address  : std_logic;                    -- Multiplexer selection input
         mux_mar      : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_ai       : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_carry    : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_s        : std_logic;                    -- Multiplexer selection input
         mux_pc       : std_logic;                    -- Multiplexer selection input
-        mux_db         : std_logic_vector(2 downto 0); -- DB Multiplexer selection input
-        mux_sb          : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
+        mux_db       : std_logic_vector(2 downto 0); -- DB Multiplexer selection input
+        mux_sb       : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
         mux_adl      : std_logic_vector(1 downto 0); -- ADL Multiplexer selection input 
         mux_adh      : std_logic_vector(1 downto 0); -- ADH Multiplexer selection input 
         ALUoperation : std_logic_vector(2 downto 0);

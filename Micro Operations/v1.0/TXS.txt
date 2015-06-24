@@ -1,0 +1,10 @@
+TXS
+---
+    - IMPLIED: TXS (9a)                      # S <- X
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- X; AI <- 0
+        T3: S <- AI + BI; wrn; wrz
+        
+   

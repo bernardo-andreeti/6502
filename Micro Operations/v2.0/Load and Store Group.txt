@@ -1,0 +1,56 @@
+Brief: 
+	- Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
+	- Lenght: 2 to 3 bytes;
+	- Cycles: 3 to 6;
+	
+States shared between different addressing modes:
+
+		ALL
+		----
+			T0: MAR <- PC ;  PC++		                    # Fetch
+			T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;			# First Decode step, IR receives opcode 
+			
+Specific States:	
+		
+		LDA
+		----
+			- IMM: LDA #01 (a9 01)           				# AC <- 01
+				T2: AC <- MEM[MAR];							# Via DB and SB
+
+			- Z-PAGE: LDA $33 (a5 33)      					# AC <- MEM[33h]
+				T2: MAR <- MEM[MAR];	    				# DB holds the address of value to be written into AC                  
+				T3: AC <- MEM[MAR];							# Via DB and SB
+       
+			 - Z-PAGE,X: LDA $13 (b5 13)                 	# AC <- MEM[13h+X]
+				T2: BI <- MEM[MAR]; AI <- X
+				T3: MAR <- AI + BI;
+				T4: AC <- MEM[MAR];	        				# Via DB and SB
+				
+			- (IND,X): LDA ($36,X) (a1 36)              	# AC <- MEM[MEM[36h+X]]    OBS: O ENDEREÇO RESULTANTE DE (IND+X) FICA DENTRO DA PÁGINA 0 (00:FF)
+				T2: BI <- MEM[MAR]; AI <- X
+				T3: MAR <- AI + BI;
+				T4: MAR <- DB;
+				T5: AC <- MEM[MAR];							# Via DB and SB
+				
+			- (IND),Y: LDA ($A5),Y (b1 a5)              	# AC <- MEM[MEM[a5h]+Y]   
+				T2: BI <- MEM[MAR]; AI <- Y
+				T3: MAR <- AI + BI;
+				T4: MAR <- DB;
+				T5: AC <- MEM[MAR];							# Via DB and SB	
+				
+			- ABS: LDA $0001 (ad 01 00)                 	# AC <- MEM[0001h]
+				T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+				T3: ABH <- MEM[MAR]; 
+				T4: AC <- MEM[ABH/ABL];	wrn; wrz;			# Via DB and SB
+				
+			- ABS,X: LDA $12F0,X (bd F0 12)             	# AC <- MEM[12F0h+X]
+			    T2: ABH <- DB; PC++;
+				
+				
+				terminar abs x e abs y, lógica correta
+				
+		STA
+		----
+			- Z-PAGE: STA $55 (85 55)                   	# MEM[55h] <- AC
+				T2: MAR <- MEM[MAR];	    				# DB holds the target address                   
+				T3: MEM[MAR] <- AC;							# Via DB and SB

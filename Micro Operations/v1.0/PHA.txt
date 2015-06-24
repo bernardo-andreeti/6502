@@ -1,0 +1,9 @@
+PHA
+---        
+    - IMPLIED: PHA (48)                   # MEM[SP] <- AC; SP--
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: ADL <- SP; ADH <- 1; SP--
+        T3: MEM[AB] <- AC;
+    

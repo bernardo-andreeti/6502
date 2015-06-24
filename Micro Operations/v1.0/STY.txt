@@ -1,0 +1,37 @@
+LDY
+---
+    - Z-PAGE: STY $33 (84 33)                   # MEM[33h] <- Y
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: MEM[AB] <- Y
+        
+    - Z-PAGE,X: STY $13 (94 13)                 # MEM[13h+X] <- Y
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: MEM[AB] <- Y
+        
+    - ABS: STY $0001 (8c 01 00)                 # MEM[0001h] <- Y
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: MEM[AB] <- Y;
+    
+    
+        
+    
+        
+     
+        
+    
+        
+    
+           
+  

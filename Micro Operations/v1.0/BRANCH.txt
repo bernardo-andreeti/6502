@@ -1,0 +1,93 @@
+BCC
+---
+    - RELATIVE: BCC $05 (90 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+        
+        # ADL ligado no MUX BI
+        - RELATIVE: BCC $05 (90 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: AI <- MEM[AB]; BI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BCS
+---
+    - RELATIVE: BCS $05 (b0 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BEQ
+---
+    - RELATIVE: BEQ $05 (f0 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BMI
+---
+    - RELATIVE: BMI $05 (30 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BNE
+---
+    - RELATIVE: BNE $05 (D0 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BPL
+---
+    - RELATIVE: BPL $05 (10 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BVC
+---
+    - RELATIVE: BVC $05 (50 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+BVS
+---
+    - RELATIVE: BVS $05 (70 05)                 # PC <- PC + 05h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+                    
+        T2: BI <- MEM[AB]; AI <- PCL            # DAQUI VOLTA PARA T0 SE A CONDIÇÃO FOR FALSA
+        T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+        T4: PCH <- AI + BI + hc
+        
+        
+Branch instructions use a signed 8-bit offset relative to the instruction after the branch
+    

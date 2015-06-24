@@ -1,0 +1,10 @@
+DEX
+---     
+    - IMPLIED: DEX (ca)                   # X <- X - 1
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- X; AI <- 0
+        T3: X <- AI + BI - 1; wrn; wnz
+   
+  

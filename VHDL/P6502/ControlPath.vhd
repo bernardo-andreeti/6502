@@ -129,7 +129,7 @@ begin
     process(decIns,currentState)
     begin
         -- Default Values
-        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","00","00",'0','0',"000","000","00","00","000",x"00",x"00",x"00",'0','0');
+        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0','0',"00","00","00",'0','0',"000","000","00","00","000",x"00",x"00",x"00",'0','0');
         
         if currentState = IDLE then
             uins.rstP(CARRY)     <= '1';
@@ -141,11 +141,11 @@ begin
             uins.rstP(NEGATIVE)  <= '1';
             uins.rstP(5)         <= '1';
                                     
-    -- Fetch
+    -- FETCH
     -- T0: MAR <- PC; PC++; (all instructions)
-    -- Decode:
+    -- DECODE
     -- T1: MAR <- PC; IR <- MEM[MAR]; PC++; (all instructions except one byte ones)
-        elsif currentState = T0 or (currentState = T1 and decIns.size > 1) then  
+        elsif currentState = T0 or (currentState = T1 and decIns.size > 1) or (currentState = T2 and decIns.size > 2) then  
             -- MAR <- PC
             uins.mux_mar <= "00";  
             uins.wrMAR   <= '1';    -- MAR <- PCH_q & PCL_q
@@ -157,8 +157,71 @@ begin
             
             -- Enable Memory Read Mode
             uins.ce <= '1';
-            uins.rw <= '1';        
-            
+            uins.rw <= '1';
+        
+        -- DECODE (absolute)    
+            if currentState = T2 then
+                uins.mux_db <= "100";   -- DB <- MEM[MAR]
+                uins.mux_adl <= "10";
+                uins.wrABL <= '1';      -- ABL <- DB
+            end if;  
+        
+    -- DECODE (zero page)
+    -- T2: MAR <- MEM[MAR];     - Decode step for Zero Page addressing mode
+        elsif (currentState = T2 and decIns.addressMode=ZPG)  then
+            uins.ce <= '1';
+            uins.rw <= '1';        -- Enable Read Mode
+            uins.mux_db <= "100";  -- DB <- MEM[MAR]
+            uins.mux_mar <= "01";   
+            uins.wrMAR <= '1';     -- MAR <- DB
+               
+    -- DECODE (second step)    
+    -- T3: ABH <- MEM[MAR];     - Second decode step for Absolute addressing mode
+        elsif (currentState = T3 and decIns.addressMode=AABS)  then
+            uins.ce <= '1';
+            uins.rw <= '1';         -- Enable Read Mode
+            uins.mux_db <= "100";   -- DB <- MEM[MAR]
+            uins.mux_adh <= "00";
+            uins.wrABH <= '1';      -- ABH <- DB
+            uins.mux_address <= '1';-- address <- ADH & ADL
+                        
+    -- EXECUTE
+        -- Execute step for Immediate (T2), ZPG (T3) and AABS (T4) 
+        elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG) or (currentState = T4 and decIns.addressMode = AABS)) then
+            if (decIns.instruction = LDA or decIns.instruction = LDX or decIns.instruction = LDY) then
+                uins.ce <= '1';
+                uins.rw <= '1';        -- Enable Read Mode
+                uins.mux_db <= "100";  -- DB <- MEM[MAR] 
+                uins.mux_sb <= "110";  -- SB <- DB
+                if decIns.instruction = LDA then
+                    uins.wrAC <= '1';  -- AC <- SB
+                elsif decIns.instruction = LDX then
+                    uins.wrX <= '1';   -- X <- SB
+                else  -- LDY
+                    uins.wrY <= '1';   -- Y <- SB
+                end if;
+                if decIns.addressMode = AABS then 
+                    uins.ceP(NEGATIVE) <= '1';
+                    uins.ceP(ZERO)     <= '1';
+                end if;
+            else -- STA, STX and STY
+                if decIns.instruction = STA then
+                    uins.mux_db <= "000";  -- DB <- AC
+                elsif decIns.instruction = STX then 
+                    uins.mux_sb <= "011";  -- SB <- X
+                    uins.mux_db <= "001";  -- DB <- SB
+                else  -- STY    
+                    uins.mux_sb <= "100";  -- SB <- Y
+                    uins.mux_db <= "001";  -- DB <- SB
+                 end if;   
+                uins.ce <= '1';
+                uins.rw <= '0';        -- Enable Write Mode : MEM[MAR] <- AC || X || Y
+            end if;
+            if decIns.addressMode = AABS then 
+                uins.mux_address <= '1';    -- address <- ADH & ADL
+            end if;    
+                        
+    -- EXECUTE (one byte instructions)
     -- T1: IR <- MEM[MAR]; P(i) <- 1 for sets, 0 for rst (One byte instructions)    
         -- Clear carry flag
         elsif decIns.instruction=CLC and currentState=T1 then
@@ -186,45 +249,7 @@ begin
             
         -- Clear overflow flag
         elsif decIns.instruction=CLV and currentState=T1 then
-            uins.rstP(OVERFLOW) <= '1';
-                    
-    -- T2 or T3: AC <- MEM[MAR]; wrn, wrz   - Execute step for Immediate (T2) and ZPG (T3) addressing mode
-        elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG)) then
-            if (decIns.instruction = LDA or decIns.instruction = LDX or decIns.instruction = LDY) then
-                uins.ce <= '1';
-                uins.rw <= '1';        -- Enable Read Mode
-                uins.mux_db <= "100";  -- DB <- MEM[MAR] 
-                uins.mux_sb <= "110";  -- SB <- DB
-                if decIns.instruction = LDA then
-                    uins.wrAC <= '1';  -- AC <- SB
-                elsif decIns.instruction = LDX then
-                    uins.wrX <= '1';   -- X <- SB
-                else  -- LDY
-                    uins.wrY <= '1';   -- Y <- SB
-                end if;
-            else -- STA, STX and STY
-                if decIns.instruction = STA then
-                    uins.mux_db <= "000";  -- DB <- AC
-                elsif decIns.instruction = STX then 
-                    uins.mux_sb <= "011";  -- SB <- X
-                    uins.mux_db <= "001";  -- DB <- SB
-                else  -- STY    
-                    uins.mux_sb <= "100";  -- SB <- Y
-                    uins.mux_db <= "001";  -- DB <- SB
-                 end if;   
-                uins.ce <= '1';
-                uins.rw <= '0';        -- Enable Write Mode : MEM[MAR] <- AC
-            end if;
-                                            
-    -- T2: MAR <- MEM[MAR];     - Decode step for Zero Page addressing mode
-        elsif (currentState = T2 and decIns.addressMode=ZPG)  then
-            uins.ce <= '1';
-            uins.rw <= '1';        -- Enable Read Mode
-            uins.mux_db <= "100";  -- DB <- MEM[MAR]
-            uins.mux_mar <= "10";   
-            uins.wrMAR <= '1';     -- MAR <- DB
-                    
-        -- working till here
+            uins.rstP(OVERFLOW) <= '1';            
 
         else
         end if;

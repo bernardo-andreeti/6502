@@ -1,0 +1,12 @@
+PLP
+---        
+    - IMPLIED: PLP (28)                   # SP++; P <- MEM[SP]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- SP; AI <- 0
+        T3: ADL <- AI + BI + 1; ADH <- 1; SP <- AI + BI + 1
+        T4: P <- MEM[AB]; 
+        
+PROCESSOR STATUS REGISTER (P) LÊ/ESCREVE NO DB
+    

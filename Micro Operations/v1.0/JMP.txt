@@ -1,0 +1,25 @@
+JMP
+---
+    - ABS: JMP $0001 (4c 01 00)                 # PC <- 0001h
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: PCL <- AI + BI; PCH <- MEM[AB]
+        
+    - IND: JMP ($0001) (6c 01 00)                 # PC <- MEM[0001h]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- MEM[AB]
+        T4: BI <- MEM[AB]; ADL <- AI + BI + 1
+        T5: PCL <- BI; PCH <- MEM[AB]; 
+        
+        
+    An original 6502 has does not correctly fetch the target address if the indirect vector falls on a 
+    page boundary (e.g. $xxFF where xx is and value from $00 to $FF). In this case fetches the LSB from $xxFF 
+    as expected but takes the MSB from $xx00. This is fixed in some later chips like the 65SC02 so for compatibility 
+    always ensure the indirect vector is not at the end of the page.
+        
+  

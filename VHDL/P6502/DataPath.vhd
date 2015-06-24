@@ -33,7 +33,7 @@ architecture structural of DataPath is
     -- Internal nets
     signal ALUresult: std_logic_vector(7 downto 0);
     signal negativeFlag, zeroFlag, carryFlag, overflowFlag, ALUcarry_in, halfCarry: std_logic;
-    signal inPC, MAR_d: std_logic_vector(15 downto 0);
+    signal inPC, MAR_d, MAR_q: std_logic_vector(15 downto 0);
     
 begin
 
@@ -218,8 +218,7 @@ begin
         );
         
     MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "00" else
-                      (ABH_q & ABL_q) when uins.mux_mar = "01" else
-                      (x"00" & DB) when uins.mux_mar = "10" else
+                      (x"00" & DB) when uins.mux_mar = "01" else
                       (SB & x"00");
         
     MAR: entity work.RegisterNbits
@@ -231,9 +230,12 @@ begin
             clk     => clk,
             rst     => rst,
             d       => MAR_d,
-            q       => address,
+            q       => MAR_q,
             ce      => uins.wrMAR
-        );    
+        );
+
+    MUX_ADDRESS: address <= MAR_q when uins.mux_address = '0' else
+                            (ABH_q & ABL_q);
         
     data_out <= DB; --when uins.ce = '1' and uins.rw = '0' else (others=>'Z');
     

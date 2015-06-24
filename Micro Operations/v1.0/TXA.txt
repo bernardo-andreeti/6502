@@ -1,0 +1,10 @@
+TXA
+---
+    - IMPLIED: TXA (8a)                      # AC <- X
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- X; AI <- 0
+        T3: AC <- AI + BI; wrn; wrz
+        
+   

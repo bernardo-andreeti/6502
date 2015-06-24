@@ -1,0 +1,21 @@
+RTS
+---
+    - IMPLIED: RTS (60)                 # SP++; PCH <- MEM[SP]; SP++; PCL <- MEM[SP] 
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]        
+        
+        T2: BI <- SP; AI <- 0
+        T3: ADL <- AI + BI + 1; ADH <- 1; SP <- AI + BI + 1
+        T4: PCL <- MEM[AB]; 
+        T5: BI <- SP; AI <- 0
+        T6: ADL <- AI + BI + 1; ADH <- 1; ADH <- 1; SP <- AI + BI + 1
+        T7: PCH <- MEM[AB]; 
+        
+      
+      
+        
+      
+        
+       
+   
+  

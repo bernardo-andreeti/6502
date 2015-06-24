@@ -1,0 +1,12 @@
+PLA
+---        
+    - IMPLIED: PLA (68)                   # SP++; AC <- MEM[SP]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- SP; AI <- 0
+        T3: ADL <- AI + BI + 1; ADH <- 1; SP <- AI + BI + 1
+        T4: BI <- MEM[AB]; AI <- 0
+        T5: AC <- AI + BI; wrn; wrz
+        
+    

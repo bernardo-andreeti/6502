@@ -1,0 +1,10 @@
+TSX
+---
+    - IMPLIED: TSX (ba)                      # X <- S
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- S; AI <- 0
+        T3: X <- AI + BI; wrn; wrz
+        
+   

@@ -1,0 +1,47 @@
+ROL
+---
+    - ACUMULATOR: ROL A (2a)                   # AC <- AC rol 1; AC(0) <- c; c <- AC(7) 
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- AC
+        T3: AC <- BI rol 1; wrn; wrz; wrc    # AC(0) <- c; c <- AC(7)     
+    
+    - Z-PAGE: ROL $33 (26 33)               # MEM[33h] <- MEM[33h] rol 1; MEM[33h](0) <- c; c <- MEM[33h](7); 
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: BI <- MEM[AB];
+        T5: MEM[AB] <- BI rol 1; wrn; wrz; wrc    # MEM[33h](0) <- c; c <- MEM[33h](7)
+        
+    - Z-PAGE,X: ROL $13 (36 13)             # MEM[13h+X] <- MEM[13h+X] rol 1; MEM[13h+X](0) <- c; c <- MEM[13h+X](7); 
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: BI <- MEM[AB];
+        T5: MEM[AB] <- BI rol 1; wrn; wrz; wrc   # MEM[13h+X](0) <- c; c <- MEM[13h+X](7)
+        
+    - ABS: ROL $0001 (2e 01 00)                 # MEM[0001h] <- MEM[0001h] rol 1; MEM[0001h](0) <- c; c <- MEM[0001h](7)
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: BI <- MEM[AB]; 
+        T5: MEM[AB] <- BI rol 1; wrn; wrz; wrc   # MEM[0001h](0) <- c; c <- MEM[0001h](7)
+        
+    - ABS,X: ROL $12F0,X (3e F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] rol 1; MEM[12F0h+X](0) <- c; c <- MEM[12F0h+X](7)
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- X              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI
+        T5: BI <- MEM[AB];
+        T6: MEM[AB] <- BI rol 1; wrn; wrz; wrc   # MEM[12F0h+X](0) <- c; c <- MEM[12F0h+X](7)
+  
+ROL shifts all bits left one position. The Carry is shifted into bit 0 and the original bit 7 is shifted into the Carry.     

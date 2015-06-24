@@ -1,0 +1,32 @@
+BIT
+---
+    - Z-PAGE: BIT $33 (24 33)                   # AC & MEM[33h]; n <- MEM(7); v <- MEM(6)
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: BI <- MEM[AB]; AI <- AC
+        T5: AC & BI; wrn; wrz; wrv              # n <- MEM(7); v <- MEM(6)  
+        
+    - ABS: BIT $0001 (2c 01 00)                 # AC & MEM[0001h]; n <- MEM(7); v <- MEM(6)
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: BI <- MEM[AB]; AI <- AC
+        T5: AI & BI; wrn; wrz; wrv              # n <- MEM(7); v <- MEM(6)
+        
+   
+        
+        
+BIT  Test Bits in Memory with Accumulator
+
+     bits 7 and 6 of operand are transfered to N and V flags
+     the zeroflag is set to the result of operand AND accumulator.
+
+     A AND MEM, MEM(7) -> N, MEM(6) -> V
+       
+        
+     

@@ -1,0 +1,32 @@
+Fetch Step
+  PC = 0503     (adc $2043 instruction  4 cycles) AABS
+    MAR<-[PC]   Place PC contents on address bus, signal read required.
+    MBR<-M[MAR] Read opcode = 8a into data register from memory.
+    IR<-[MBR]   Move opcode to instruction register.
+    PC<-[PC]+1  Increment PC. PC = 0504  
+
+                Decode opcode - next 2 bytes are address of needed data.
+
+  PC = 0504  
+    MAR<-[PC]   Place PC contents on address bus, signal read required.
+    MBR<-M[MAR] Fetch byte = 43 into data register.
+    TL<-[MBR]   Move retrieved data into lower half of 2 byte temp register.
+    PC<-[PC]+1  Increment PC. PC = 0505  
+
+  PC = 0505  
+    MAR<-[PC]   Place PC contents on address bus, signal read required.
+    MBR<-M[MAR] Fetch byte = 20 into data register.
+    TH<-[MBR]   Move retrieved data into upper half of 2 byte temp register.
+    PC<-[PC]+1  Increment PC. PC = 0506  
+
+Execute Step
+    MAR<-[TH/TL]  Move combined address to memory address register.
+    MBR<-M[MAR]   Fetch byte at memory 2043 into data register.
+    AC<-[AC]+MBR  Add data to Accumulator
+    AC<-[AC]+CC[C] Add carry if set.
+                  For 6502, programmer is responsible for setting initial value
+                  of carry register before performing math.
+
+    Change CC   Set various flags as appropriate after completing both adds.
+                N Z C I D V  Negative, zero, carry, and overflow affected.
+                + + + - - + 

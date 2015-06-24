@@ -1,0 +1,39 @@
+CPX
+---
+    - IMM: CPX #01 (e0 01)                      # X - 01
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- X
+        T3: AI - BI; wrn; wrz; wrc
+    
+    - Z-PAGE: CPX $33 (e4 33)                   # X - MEM[33h]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: BI <- MEM[AB]; AI <- X
+        T5: AI - BI; wrn; wrz; wrc  
+        
+    - ABS: CPX $0001 (ec 01 00)                 # X - MEM[0001h]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: BI <- MEM[AB]; AI <- X
+        T5: AI - BI; wrn; wrz; wrc
+        
+   
+        
+        
+Compare Instruction Results
+    Compare Result	        N	Z	C
+    A, X, or Y < Memory	    *	0	0
+    A, X, or Y = Memory	    0	1	1
+    A, X, or Y > Memory	    *	0	1
+    * The N flag will be bit 7 of A, X, or Y - Memory
+       
+        
+     

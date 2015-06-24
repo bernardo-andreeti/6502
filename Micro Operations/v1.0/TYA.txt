@@ -1,0 +1,10 @@
+TYA
+---
+    - IMPLIED: TYA (98)                      # AC <- Y
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC IR <- MEM[AB]
+        
+        T2: BI <- Y; AI <- 0
+        T3: AC <- AI + BI; wrn; wrz
+        
+   

@@ -1,0 +1,57 @@
+STX
+---        
+    - Z-PAGE: STX $33 (86 33)                   # MEM[33h] <- X
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: MEM[AB] <- X
+        
+    - Z-PAGE,Y: STX $13 (96 13)                 # MEM[13h+Y] <- X
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- Y
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: MEM[AB] <- X
+        
+    - ABS: STX $0001 (8e 01 00)                 # MEM[0001h] <- X
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: MEM[AB] <- X;
+        
+    
+        
+    
+        
+     
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+           
+  

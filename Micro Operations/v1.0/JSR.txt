@@ -1,0 +1,28 @@
+JSR
+---
+    - ABS: JSR $0001 (20 01 00)                 # PC <- 0001h; MEM[SP] <- RA_H; SP--; MEM[SP] <- RA_L; SP--; 
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]        
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB];      # EM T2 PC APONTA TERCEIRO BYTE A INSTRUCAO (ADDR HIGH BYTE DO TARGET) AB APONTA ADD LOW
+        T3: AI <- MEM[AB];
+        T4: ADL <- SP; ADH <- 1; SP--
+        T5: MEM[AB] <- PCH; ADL <- SP; ADH <- 1; SP--
+        T6: MEM[AB] <- PCL; PCL <- BI;
+        T7: PCH <- AI
+        
+        
+        T2: PC++; BI <- MEM[AB];  AI <- 0    # EM T2 PC APONTA TERCEIRO BYTE A INSTRUCAO (ADDR HIGH BYTE DO TARGET) AB APONTA ADD LOW
+        T3: ADL <- SP; ADH <- 1; SP--
+        T4: MEM[AB] <- PCH; ADL <- SP; ADH <- 1; SP--;
+        T5: MEM[AB] <- PCL; AB <- PC; PCL <- BI
+        T6: PCH <- MEM[AB]
+
+      
+      
+        
+      
+        
+       
+   
+  

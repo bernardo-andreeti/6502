@@ -1,0 +1,62 @@
+LDY
+---
+    - IMM: LDY #01 (a0 01)                      # Y <- 01
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: Y <- AI + BI; wrn; wrz
+        
+    - Z-PAGE: LDY $33 (a4 33)                   # Y <- MEM[33h]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: BI <- MEM[AB]; AI <- 0
+        T5: Y <- AI + BI; wrn; wrz
+        
+    - Z-PAGE,X: LDY $13 (b4 13)                 # Y <- MEM[13h+X]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: BI <- MEM[AB]; AI <- 0
+        T6: Y <- AI + BI; wrn; wrz
+        
+    - ABS: LDY $0001 (ac 01 00)                 # Y <- MEM[0001h]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: BI <- MEM[AB]; AI <- 0
+        T6: Y <- AI + BI; wrn; wrz
+    
+    - ABS,X: LDY $12F0,X (bc F0 12)             # Y <- MEM[12F0h+X]
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- X              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI + hc
+        T5: BI <- MEM[AB]; AI <- 0
+        T6: Y <- AI + BI; wrn; wrz
+        
+    
+        
+    
+        
+     
+        
+    
+        
+    
+           
+  
+  
+  
+  
+  
+  

@@ -1,0 +1,10 @@
+INY
+---     
+    - IMPLIED: INY (c8)                   # Y <- Y + 1
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- Y; AI <- 0
+        T3: Y <- AI + BI + 1; wrn; wnz
+   
+  

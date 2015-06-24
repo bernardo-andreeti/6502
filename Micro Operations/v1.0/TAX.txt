@@ -1,0 +1,10 @@
+TAX
+---
+    - IMPLIED: TAX (aa)                      # X <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- AC; AI <- 0
+        T3: X <- AI + BI; wrn; wrz
+        
+   

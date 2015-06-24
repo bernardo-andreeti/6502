@@ -1,0 +1,47 @@
+LSR
+---
+    - ACUMULATOR: LSR A (4a)                   # AC <- AC >> 1; c <- AC(0); AC(7) <- 0 
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; IR <- MEM[AB]
+        
+        T2: BI <- AC
+        T3: AC <- BI >> 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- 0    
+    
+    - Z-PAGE: LSR $33 (46 33)               # MEM[33h] <- MEM[33h] >> 1; c <- MEM[33h](0); MEM[33h](7) <- 0
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: BI <- MEM[AB];
+        T5: MEM[AB] <- BI >> 1; wrn; wrz; wrc    # c <- MEM[33h](0); MEM[33h](7) <- 0
+        
+    - Z-PAGE,X: LSR $13 (56 13)             # MEM[13h+X] <- MEM[13h+X] >> 1; c <- MEM[13h+X](0); MEM[13h+X](7) <- 0
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: BI <- MEM[AB];
+        T5: MEM[AB] <- BI >> 1; wrn; wrz; wrc   # c <- MEM[13h+X](0); MEM[13h+X](7) <- 0
+        
+    - ABS: LSR $0001 (4e 01 00)                 # MEM[0001h] <- MEM[0001h] >> 1; c <- MEM[0001h](0); MEM[0001h](7) <- 0
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: BI <- MEM[AB]; 
+        T5: MEM[AB] <- BI >> 1; wrn; wrz; wrc   # c <- MEM[0001h](0); MEM[0001h](7) <- 0
+        
+    - ABS,X: LSR $12F0,X (5e F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] >> 1; c <- MEM[12F0h+X](0); MEM[12F0h+X](7) <- 0
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- X              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI + hc
+        T5: BI <- MEM[AB];
+        T6: MEM[AB] <- BI >> 1; wrn; wrz; wrc   # c <- MEM[12F0h+X](0); MEM[12F0h+X](7) <- 0
+  
+LSR shifts all bits right one position. 0 is shifted into bit 7 and the original bit 0 is shifted into the Carry.     

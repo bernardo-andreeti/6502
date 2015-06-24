@@ -1,0 +1,34 @@
+- IMM: LDA (a9)         : 101 010 01
+- Z-PAGE: LDA (a5)      : 101 001 01
+- Z-PAGE,X: LDA (b5)    : 101 101 01
+- (IND,X): LDA (a1)     : 101 000 01
+- (IND),Y: LDA (b1)     : 101 100 01
+- ABS: LDA (ad)         : 101 011 01
+- ABS,X: LDA (bd)       : 101 111 01
+- ABS,Y: LDA (b9)       : 101 110 01
+
+- IMM: LDX (a2)         : 101 000 10
+- Z-PAGE: LDX (a6)      : 101 001 10
+- Z-PAGE,Y: LDX (b6)    : 101 101 10
+- ABS: LDX (ae)         : 101 011 10
+- ABS,Y: LDX (be)       : 101 111 10
+
+- IMM: LDY (a0)         : 101 000 00
+- Z-PAGE: LDY (a4)      : 101 001 00
+- Z-PAGE,X: LDY (b4)    : 101 101 00
+- ABS: LDY (ac)         : 101 011 00
+- ABS,X: LDY (bc)       : 101 111 00
+
+- IMM: CMP (c9)         : 110 010 01
+
+- Z-PAGE,Y: LDX (b6)    : 101 101 10
+- Z-PAGE,X: LDY (b4)    : 101 101 00
+
+- ACUMULATOR: ASL A (0a): 000 010 10
+
+- RELATIVE: BCS (b0)    : 101 100 00
+
+- IMPLIED: TSX (ba)     : 101 110 10
+- IMPLIED: CLC (18)     : 000 110 00
+
+- IND: JMP (6c)         : 011 011 00

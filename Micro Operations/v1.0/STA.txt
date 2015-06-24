@@ -1,0 +1,82 @@
+STA
+---     
+    - Z-PAGE: STA $33 (85 33)                   # MEM[33h] <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: MEM[AB] <- AC    
+        
+    - Z-PAGE,X: STA $13 (95 13)                 # MEM[13h+X] <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: MEM[AB] <- AC    
+    
+    - (IND,X): STA ($36,X) (81 36)              # MEM[MEM[36h+X]] <- AC    OBS: O ENDEREÇO RESULTANTE DE (IND+X) FICA DENTRO DA PÁGINA 0 (00:FF)
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0                        # AB <- ZERO PAGE ADDRESS
+        T4: ADL <- AI + BI + 1; BI <- MEM[AB]; AI <- 0;     # LÊ O LOW BYTE DO ENDEREÇO DO DADO EM BI; ADL TEM END. HIGH BYTE
+        T5: ADL <- AI + BI; ADH <- MEM[AB]
+        T6: MEM[AB] <- AC
+        
+    - (IND),Y: STA ($A5),Y (91 a5)              # MEM[MEM[a5h]+X] <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: ADL <- AI + BI + 1; BI <- MEM[AB]; AI <- Y      # LÊ LOW BYTE DO ENDEREÇO
+        T5: ADL <- BI + AI; BI <- MEM[AB]; AI <- 0;    # LÊ O HIGH BYTE DO ENDEREÇO EM BI E SOMA Y AO LOW BYTE RECÉM LIDO
+        T6: ADH <- AI + BI + hc
+        T7: MEM[AB] <- AC   
+    
+    - ABS: STA $0001 (8d 01 00)                 # MEM[0001h] <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0		# PC ENDEREÇA A MEMÓRIA PARA TRAZER A PARTE ALTA DO ENDEREÇO ONDE O DADO SERÁ SALVO
+        T3: ADL <- AI + BI; ABH <- MEM[AB]					# PARTE BAIXA DO ENDEREÇO É OBTIDA POR AI+BI, PARTE ALTA É OBTIDA A PARTIR DA PRÓPRIA MEMÓRIA (TERCEIRO BYTE DA INSTRUÇÃO)
+        T4: MEM[AB] <- AC;            								# CONTEÚDO DO ACC É SALVO NA MEMÓRIA
+		
+		**** POPOSTA CICLOS
+FETCH:
+		T0 : AB <- PC; PC++; IR <- MEM[AB]		# busca op code da instrução (8d)
+		T1: AB <- PC; PC++; 							# busca byte menos significativo do endereço (01), neste momento PCL endereça ABL
+		T2: AB <- PC; PC++;								# busca byte mais significativo do endereço (00), neste momento PCH endereça ABH
+EXEC:		
+		T3: MEM[AB] <- AC;								# memoria endereçada previamente recebe dado do acumulador
+    
+    - ABS,X: STA $12F0,X (9d F0 12)             # MEM[12F0h+X] <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- X              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI + hc
+        T5: MEM[AB] <- AC;
+        
+    - ABS,Y: STA $12F0,Y (99 F0 12)             # MEM[12F0h+Y] <- AC
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- Y              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI + hc
+        T5: MEM[AB] <- AC;
+        
+    
+        
+     
+        
+    
+        
+    
+           
+  

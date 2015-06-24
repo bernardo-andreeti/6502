@@ -1,6 +1,6 @@
  -- Changes:
  
-	Added support for LDX, LDY, STX and STY with ZPG addressing mode;
-    IR receives opcode at T1 cycle instead of T0 to avoid issues with store instructions;
+	Added support for absolute addressing mode, load and store group tested;
+    Added a multiplexer to data path in order to change address source (MAR or ABH & ABL);
 	
 		

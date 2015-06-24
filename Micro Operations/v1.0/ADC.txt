@@ -1,0 +1,88 @@
+ADC
+---
+    - IMM: ADC #01 (69 01)                      # AC <- AC + 01 + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- AC  
+        T3: AC <- AI + BI + c; wrn; wrz; wrc; wrv; 
+        
+    - Z-PAGE: ADC $33 (65 33)                   # AC <- AC + MEM[33h] + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0;
+        T4: BI <- MEM[AB]; AI <- AC  
+        T5: AC <- AI + BI + c; wrn; wrz; wrc; wrv;
+         
+    - Z-PAGE,X: adc $13 (75 13)                 # AC <- AC + MEM[13h+X] + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+       
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: BI <- MEM[AB]; AI <- AC  
+        T5: AC <- AI + BI + c; wrn; wrz; wrc; wrv;
+    
+    - (IND,X): ADC ($36,X) (61 36)              # AC <- AC + MEM[MEM[36h+X]] + c    OBS: O ENDEREÇO RESULTANTE DE (IND+X) FICA DENTRO DA PÁGINA 0 (00:FF)
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- X
+        T3: ADL <- AI + BI; ADH <- 0                        # AB <- ZERO PAGE ADDRESS
+        T4: ADL <- AI + BI + 1; BI <- MEM[AB]; AI <- 0;     # LÊ O LOW BYTE DO ENDEREÇO DO DADO EM BI; ADL TEM END. HIGH BYTE
+        T5: ADL <- AI + BI; ADH <- MEM[AB]
+        T6: BI <- MEM[AB]; AI <- AC  
+        T7: AC <- AI + BI + c; wrn; wrz; wrc; wrv;
+        
+    - (IND),Y: ADC ($A5),Y (71 a5)              # AC <- AC + MEM[MEM[a5h]+X] + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ADH <- 0
+        T4: ADL <- AI + BI + 1; BI <- MEM[AB]; AI <- Y      # LÊ LOW BYTE DO ENDEREÇO
+        T5: ADL <- BI + AI; BI <- MEM[AB]; AI <- 0;    # LÊ O HIGH BYTE DO ENDEREÇO EM BI E SOMA Y AO LOW BYTE RECÉM LIDO
+        T6: ADH <- AI + BI + hc
+        T7: BI <- MEM[AB]; AI <- AC  
+        T8: AC <- AI + BI + c; wrn; wrz; wrc; wrv;   
+    
+    - ABS: ADC $0001 (6d 01 00)                 # AC <- AC + MEM[0001h] + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- 0
+        T3: ADL <- AI + BI; ABH <- MEM[AB]
+        T4: BI <- MEM[AB]; AI <- AC  
+        T5: AC <- AI + BI + c; wrn; wrz; wrc; wrv;            
+    
+    - ABS,X: ADC $12F0,X (7d F0 12)             # AC <- AC + MEM[12F0h+X] + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- X              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI + hc
+        T5: BI <- MEM[AB]; AI <- AC  
+        T6: AC <- AI + BI + c; wrn; wrz; wrc; wrv;
+        
+    - ABS,Y: ADC $12F0,Y (79 F0 12)             # AC <- AC + MEM[12F0h+Y] + c
+        T0: AB <- PC; PC++; 
+        T1: AB <- PC; PC++; IR <- MEM[AB]
+        
+        T2: AB <- PC; PC++; BI <- MEM[AB]; AI <- Y              # LÊ LOW BYTE DO END. BASE
+        T3: ADL <- AI + BI; BI <- MEM[AB]; AI <- 0         # BI <- HIGH BYTE DA BASE
+        T4: ADH <- AI + BI + hc
+        T5: BI <- MEM[AB]; AI <- AC  
+        T6: AC <- AI + BI + c; wrn; wrz; wrc; wrv;
+        
+    
+        
+     
+        
+    
+        
+    
+           
+  

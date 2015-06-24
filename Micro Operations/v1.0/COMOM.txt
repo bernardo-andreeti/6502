@@ -1,0 +1,11 @@
+T2: BI <- MEM[AB]; AI <- 0
+
+T3: AC <- AI + BI + 0; wrn; wrz
+
+T3: ADL <- AI + BI; ADH <- 0;
+
+ADH <- AI + BI + hc
+
+BI <- MEM[AB]; AI <- AC     # Lógicas/aritméticas/CMP
+
+BI <- MEM[AB]; AI <- X
