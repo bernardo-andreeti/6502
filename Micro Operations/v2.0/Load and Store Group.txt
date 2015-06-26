@@ -1,56 +1,179 @@
 Brief: 
-	- Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
-	- Lenght: 2 to 3 bytes;
-	- Cycles: 3 to 6;
-	
+    - Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
+    - Lenght: 2 to 3 bytes;
+    - Cycles: 3 to 6;
+    
 States shared between different addressing modes:
 
-		ALL
-		----
-			T0: MAR <- PC ;  PC++		                    # Fetch
-			T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;			# First Decode step, IR receives opcode 
-			
-Specific States:	
-		
-		LDA
-		----
-			- IMM: LDA #01 (a9 01)           				# AC <- 01
-				T2: AC <- MEM[MAR];							# Via DB and SB
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;          # First Decode step, IR receives opcode 
+            
+Specific States:    
+        
+        LDA
+        ----
+            - IMM: LDA #01 (a9 01)                          # AC <- 01
+                T2: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB
 
-			- Z-PAGE: LDA $33 (a5 33)      					# AC <- MEM[33h]
-				T2: MAR <- MEM[MAR];	    				# DB holds the address of value to be written into AC                  
-				T3: AC <- MEM[MAR];							# Via DB and SB
+            - Z-PAGE: LDA $33 (a5 33)                       # AC <- MEM[33h]
+                T2: MAR <- MEM[MAR];                        # DB holds the address of value to be written into AC                  
+                T3: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB
        
-			 - Z-PAGE,X: LDA $13 (b5 13)                 	# AC <- MEM[13h+X]
-				T2: BI <- MEM[MAR]; AI <- X
-				T3: MAR <- AI + BI;
-				T4: AC <- MEM[MAR];	        				# Via DB and SB
-				
-			- (IND,X): LDA ($36,X) (a1 36)              	# AC <- MEM[MEM[36h+X]]    OBS: O ENDEREÇO RESULTANTE DE (IND+X) FICA DENTRO DA PÁGINA 0 (00:FF)
-				T2: BI <- MEM[MAR]; AI <- X
-				T3: MAR <- AI + BI;
-				T4: MAR <- DB;
-				T5: AC <- MEM[MAR];							# Via DB and SB
-				
-			- (IND),Y: LDA ($A5),Y (b1 a5)              	# AC <- MEM[MEM[a5h]+Y]   
-				T2: BI <- MEM[MAR]; AI <- Y
-				T3: MAR <- AI + BI;
-				T4: MAR <- DB;
-				T5: AC <- MEM[MAR];							# Via DB and SB	
-				
-			- ABS: LDA $0001 (ad 01 00)                 	# AC <- MEM[0001h]
-				T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
-				T3: ABH <- MEM[MAR]; 
-				T4: AC <- MEM[ABH/ABL];	wrn; wrz;			# Via DB and SB
-				
-			- ABS,X: LDA $12F0,X (bd F0 12)             	# AC <- MEM[12F0h+X]
-			    T2: ABH <- DB; PC++;
-				
-				
-				terminar abs x e abs y, lógica correta
-				
-		STA
-		----
-			- Z-PAGE: STA $55 (85 55)                   	# MEM[55h] <- AC
-				T2: MAR <- MEM[MAR];	    				# DB holds the target address                   
-				T3: MEM[MAR] <- AC;							# Via DB and SB
+            - Z-PAGE,X: LDA $13 (b5 13)                     # AC <- MEM[13h+X]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: MAR <- AI + BI;
+                T4: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB
+                
+            - (IND,X): LDA ($36,X) (a1 36)                  # AC <- MEM[MEM[36h+X]] : Results in zero page address!
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: MAR <- AI + BI;
+                T4: MAR <- DB;
+                T5: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB
+                
+            - (IND),Y: LDA ($A5),Y (b1 a5)                  # AC <- MEM[MEM[a5h]+Y]   
+                T2: BI <- MEM[MAR]; AI <- Y
+                T3: MAR <- AI + BI;
+                T4: MAR <- DB;
+                T5: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB 
+                
+            - ABS: LDA $0001 (ad 01 00)                     # AC <- MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]; 
+                T4: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB
+                
+            - ABS,X: LDA $12F0,X (bd F0 12)                 # AC <- MEM[12F0h+X]
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+X]
+                T5: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB
+                
+            - ABS,Y: LDA $12F0,Y (b9 F0 12)                 # AC <- MEM[12F0h+Y]    
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
+                T5: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB
+        
+        LDX
+        ----
+            - IMM: LDX #01 (a2 01)                          # X <- 01
+                T2: X <- MEM[MAR];  wrn; wrz;               # Via DB and SB
+
+            - Z-PAGE: LDX $33 (a6 33)                       # X <- MEM[33h]
+                T2: MAR <- MEM[MAR];                        # DB holds the address of value to be written into AC                  
+                T3: X <- MEM[MAR];  wrn; wrz;               # Via DB and SB
+            
+            - Z-PAGE,Y: LDX $13 (b6 13)                     # X <- MEM[13h+Y]
+                T2: BI <- MEM[MAR]; AI <- Y
+                T3: MAR <- AI + BI;
+                T4: X <- MEM[MAR];  wrn; wrz;               # Via DB and SB    
+            
+            - ABS: LDX $0001 (ae 01 00)                     # X <- MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]; 
+                T4: X <- MEM[ABH/ABL];  wrn; wrz;           # Via DB and SB
+                
+            - ABS,Y: LDX $12F0,Y (be F0 12)                 # X <- MEM[12F0h+Y]  
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
+                T5: X <- MEM[ABH/ABL];  wrn; wrz;           # Via DB and SB    
+        
+        LDY
+        ----
+            - IMM: LDY #01 (a0 01)                          # Y <- 01   
+                T2: Y <- MEM[MAR];  wrn; wrz;               # Via DB and SB
+
+            - Z-PAGE: LDY $33 (a4 33)                       # Y <- MEM[33h]
+                T2: MAR <- MEM[MAR];                        # DB holds the address of value to be written into AC                  
+                T3: Y <- MEM[MAR];  wrn; wrz;               # Via DB and SB
+            
+            - Z-PAGE,X: LDY $13 (b4 13)                     # Y <- MEM[13h+X]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: MAR <- AI + BI;
+                T4: Y <- MEM[MAR];  wrn; wrz;               # Via DB and SB    
+            
+            - ABS: LDY $0001 (ac 01 00)                     # Y <- MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]; 
+                T4: Y <- MEM[ABH/ABL];  wrn; wrz;           # Via DB and SB
+                
+            - ABS,X: LDY $12F0,X (bc F0 12)                 # Y <- MEM[12F0h+X]
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
+                T5: Y <- MEM[ABH/ABL];  wrn; wrz;           # Via DB and SB
+        
+        STA
+        ----
+            - Z-PAGE: STA $55 (85 55)                       # MEM[55h] <- AC
+                T2: MAR <- MEM[MAR];                        # DB holds the target address                   
+                T3: MEM[MAR] <- AC;                         # Via DB and SB
+                
+            - Z-PAGE,X: STA $13 (95 13)                     # MEM[13h+X] <- AC
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: MAR <- AI + BI;
+                T4: MEM[MAR] <- AC;                         # Via DB and SB 
+
+            - (IND,X): STA ($36,X) (81 36)                  # MEM[MEM[36h+X]] <- AC  
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: MAR <- AI + BI;
+                T4: MAR <- DB;
+                T5: MEM[MAR] <- AC;                         # Via DB and SB
+            
+            - (IND),Y: STA ($A5),Y (91 a5)                  # MEM[MEM[a5h]+X] <- AC 
+                T2: BI <- MEM[MAR]; AI <- Y
+                T3: MAR <- AI + BI;
+                T4: MAR <- DB;
+                T5: MEM[MAR] <- AC;                         # Via DB and SB
+                
+            - ABS: STA $0001 (8d 01 00)                     # MEM[0001h] <- AC 
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]; 
+                T4: MEM[ABH/ABL] <- AC;                     # Via DB and SB
+                
+            - ABS,X: STA $12F0,X (9d F0 12)                 # MEM[12F0h+X] <- AC
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+X]
+                T5: MEM[ABH/ABL] <- AC;                     # Via DB and SB
+                
+            - ABS,Y: STA $12F0,Y (99 F0 12)                 # MEM[12F0h+Y] <- AC
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
+                T5: MEM[ABH/ABL] <- AC;                     # Via DB and SB
+                
+        STX
+        ----
+            - Z-PAGE: STX $33 (86 33)                       # MEM[33h] <- X
+                T2: MAR <- MEM[MAR];                        # DB holds the target address                   
+                T3: MEM[MAR] <- X;                          # Via DB and SB
+        
+            - Z-PAGE,Y: STX $13 (96 13)                     # MEM[13h+Y] <- X
+                T2: BI <- MEM[MAR]; AI <- Y
+                T3: MAR <- AI + BI;
+                T4: MEM[MAR] <- X;                          # Via DB and SB 
+        
+            - ABS: STX $0001 (8e 01 00)                     # MEM[0001h] <- X
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]; 
+                T4: MEM[ABH/ABL] <- X;                      # Via DB and SB
+        
+        STY
+        ----
+            - Z-PAGE: STY $33 (84 33)                       # MEM[33h] <- Y
+                T2: MAR <- MEM[MAR];                        # DB holds the target address                   
+                T3: MEM[MAR] <- Y;                          # Via DB and SB
+        
+            - Z-PAGE,X: STY $13 (94 13)                     # MEM[13h+X] <- Y
+                T2: BI <- MEM[MAR]; AI <- Y
+                T3: MAR <- AI + BI;
+                T4: MEM[MAR] <- Y;                          # Via DB and SB 
+        
+            - ABS: STY $0001 (8c 01 00)                     # MEM[0001h] <- Y
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]; 
+                T4: MEM[ABH/ABL] <- Y;                      # Via DB and SB
+        
