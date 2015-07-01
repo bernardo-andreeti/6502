@@ -3,8 +3,8 @@
 -- DESCRIPTION  : 6502 Control Logic                                                --                    
 -- AUTHOR       : Everton Alceu Carara and Bernardo Favero Andreeti                 --
 -- CREATED      : Feb, 2015                                                         --
--- VERSION      : 1.0                                                               --
--- HISTORY      : Version 1.0 - Feb, 2015 - Everton Alceu Carara                    --
+-- VERSION      : 0.7                                                               --
+-- HISTORY      : Version 0.1 - Feb, 2015 - Everton Alceu Carara                    --
 --------------------------------------------------------------------------------------
 
 library IEEE;
@@ -89,15 +89,22 @@ begin
                 end if; 
                 
             when T4 => 
-                if (decIns.addressMode=AABS) then
+                if (decIns.addressMode=AABS or decIns.addressMode=ZPG_XY) then
                     nextState <= T0;
                 else
                     nextState <= T5;
                 end if;
             
             when T5 =>
+            if (decIns.addressMode=IND_X or decIns.addressMode=IND_Y) then
+                    nextState <= T0;
+            else
+                    nextState <= T6;
+            end if;
             
-                nextState <= T0;
+            when T6 =>
+            
+                nextState <= T0;    
 
             when BREAK =>
                 nextState <= BREAK;
@@ -166,28 +173,52 @@ begin
                 uins.wrABL <= '1';      -- ABL <- DB
             end if;  
         
-    -- DECODE (zero page)
-    -- T2: MAR <- MEM[MAR];     - Decode step for Zero Page addressing mode
-        elsif (currentState = T2 and decIns.addressMode=ZPG)  then
+    -- DECODE (ZPG, IND_X and IND_Y)
+    -- T2 or T4: MAR <- MEM[MAR];    
+        elsif ((currentState = T2 and (decIns.addressMode=ZPG or decIns.addressMode = IND_Y)) or (currentState = T4 and decIns.addressMode = IND_X)) then
             uins.ce <= '1';
             uins.rw <= '1';        -- Enable Read Mode
             uins.mux_db <= "100";  -- DB <- MEM[MAR]
             uins.mux_mar <= "01";   
             uins.wrMAR <= '1';     -- MAR <- DB
-               
+            
+    -- DECODE (ZPG_XY, IND_X, IND_Y)
+    -- T2 or T3: BI <- MEM[MAR]; AI <- X/Y         
+        elsif (currentState = T2 and (decIns.addressMode=ZPG_XY or decIns.addressMode=IND_X) or (currentState = T3 and decIns.addressMode=IND_Y)) then
+            uins.ce <= '1';
+            uins.rw <= '1';        -- Enable Read Mode
+            uins.mux_db <= "100";  -- DB <- MEM[MAR]
+            uins.wrBI <= '1';      -- BI <- DB
+            if (decIns.instruction = LDA or decIns.instruction = LDY or decIns.instruction = STA or decIns.instruction = STY or decIns.addressMode = IND_X) then  
+                uins.mux_sb <= "011";  -- SB <- X
+            else
+                uins.mux_sb <= "100";  -- SB <- Y
+            end if;
+            uins.mux_ai <= "10";   
+            uins.wrAI <= '1';      -- AI <- SB
+            
+    -- DECODE (second step for ZPG_XY, IND_X, IND_Y)
+    -- T3 or T4: ABL <- AI + BI;          
+        elsif ((currentState = T3 and (decIns.addressMode=ZPG_XY or decIns.addressMode=IND_X)) or (currentState = T4 and decIns.addressMode = IND_Y)) then
+            uins.ALUoperation <= "101";
+            uins.wrABL <= '1';       -- ABL <- AI + BI  
+            uins.mux_adh <= "10";
+            uins.wrABH <= '1';       -- ABH <- x"00"
+            uins.mux_address <= '1'; -- address <- ABH & ABL
+
     -- DECODE (second step)    
     -- T3: ABH <- MEM[MAR];     - Second decode step for Absolute addressing mode
-        elsif (currentState = T3 and decIns.addressMode=AABS)  then
+        elsif (currentState = T3 and decIns.addressMode=AABS) then
             uins.ce <= '1';
             uins.rw <= '1';         -- Enable Read Mode
             uins.mux_db <= "100";   -- DB <- MEM[MAR]
             uins.mux_adh <= "00";
             uins.wrABH <= '1';      -- ABH <- DB
-            uins.mux_address <= '1';-- address <- ADH & ADL
-                        
+            uins.mux_address <= '1';-- address <- ABH & ABL    
+                            
     -- EXECUTE
-        -- Execute step for Immediate (T2), ZPG (T3) and AABS (T4) 
-        elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG) or (currentState = T4 and decIns.addressMode = AABS)) then
+        -- Load and Store Group (all addressing modes)
+        elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG) or (currentState = T4 and (decIns.addressMode = AABS or decIns.addressMode = ZPG_XY)) or (currentState = T5 and (decIns.addressMode = IND_X or decIns.addressMode = IND_Y or decIns.addressMode = ABS_XY))) then
             if (decIns.instruction = LDA or decIns.instruction = LDX or decIns.instruction = LDY) then
                 uins.ce <= '1';
                 uins.rw <= '1';        -- Enable Read Mode
@@ -200,10 +231,8 @@ begin
                 else  -- LDY
                     uins.wrY <= '1';   -- Y <- SB
                 end if;
-                if decIns.addressMode = AABS then 
-                    uins.ceP(NEGATIVE) <= '1';
-                    uins.ceP(ZERO)     <= '1';
-                end if;
+                uins.ceP(NEGATIVE) <= '1';
+                uins.ceP(ZERO)     <= '1';
             else -- STA, STX and STY
                 if decIns.instruction = STA then
                     uins.mux_db <= "000";  -- DB <- AC
@@ -217,8 +246,8 @@ begin
                 uins.ce <= '1';
                 uins.rw <= '0';        -- Enable Write Mode : MEM[MAR] <- AC || X || Y
             end if;
-            if decIns.addressMode = AABS then 
-                uins.mux_address <= '1';    -- address <- ADH & ADL
+            if (decIns.addressMode = AABS or decIns.addressMode = ZPG_XY or decIns.addressMode=IND_Y) then 
+                uins.mux_address <= '1';    -- address <- ABH & ABL
             end if;    
                         
     -- EXECUTE (one byte instructions)
