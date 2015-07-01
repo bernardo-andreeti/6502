@@ -41,7 +41,7 @@ package P6502_pkg is
         invalid_instruction
     );
     
-    type AddressMode_type is (IMM, ZPG, ZPG_XY, IND_X, IND_Y, AABS, ABS_XY, IMP);
+    type AddressMode_type is (IMM, ZPG, ZPG_XY, IND_X, IND_Y, AABS, ABS_X, ABS_Y, IMP);
     
     type DecodedInstruction_type is record
         instruction        : Instruction_type;
@@ -99,8 +99,8 @@ package body P6502_pkg is
             when x"AD" =>   di.instruction := LDA;  di.addressMode := AABS;     di.size := 3;
             when x"A5" =>   di.instruction := LDA;  di.addressMode := ZPG;      di.size := 2;
             when x"A9" =>   di.instruction := LDA;  di.addressMode := IMM;      di.size := 2;
-            when x"BD" =>   di.instruction := LDA;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"B9" =>   di.instruction := LDA;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"BD" =>   di.instruction := LDA;  di.addressMode := ABS_X;    di.size := 3;
+            when x"B9" =>   di.instruction := LDA;  di.addressMode := ABS_Y;    di.size := 3;
             when x"B5" =>   di.instruction := LDA;  di.addressMode := ZPG_XY;   di.size := 2;
             when x"A1" =>   di.instruction := LDA;  di.addressMode := IND_X;    di.size := 2;
             when x"B1" =>   di.instruction := LDA;  di.addressMode := IND_Y;    di.size := 2;
@@ -109,21 +109,21 @@ package body P6502_pkg is
             when x"AE" =>   di.instruction := LDX;  di.addressMode := AABS;     di.size := 3;
             when x"A6" =>   di.instruction := LDX;  di.addressMode := ZPG;      di.size := 2;
             when x"A2" =>   di.instruction := LDX;  di.addressMode := IMM;      di.size := 2;
-            when x"BE" =>   di.instruction := LDX;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"BE" =>   di.instruction := LDX;  di.addressMode := ABS_Y;   di.size := 3;
             when x"B6" =>   di.instruction := LDX;  di.addressMode := ZPG_XY;   di.size := 2;
                                  
             -- LDY
             when x"AC" =>   di.instruction := LDY;  di.addressMode := AABS;     di.size := 3;
             when x"A4" =>   di.instruction := LDY;  di.addressMode := ZPG;      di.size := 2;
             when x"A0" =>   di.instruction := LDY;  di.addressMode := IMM;      di.size := 2;
-            when x"BC" =>   di.instruction := LDY;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"BC" =>   di.instruction := LDY;  di.addressMode := ABS_X;   di.size := 3;
             when x"B4" =>   di.instruction := LDY;  di.addressMode := ZPG_XY;   di.size := 2;
             
             -- STA
             when x"8D" =>   di.instruction := STA;  di.addressMode := AABS;     di.size := 3;
             when x"85" =>   di.instruction := STA;  di.addressMode := ZPG;      di.size := 2;
-            when x"9D" =>   di.instruction := STA;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"99" =>   di.instruction := STA;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"9D" =>   di.instruction := STA;  di.addressMode := ABS_X;   di.size := 3;
+            when x"99" =>   di.instruction := STA;  di.addressMode := ABS_Y;   di.size := 3;
             when x"95" =>   di.instruction := STA;  di.addressMode := ZPG_XY;   di.size := 2;
             when x"81" =>   di.instruction := STA;  di.addressMode := IND_X;    di.size := 2;
             when x"91" =>   di.instruction := STA;  di.addressMode := IND_Y;    di.size := 2;
@@ -146,8 +146,8 @@ package body P6502_pkg is
             when x"6D" =>   di.instruction := ADC;  di.addressMode := AABS;     di.size := 3;
             when x"65" =>   di.instruction := ADC;  di.addressMode := ZPG;      di.size := 2;
             when x"69" =>   di.instruction := ADC;  di.addressMode := IMM;      di.size := 2;
-            when x"7D" =>   di.instruction := ADC;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"79" =>   di.instruction := ADC;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"7D" =>   di.instruction := ADC;  di.addressMode := ABS_X;    di.size := 3;
+            when x"79" =>   di.instruction := ADC;  di.addressMode := ABS_Y;    di.size := 3;
             when x"75" =>   di.instruction := ADC;  di.addressMode := ZPG_XY;   di.size := 2;
             when x"61" =>   di.instruction := ADC;  di.addressMode := IND_X;    di.size := 2;
             when x"71" =>   di.instruction := ADC;  di.addressMode := IND_Y;    di.size := 2;
@@ -156,8 +156,8 @@ package body P6502_pkg is
             when x"ED" =>   di.instruction := SBC;  di.addressMode := AABS;     di.size := 3;
             when x"E5" =>   di.instruction := SBC;  di.addressMode := ZPG;      di.size := 2;
             when x"E9" =>   di.instruction := SBC;  di.addressMode := IMM;      di.size := 2;
-            when x"FD" =>   di.instruction := SBC;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"F9" =>   di.instruction := SBC;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"FD" =>   di.instruction := SBC;  di.addressMode := ABS_X;    di.size := 3;
+            when x"F9" =>   di.instruction := SBC;  di.addressMode := ABS_Y;    di.size := 3;
             when x"F5" =>   di.instruction := SBC;  di.addressMode := ZPG_XY;   di.size := 2;
             when x"E1" =>   di.instruction := SBC;  di.addressMode := IND_X;    di.size := 2;
             when x"F1" =>   di.instruction := SBC;  di.addressMode := IND_Y;    di.size := 2;
@@ -169,7 +169,7 @@ package body P6502_pkg is
             -- INC
             when x"EE" =>   di.instruction := INC;  di.addressMode := AABS;     di.size := 3;
             when x"E6" =>   di.instruction := INC;  di.addressMode := ZPG;      di.size := 2;
-            when x"FE" =>   di.instruction := INC;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"FE" =>   di.instruction := INC;  di.addressMode := ABS_X;    di.size := 3;
             when x"F6" =>   di.instruction := INC;  di.addressMode := ZPG_XY;   di.size := 2;
             
             -- INX
@@ -181,7 +181,7 @@ package body P6502_pkg is
             -- DEC
             when x"CE" =>   di.instruction := DEC;  di.addressMode := AABS;     di.size := 3;
             when x"C6" =>   di.instruction := DEC;  di.addressMode := ZPG;      di.size := 2;
-            when x"DE" =>   di.instruction := DEC;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"DE" =>   di.instruction := DEC;  di.addressMode := ABS_X;    di.size := 3;
             when x"D6" =>   di.instruction := DEC;  di.addressMode := ZPG_XY;   di.size := 2;
             
             -- DEX
@@ -214,8 +214,8 @@ package body P6502_pkg is
             when x"2D" =>   di.instruction := AAND;  di.addressMode := AABS;     di.size := 3;
             when x"25" =>   di.instruction := AAND;  di.addressMode := ZPG;      di.size := 2;
             when x"29" =>   di.instruction := AAND;  di.addressMode := IMM;      di.size := 2;
-            when x"3D" =>   di.instruction := AAND;  di.addressMode := ABS_XY;   di.size := 3;
-            when x"39" =>   di.instruction := AAND;  di.addressMode := ABS_XY;   di.size := 3;
+            when x"3D" =>   di.instruction := AAND;  di.addressMode := ABS_X;    di.size := 3;
+            when x"39" =>   di.instruction := AAND;  di.addressMode := ABS_Y;    di.size := 3;
             when x"35" =>   di.instruction := AAND;  di.addressMode := ZPG_XY;   di.size := 2;
             when x"21" =>   di.instruction := AAND;  di.addressMode := IND_X;    di.size := 2;
             when x"31" =>   di.instruction := AAND;  di.addressMode := IND_Y;    di.size := 2;
@@ -224,8 +224,8 @@ package body P6502_pkg is
             when x"4D" =>   di.instruction := EOR;  di.addressMode := AABS;      di.size := 3;
             when x"45" =>   di.instruction := EOR;  di.addressMode := ZPG;       di.size := 2;
             when x"49" =>   di.instruction := EOR;  di.addressMode := IMM;       di.size := 2;
-            when x"5D" =>   di.instruction := EOR;  di.addressMode := ABS_XY;    di.size := 3;
-            when x"59" =>   di.instruction := EOR;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"5D" =>   di.instruction := EOR;  di.addressMode := ABS_X;     di.size := 3;
+            when x"59" =>   di.instruction := EOR;  di.addressMode := ABS_Y;     di.size := 3;
             when x"55" =>   di.instruction := EOR;  di.addressMode := ZPG_XY;    di.size := 2;
             when x"41" =>   di.instruction := EOR;  di.addressMode := IND_X;     di.size := 2;
             when x"51" =>   di.instruction := EOR;  di.addressMode := IND_Y;     di.size := 2;
@@ -234,8 +234,8 @@ package body P6502_pkg is
             when x"0D" =>   di.instruction := ORA;  di.addressMode := AABS;      di.size := 3;
             when x"05" =>   di.instruction := ORA;  di.addressMode := ZPG;       di.size := 2;
             when x"09" =>   di.instruction := ORA;  di.addressMode := IMM;       di.size := 2;
-            when x"1D" =>   di.instruction := ORA;  di.addressMode := ABS_XY;    di.size := 3;
-            when x"19" =>   di.instruction := ORA;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"1D" =>   di.instruction := ORA;  di.addressMode := ABS_X;     di.size := 3;
+            when x"19" =>   di.instruction := ORA;  di.addressMode := ABS_Y;     di.size := 3;
             when x"15" =>   di.instruction := ORA;  di.addressMode := ZPG_XY;    di.size := 2;
             when x"01" =>   di.instruction := ORA;  di.addressMode := IND_X;     di.size := 2;
             when x"11" =>   di.instruction := ORA;  di.addressMode := IND_Y;     di.size := 2;
@@ -248,8 +248,8 @@ package body P6502_pkg is
             when x"CD" =>   di.instruction := CMP;  di.addressMode := AABS;      di.size := 3;
             when x"C5" =>   di.instruction := CMP;  di.addressMode := ZPG;       di.size := 2;
             when x"C9" =>   di.instruction := CMP;  di.addressMode := IMM;       di.size := 2;
-            when x"DD" =>   di.instruction := CMP;  di.addressMode := ABS_XY;    di.size := 3;
-            when x"D9" =>   di.instruction := CMP;  di.addressMode := ABS_XY;    di.size := 3;
+            when x"DD" =>   di.instruction := CMP;  di.addressMode := ABS_X;     di.size := 3;
+            when x"D9" =>   di.instruction := CMP;  di.addressMode := ABS_Y;     di.size := 3;
             when x"D5" =>   di.instruction := CMP;  di.addressMode := ZPG_XY;    di.size := 2;
             when x"C1" =>   di.instruction := CMP;  di.addressMode := IND_X;     di.size := 2;
             when x"D1" =>   di.instruction := CMP;  di.addressMode := IND_Y;     di.size := 2;

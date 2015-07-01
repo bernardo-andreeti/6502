@@ -45,13 +45,13 @@ Specific States:
                 
             - ABS,X: LDA $12F0,X (bd F0 12)                 # AC <- MEM[12F0h+X]
                 T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
-                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+X]
                 T5: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB
                 
             - ABS,Y: LDA $12F0,Y (b9 F0 12)                 # AC <- MEM[12F0h+Y]    
                 T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
-                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
                 T5: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB
         
@@ -76,7 +76,7 @@ Specific States:
                 
             - ABS,Y: LDX $12F0,Y (be F0 12)                 # X <- MEM[12F0h+Y]  
                 T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
-                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
                 T5: X <- MEM[ABH/ABL];  wrn; wrz;           # Via DB and SB    
         
@@ -101,7 +101,7 @@ Specific States:
                 
             - ABS,X: LDY $12F0,X (bc F0 12)                 # Y <- MEM[12F0h+X]
                 T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
-                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
                 T5: Y <- MEM[ABH/ABL];  wrn; wrz;           # Via DB and SB
         
@@ -135,13 +135,13 @@ Specific States:
                 
             - ABS,X: STA $12F0,X (9d F0 12)                 # MEM[12F0h+X] <- AC
                 T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
-                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+X]
                 T5: MEM[ABH/ABL] <- AC;                     # Via DB and SB
                 
             - ABS,Y: STA $12F0,Y (99 F0 12)                 # MEM[12F0h+Y] <- AC
                 T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
-                T3: ABL <- AI + BI; BI <- MEM[AB]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;     # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                    # ABH & ABL <- [12F0h+Y]
                 T5: MEM[ABH/ABL] <- AC;                     # Via DB and SB
                 

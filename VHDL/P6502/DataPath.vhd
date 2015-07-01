@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------------
 -- DESIGN UNIT  : Data path                                                         --
 -- DESCRIPTION  : Organization described in 6502.circ (Logisim schematic)           --
--- AUTHOR       : Everton Alceu Carara                                              --
+-- AUTHOR       : Everton Alceu Carara and Bernardo Andreeti                        --
 -- CREATED      : Feb, 2015                                                         --
--- VERSION      : 1.0                                                               --
--- HISTORY      : Version 1.0 - Feb, 2015 - Everton Alceu Carara                    --
+-- VERSION      : 0.7                                                               --
+-- HISTORY      : Version 0.1 - Feb, 2015 - Everton Alceu Carara                    --
 --------------------------------------------------------------------------------------
 
 library IEEE;
@@ -255,6 +255,16 @@ begin
                 q       => P_q(i)
             );
     end generate;
-                   
+    
+    -- Half Carry Flip Flop
+    FFHC: entity work.FlipFlopD_sr 
+        port map(
+                clk     => clk,
+                rst     => uins.rstP(CARRY),
+                set     => '0',
+                ce      => '1',
+                d       => carryFlag,
+                q       => halfCarry
+            );
 
 end Structural;
