@@ -237,7 +237,7 @@ begin
     MUX_ADDRESS: address <= MAR_q when uins.mux_address = '0' else
                             (ABH_q & ABL_q);
         
-    data_out <= DB; --when uins.ce = '1' and uins.rw = '0' else (others=>'Z');
+    data_out <= DB; 
     
     P_d(0) <= carryFlag;
     P_d(1) <= zeroFlag;

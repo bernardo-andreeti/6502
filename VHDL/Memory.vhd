@@ -131,8 +131,8 @@ architecture block_RAM of Memory is
     
     type ram_type is array (0 to (2**ADDR_WIDTH)-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     signal ram: ram_type := (
-            x"a9", x"12", x"8d", x"55", x"01", x"ae", x"55", x"01", others=>x"00"
-            -- lda_imm, sta_aabs (#0155), ldx_aabs (#0155), brk
+            x"a9", x"55", x"a2", x"66", x"a0", x"77", x"8d", x"55", x"01", x"8e", x"56", x"01", x"8c", x"57", x"01", x"ad", x"57", x"01" , x"a5", x"80", x"bd", x"22", x"40", x"b9", x"23", x"30", x"b5", x"20", x"a1", x"30", x"b1", x"40", others=>x"00"
+            -- lda_imm, ldx_imm, ldy_imm, sta_aabs (#0155), stx_aabs (#0156), sty_aabs (#0157), lda_aabs, lda_ zpg, lda_abs_x, lda_abs_y, lda_zpg_x, lda_indx, lda_indy, brk
 
     --    x"a9",x"12",x"a2",x"01",x"a0",x"02",x"69",x"03",x"e9",x"02",x"18",x"38",x"69",x"01",
     --    x"e9",x"14",x"a9",x"aa",x"29",x"0f",x"09",x"f0",x"49",x"fa",x"c9",x"01",x"00", others=>x"ff"

@@ -51,7 +51,7 @@ begin
     n <= temp(7);
     
     -- Zero flag
-    z <= '1' when temp = x"0000" else '0';
+    z <= '1' when temp = x"00" else '0';
     
     -- Overflow flag (Operands with the same signal but different from the result's signal)
     v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
