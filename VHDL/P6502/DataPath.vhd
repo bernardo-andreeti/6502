@@ -168,7 +168,8 @@ begin
         
     PCH: entity work.RegisterNbits
         generic map (
-            WIDTH   => 8
+            WIDTH   => 8,
+            INIT_VALUE  => 64
         )
         port map (
             clk     => clk,
@@ -180,7 +181,8 @@ begin
         
     PCL: entity work.RegisterNbits
         generic map (
-            WIDTH   => 8
+            WIDTH   => 8,
+            INIT_VALUE  => 0
         )
         port map (
             clk     => clk,

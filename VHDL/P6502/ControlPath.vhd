@@ -192,13 +192,10 @@ begin
         elsif ((currentState = T2 and (decIns.addressMode=ZPG or decIns.addressMode = IND_Y)) or (currentState = T4 and decIns.addressMode = IND_X)) then
             uins.ce <= '1';
             uins.rw <= '1';        -- Enable Read Mode
-            uins.mux_db <= "100";  -- DB <- MEM[MAR or ABH/ABL]
+            uins.mux_db <= "100";  -- DB <- MEM[MAR]
             uins.mux_mar <= "01";   
             uins.wrMAR <= '1';     -- MAR <- DB
-            if decIns.addressMode = IND_X then
-                uins.mux_address <= '1'; -- address <- ABH & ABL
-            end if;
-            
+                        
     -- DECODE (ZPG_XY, IND_X, IND_Y)
     -- T2 or T3: BI <- MEM[MAR]; AI <- X/Y         
         elsif ((currentState = T2 and (decIns.addressMode=ZPG_XY or decIns.addressMode=IND_X)) or (currentState = T3 and decIns.addressMode=IND_Y)) then
