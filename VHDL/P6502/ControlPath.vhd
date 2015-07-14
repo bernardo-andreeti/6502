@@ -203,7 +203,7 @@ begin
             uins.rw <= '1';        -- Enable Read Mode
             uins.mux_db <= "100";  -- DB <- MEM[MAR]
             uins.wrBI <= '1';      -- BI <- DB
-            if (decIns.instruction = LDA or decIns.instruction = LDY or decIns.instruction = STA or decIns.instruction = STY or decIns.addressMode = IND_X) then  
+            if (((decIns.instruction = LDA or decIns.instruction = LDY or decIns.instruction = STA or decIns.instruction = STY) and decIns.addressMode = ZPG_XY) or ((decIns.instruction = LDA or decIns.instruction = STA) and decIns.addressMode = IND_X)) then
                 uins.mux_sb <= "011";  -- SB <- X
             else
                 uins.mux_sb <= "100";  -- SB <- Y

@@ -57,7 +57,7 @@ begin
     v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
     
     -- Carry flag
-    c <= sum(8) when Operation = "101" else '0';
+    c <= sum(8); -- when Operation = "101" else '0';
     
 end behavioral;
 
