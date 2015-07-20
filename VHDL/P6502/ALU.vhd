@@ -16,8 +16,6 @@ entity ALU is
         a, b        : in std_logic_vector(7 downto 0);      -- Operands
         carry_in    : in std_logic;                         -- Carry in
         result      : out std_logic_vector(7 downto 0);     -- Operation result
-        n           : out std_logic;                        -- Negative flag
-        z           : out std_logic;                        -- Zero flag
         c           : out std_logic;                        -- Carry flag
         v           : out std_logic;                        -- Overflow flag
         operation   : in std_logic_vector(2 downto 0)       -- Operation select                  
@@ -46,13 +44,7 @@ begin
     -- Sum and carry generation
     carry <= carry_in when Operation = "101" else '0';      -- Operation = "101": ADC or SBC
     sum <= ('0' & a) + ('0' & b) + carry;
-    
-    -- Negative flag (result's MSb)
-    n <= temp(7);
-    
-    -- Zero flag
-    z <= '1' when temp = x"00" else '0';
-    
+        
     -- Overflow flag (Operands with the same signal but different from the result's signal)
     v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
     

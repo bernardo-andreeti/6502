@@ -89,7 +89,7 @@ begin
                 end if; 
                 
             when T4 => 
-                if (decIns.addressMode=AABS or decIns.addressMode=ZPG_XY) then
+                if (decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) then
                     nextState <= T0;
                 else
                     nextState <= T5;
@@ -196,24 +196,24 @@ begin
             uins.mux_mar <= "01";   
             uins.wrMAR <= '1';     -- MAR <- DB
                         
-    -- DECODE (ZPG_XY, IND_X, IND_Y)
+    -- DECODE (ZPG_X, ZPG_Y, IND_X, IND_Y)
     -- T2 or T3: BI <- MEM[MAR]; AI <- X/Y         
-        elsif ((currentState = T2 and (decIns.addressMode=ZPG_XY or decIns.addressMode=IND_X)) or (currentState = T3 and decIns.addressMode=IND_Y)) then
+        elsif ((currentState = T2 and (decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y or decIns.addressMode=IND_X)) or (currentState = T3 and decIns.addressMode=IND_Y)) then
             uins.ce <= '1';
             uins.rw <= '1';        -- Enable Read Mode
             uins.mux_db <= "100";  -- DB <- MEM[MAR]
             uins.wrBI <= '1';      -- BI <- DB
-            if (((decIns.instruction = LDA or decIns.instruction = LDY or decIns.instruction = STA or decIns.instruction = STY) and decIns.addressMode = ZPG_XY) or ((decIns.instruction = LDA or decIns.instruction = STA) and decIns.addressMode = IND_X)) then
+            if (decIns.addressMode=ZPG_X or decIns.addressMode=IND_X) then
                 uins.mux_sb <= "011";  -- SB <- X
-            else
+            else -- ZPG_Y and IND_Y
                 uins.mux_sb <= "100";  -- SB <- Y
             end if;
             uins.mux_ai <= "10";   
             uins.wrAI <= '1';      -- AI <- SB
             
-    -- DECODE (second step for ZPG_XY, IND_X, IND_Y, ABS_X, ABS_Y)
+    -- DECODE (second step for ZPG_X, ZPG_Y IND_X, IND_Y, ABS_X, ABS_Y)
     -- T3 or T4: ABL <- AI + BI; T3(ABS_XY) ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;         
-        elsif ((currentState = T3 and (decIns.addressMode=ZPG_XY or decIns.addressMode=IND_X or decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState = T4 and decIns.addressMode=IND_Y)) then
+        elsif ((currentState = T3 and (decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y or decIns.addressMode=IND_X or decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState = T4 and decIns.addressMode=IND_Y)) then
             uins.ALUoperation <= "110";
             uins.wrABL <= '1';         -- ABL <- AI + BI 
             if (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) then
@@ -251,7 +251,7 @@ begin
             
     -- EXECUTE
         -- Load and Store Group (all addressing modes)
-        elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG) or (currentState = T4 and (decIns.addressMode = AABS or decIns.addressMode = ZPG_XY)) or (currentState = T5 and (decIns.addressMode = IND_X or decIns.addressMode = IND_Y or decIns.addressMode = ABS_X or decIns.addressMode = ABS_Y))) then
+        elsif ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG) or (currentState = T4 and (decIns.addressMode = AABS or decIns.addressMode = ZPG_X or decIns.addressMode=ZPG_Y)) or (currentState = T5 and (decIns.addressMode = IND_X or decIns.addressMode = IND_Y or decIns.addressMode = ABS_X or decIns.addressMode = ABS_Y))) then
             if (decIns.instruction = LDA or decIns.instruction = LDX or decIns.instruction = LDY) then
                 uins.ce <= '1';
                 uins.rw <= '1';        -- Enable Read Mode
@@ -279,7 +279,7 @@ begin
                 uins.ce <= '1';
                 uins.rw <= '0';        -- Enable Write Mode : MEM[MAR] <- AC || X || Y
             end if;
-            if (decIns.addressMode=AABS or decIns.addressMode=ZPG_XY or decIns.addressMode=IND_Y or decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) then 
+            if (decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y or decIns.addressMode=IND_Y or decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) then 
                 uins.mux_address <= '1';    -- address <- ABH & ABL
             end if;    
                         

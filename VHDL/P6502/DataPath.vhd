@@ -32,7 +32,7 @@ architecture structural of DataPath is
      
     -- Internal nets
     signal ALUresult: std_logic_vector(7 downto 0);
-    signal negativeFlag, zeroFlag, carryFlag, overflowFlag, ALUcarry_in, halfCarry: std_logic;
+    signal carryFlag, overflowFlag, ALUcarry_in, halfCarry: std_logic;
     signal inPC, MAR_d, MAR_q: std_logic_vector(15 downto 0);
     
 begin
@@ -74,8 +74,6 @@ begin
             b           => BI_q,
             result      => ALUresult,
             operation   => uins.ALUoperation,
-            n           => negativeFlag,
-            z           => zeroFlag,
             c           => carryFlag,
             v           => overflowFlag,
             carry_in    => ALUcarry_in
@@ -241,10 +239,10 @@ begin
         
     data_out <= DB; 
     
-    P_d(0) <= carryFlag;
-    P_d(1) <= zeroFlag;
-    P_d(6) <= overflowFlag;
-    P_d(7) <= negativeFlag;
+    P_d(CARRY) <= carryFlag;
+    P_d(ZERO) <= '1' when SB = x"00" else '0';
+    P_d(OVERFLOW) <= overflowFlag;
+    P_d(NEGATIVE) <= SB(7); -- Negative flag (result's MSb)
     
     STATUS_PROCESSOR_REGISTER: for i in 0 to 7 generate
         FFD: entity work.FlipFlopD_sr
