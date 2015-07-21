@@ -1,0 +1,173 @@
+Brief: 
+    - Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
+    - Lenght: 2 to 3 bytes;
+    - Cycles: 3 to 6;
+    
+States shared between different addressing modes:
+
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;          # First Decode step, IR receives opcode 
+            
+Specific States:    
+        
+        AND
+        ----
+            - IMM: AND #01 (29 01)                          # AC <- AC & 01
+                T2: BI <- MEM[MAR]; AI <- AC
+                T3: AC <- AI & BI; wrn; wrz
+                
+            - Z-PAGE: AND $33 (25 33)                       # AC <- AC & MEM[33h]            
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- AC
+                T4: AC <- AI & BI; wrn; wrz
+
+            - Z-PAGE,X: AND $13 (35 13)                     # AC <- AC & MEM[13h+X]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AC <- AI & BI; wrn; wrz;
+                   
+            - (IND,X): AND ($36,X) (21 36)                  # AC <- AC & MEM[MEM[36h+X]]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI; ADH <- 0
+                T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;
+                T5: ABL <- AI + BI; ABH <- MEM[ABH/ABL]
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AC <- AI & BI; wrn; wrz
+                
+            - (IND),Y: AND ($A5),Y (31 a5)                  # AC <- AC & MEM[MEM[a5h]+Y]
+                T2: MAR <- MEM[MAR]; BI <- MEM[MAR]; AI <- 0
+                T3: MAR <- AI + BI + 1; BI <- MEM[MAR]; AI <- Y 
+                T4: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0
+                T5: ABH <- AI + BI + hc;
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AC <- AI & BI; wrn; wrz
+                
+            - ABS: AND $0001 (2d 01 00)                     # AC <- AC & MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AC <- AI & BI; wrn; wrz
+                
+            - ABS,X: LDA $12F0,X (3d F0 12)                     # AC <- AC & MEM[12F0h+X]    
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AC <- AI & BI; wrn; wrz
+                
+            - ABS,Y: AND $12F0,Y (39 F0 12)                     # AC <- AC & MEM[12F0h+Y]
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+Y]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AC <- AI & BI; wrn; wrz
+                
+        ORA
+        ---- 
+            - IMM: ORA #01 (09 01)                          # AC <- AC | 01
+                T2: BI <- MEM[MAR]; AI <- AC
+                T3: AC <- AI | BI; wrn; wrz
+            
+            - Z-PAGE: ORA $33 (05 33)                       # AC <- AC | MEM[33h]
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- AC
+                T4: AC <- AI | BI; wrn; wrz
+            
+            - Z-PAGE,X: ORA $13 (15 13)                     # AC <- AC | MEM[13h+X]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AC <- AI | BI; wrn; wrz;
+            
+            - (IND,X): ORA ($36,X) (01 36)
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI; ADH <- 0
+                T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;
+                T5: ABL <- AI + BI; ABH <- MEM[ABH/ABL]
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AC <- AI | BI; wrn; wrz
+            
+            - (IND),Y: ORA ($A5),Y (11 a5)                  # AC <- AC | MEM[MEM[a5h]+Y]
+                T2: MAR <- MEM[MAR]; BI <- MEM[MAR]; AI <- 0
+                T3: MAR <- AI + BI + 1; BI <- MEM[MAR]; AI <- Y 
+                T4: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0
+                T5: ABH <- AI + BI + hc;
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AC <- AI | BI; wrn; wrz
+            
+            - ABS: ORA $0001 (0d 01 00)                     # AC <- AC | MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AC <- AI | BI; wrn; wrz
+            
+            - ABS,X: LDA $12F0,X (1d F0 12)                     # AC <- AC | MEM[12F0h+X]
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AC <- AI | BI; wrn; wrz
+            
+            - ABS,Y: ORA $12F0,Y (19 F0 12)                     # AC <- AC | MEM[12F0h+Y]
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+Y]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AC <- AI | BI; wrn; wrz
+                
+        EOR
+        ----
+            - IMM: EOR #01 (49 01)                      # AC <- AC ^ 01
+                T2: BI <- MEM[MAR]; AI <- AC
+                T3: AC <- AI ^ BI; wrn; wrz
+    
+            - Z-PAGE: EOR $33 (45 33)                   # AC <- AC ^ MEM[33h]
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- AC
+                T4: AC <- AI ^ BI; wrn; wrz
+
+            - Z-PAGE,X: EOR $13 (55 13)                 # AC <- AC ^ MEM[13h+X]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AC <- AI ^ BI; wrn; wrz;
+        
+            - (IND,X): EOR ($36,X) (41 36)              # AC <- AC ^ MEM[MEM[36h+X]]    
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI; ADH <- 0
+                T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;
+                T5: ABL <- AI + BI; ABH <- MEM[ABH/ABL]
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AC <- AI ^ BI; wrn; wrz
+                
+            - (IND),Y: EOR ($A5),Y (51 a5)              # AC <- AC ^ MEM[MEM[a5h]+Y]
+                T2: MAR <- MEM[MAR]; BI <- MEM[MAR]; AI <- 0
+                T3: MAR <- AI + BI + 1; BI <- MEM[MAR]; AI <- Y 
+                T4: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0
+                T5: ABH <- AI + BI + hc;
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AC <- AI ^ BI; wrn; wrz        
+        
+            - ABS: EOR $0001 (4d 01 00)                 # AC <- AC ^ MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AC <- AI ^ BI; wrn; wrz
+        
+            - ABS,X: LDA $12F0,X (5d F0 12)             # AC <- AC ^ MEM[12F0h+X]
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AC <- AI ^ BI; wrn; wrz
+        
+            - ABS,Y: EOR $12F0,Y (59 F0 12)             # AC <- AC ^ MEM[12F0h+Y]
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+Y]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AC <- AI ^ BI; wrn; wrz
+                

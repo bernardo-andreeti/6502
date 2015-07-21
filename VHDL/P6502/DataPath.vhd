@@ -219,7 +219,8 @@ begin
         
     MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "00" else
                       (x"00" & DB) when uins.mux_mar = "01" else
-                      (SB & x"00");
+                      (SB & x"00") when uins.mux_mar = "10" else
+                      (x"00" & ALUresult);
         
     MAR: entity work.RegisterNbits
 

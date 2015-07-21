@@ -28,15 +28,17 @@ Specific States:
                 
             - (IND,X): LDA ($36,X) (a1 36)                  # AC <- MEM[MEM[36h+X]] : Results in zero page address!
                 T2: BI <- MEM[MAR]; AI <- X
-                T3: ABL <- AI + BI;
-                T4: MAR <- MEM[ABH/ABL];
-                T5: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB
+                T3: ABL <- AI + BI; ADH <- 0
+                T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;
+                T5: ABL <- AI + BI; ABH <- MEM[ABH/ABL]
+                T6: AC <- MEM[ABH/ABL]; wrn; wrz;               # Via DB and SB
                 
             - (IND),Y: LDA ($A5),Y (b1 a5)                  # AC <- MEM[MEM[a5h]+Y]   
-                T2: MAR <- MEM[MAR];
-                T3: BI <- MEM[MAR]; AI <- Y
-                T4: ABL <- AI + BI;
-                T5: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB 
+                T2: MAR <- MEM[MAR]; BI <- MEM[MAR]; AI <- 0
+                T3: MAR <- AI + BI + 1; BI <- MEM[MAR]; AI <- Y 
+                T4: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0
+                T5: ABH <- AI + BI + hc;    
+                T6: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB 
                 
             - ABS: LDA $0001 (ad 01 00)                     # AC <- MEM[0001h]
                 T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
@@ -118,15 +120,17 @@ Specific States:
 
             - (IND,X): STA ($36,X) (81 36)                  # MEM[MEM[36h+X]] <- AC  
                 T2: BI <- MEM[MAR]; AI <- X
-                T3: ABL <- AI + BI;
-                T4: MAR <- MEM[MAR];
-                T5: AC <- MEM[MAR]; wrn; wrz;               # Via DB and SB
+                T3: ABL <- AI + BI; ADH <- 0
+                T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;
+                T5: ABL <- AI + BI; ABH <- MEM[ABH/ABL]
+                T6: MEM[ABH/ABL] <- AC;                     # Via DB and SB
             
             - (IND),Y: STA ($A5),Y (91 a5)                  # MEM[MEM[a5h]+X] <- AC 
-                T2: MAR <- MEM[MAR];
-                T3: BI <- MEM[MAR]; AI <- Y
-                T4: ABL <- AI + BI;
-                T5: AC <- MEM[ABH/ABL]; wrn; wrz;           # Via DB and SB
+                T2: MAR <- MEM[MAR]; BI <- MEM[MAR]; AI <- 0
+                T3: MAR <- AI + BI + 1; BI <- MEM[MAR]; AI <- Y 
+                T4: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0
+                T5: ABH <- AI + BI + hc;
+                T6: MEM[ABH/ABL] <- AC;                     # Via DB and SB
                 
             - ABS: STA $0001 (8d 01 00)                     # MEM[0001h] <- AC 
                 T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
