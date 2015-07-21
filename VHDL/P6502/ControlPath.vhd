@@ -65,7 +65,7 @@ begin
                     nextState <= T1;
                     
             when T1 =>  
-                if (decIns.InsGroup = "0110") then -- Status Flag Change Group
+                if (decIns.InsGroup = STATUS_FLAG) then -- Status Flag Change Group
                     nextState <= T0;
                 
                 elsif decIns.instruction=BRK then  
@@ -75,42 +75,42 @@ begin
                 end if;
                 
             when T2 =>
-                if (decIns.addressMode=IMM and decIns.InsGroup="0000") then -- Load and Store Group
+                if (decIns.addressMode=IMM and decIns.InsGroup=LOAD_STORE) then -- Load and Store Group
                     nextState <= T0;
                 else
                     nextState <= T3;
                 end if;
                 
             when T3 =>
-                if (decIns.addressMode=ZPG and decIns.InsGroup="0000") or (decIns.addressMode=IMM and decIns.InsGroup="0100") then
+                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and decIns.InsGroup=LOGICAL) then
                     nextState <= T0;
                 else
                     nextState <= T4;
                 end if; 
                 
             when T4 => 
-                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup="0000") or (decIns.addressMode=ZPG and decIns.InsGroup="0100") then
+                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and decIns.InsGroup=LOGICAL) then
                     nextState <= T0;
                 else
                     nextState <= T5;
                 end if;
             
             when T5 =>
-                if ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup="0000") or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and decIns.InsGroup="0100") then
+                if ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and decIns.InsGroup=LOGICAL) then
                         nextState <= T0;
                 else
                         nextState <= T6;
                 end if;
             
             when T6 =>
-                if (((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup="0000") or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup="0100"))  then
+                if (((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOGICAL))  then
                         nextState <= T0;
                 else
                         nextState <= T7;
                 end if;
             
             when T7 =>
-                if ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup="0100") then
+                if ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOGICAL) then
                     nextState <= T0;
                 end if;
                 
@@ -197,7 +197,7 @@ begin
             
     -- DECODE (Logical Group)
     -- T2 or T3 or T4 or T5 or T6: BI <- MEM[MAR or ABH/ABL]; AI <- AC     
-        elsif (((currentState=T2 and decIns.addressMode=IMM) or (currentState=T3 and decIns.addressMode=ZPG) or (currentState=T4 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T5 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T6 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) and decIns.InsGroup="0100") then
+        elsif (((currentState=T2 and decIns.addressMode=IMM) or (currentState=T3 and decIns.addressMode=ZPG) or (currentState=T4 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T5 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T6 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) and decIns.InsGroup=LOGICAL) then
             uins.ce <= '1';
             uins.rw <= '1';        -- Enable Read Mode
             uins.mux_db <= "100";  -- DB <- MEM[MAR]
@@ -316,7 +316,7 @@ begin
                         
     -- EXECUTE
         -- Load and Store Group (all addressing modes)
-        elsif (decIns.InsGroup="0000") then
+        elsif (decIns.InsGroup=LOAD_STORE) then
             if ((currentState = T2 and decIns.addressMode = IMM) or (currentState = T3 and decIns.addressMode = ZPG) or (currentState = T4 and (decIns.addressMode = AABS or decIns.addressMode = ZPG_X or decIns.addressMode=ZPG_Y)) or (currentState = T5 and (decIns.addressMode = ABS_X or decIns.addressMode = ABS_Y)) or (currentState=T6 and (decIns.addressMode = IND_X or decIns.addressMode = IND_Y))) then
                 if (decIns.instruction = LDA or decIns.instruction = LDX or decIns.instruction = LDY) then
                     uins.ce <= '1';
@@ -354,7 +354,7 @@ begin
             
     -- EXECUTE
         -- Logical Group (all addressing modes)
-        elsif (decIns.InsGroup="0100") then
+        elsif (decIns.InsGroup=LOGICAL) then
             if ((currentState=T3 and decIns.addressMode=IMM) or (currentState=T4 and decIns.addressMode=ZPG) or (currentState=T5 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T6 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T7 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) then
                 uins.mux_sb <= "001";   -- SB <- ALUresult
                 uins.wrAC <= '1';          -- AC <- SB  
@@ -371,7 +371,7 @@ begin
                         
     -- EXECUTE (one byte instructions)
     -- T1: IR <- MEM[MAR]; P(i) <- 1 for sets, 0 for rst (One byte instructions)
-        elsif (decIns.InsGroup="0110" and currentState=T1) then 
+        elsif (decIns.InsGroup=STATUS_FLAG and currentState=T1) then 
             if decIns.instruction=CLC then
                 uins.rstP(CARRY) <= '1'; -- Clear carry flag
             elsif decIns.instruction=SECi then
