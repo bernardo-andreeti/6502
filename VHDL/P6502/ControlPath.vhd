@@ -110,9 +110,10 @@ begin
                 end if;
             
             when T7 =>
-                if ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOGICAL) then
+                -- if ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOGICAL) then
                     nextState <= T0;
-                end if;
+                    
+                -- end if;
                 
             when BREAK =>
                 nextState <= BREAK;

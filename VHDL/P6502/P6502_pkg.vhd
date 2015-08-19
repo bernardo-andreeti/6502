@@ -48,7 +48,7 @@ package P6502_pkg is
         JUMP_BRANCH, STACK, SHIFT_ROTATE
     );
     
-    type AddressMode_type is (IMM, ZPG, ZPG_X, ZPG_Y, IND_X, IND_Y, AABS, ABS_X, ABS_Y, IMP);
+    type AddressMode_type is (IMM, ZPG, ZPG_X, ZPG_Y, IND_X, IND_Y, AABS, ABS_X, ABS_Y, IMP, REL, ACC, IND);
     
     type DecodedInstruction_type is record
         instruction        : Instruction_type;
@@ -272,6 +272,88 @@ package body P6502_pkg is
             when x"C4" =>   di.instruction := CPY;  di.addressMode := ZPG;       di.size := 2;  di.InsGroup := COMPARE;
             when x"C0" =>   di.instruction := CPY;  di.addressMode := IMM;       di.size := 2;  di.InsGroup := COMPARE;
             
+            ------------------------------
+            -- Shift and Rotate Group   --
+            ------------------------------
+            -- ASL
+            when x"0E" =>   di.instruction := ASL;  di.addressMode := AABS;      di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"06" =>   di.instruction := ASL;  di.addressMode := ZPG;       di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            when x"0A" =>   di.instruction := ASL;  di.addressMode := ACC;       di.size := 1;  di.InsGroup := SHIFT_ROTATE;
+            when x"1E" =>   di.instruction := ASL;  di.addressMode := ABS_X;     di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"16" =>   di.instruction := ASL;  di.addressMode := ZPG_X;     di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            
+            -- LSR
+            when x"4E" =>   di.instruction := LSR;  di.addressMode := AABS;      di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"46" =>   di.instruction := LSR;  di.addressMode := ZPG;       di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            when x"4A" =>   di.instruction := LSR;  di.addressMode := ACC;       di.size := 1;  di.InsGroup := SHIFT_ROTATE;
+            when x"5E" =>   di.instruction := LSR;  di.addressMode := ABS_X;     di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"56" =>   di.instruction := LSR;  di.addressMode := ZPG_X;     di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            
+            -- ROL
+            when x"2E" =>   di.instruction := ROLL;  di.addressMode := AABS;     di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"26" =>   di.instruction := ROLL;  di.addressMode := ZPG;      di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            when x"2A" =>   di.instruction := ROLL;  di.addressMode := ACC;      di.size := 1;  di.InsGroup := SHIFT_ROTATE;
+            when x"3E" =>   di.instruction := ROLL;  di.addressMode := ABS_X;    di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"36" =>   di.instruction := ROLL;  di.addressMode := ZPG_X;    di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            
+            -- ROR
+            when x"6E" =>   di.instruction := RORR;  di.addressMode := AABS;     di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"66" =>   di.instruction := RORR;  di.addressMode := ZPG;      di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            when x"6A" =>   di.instruction := RORR;  di.addressMode := ACC;      di.size := 1;  di.InsGroup := SHIFT_ROTATE;
+            when x"7E" =>   di.instruction := RORR;  di.addressMode := ABS_X;    di.size := 3;  di.InsGroup := SHIFT_ROTATE;
+            when x"76" =>   di.instruction := RORR;  di.addressMode := ZPG_X;    di.size := 2;  di.InsGroup := SHIFT_ROTATE;
+            
+            ------------------------------
+            -- Jump and Branch Group    --
+            ------------------------------
+            -- JMP
+            when x"4C" =>   di.instruction := JMP;   di.addressMode := AABS;     di.size := 3;  di.InsGroup := JUMP_BRANCH;
+            when x"6C" =>   di.instruction := JMP;   di.addressMode := IND;      di.size := 3;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BCC
+            when x"90" =>   di.instruction := BCC;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BCS
+            when x"B0" =>   di.instruction := BCS;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BEQ
+            when x"F0" =>   di.instruction := BEQ;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BMI
+            when x"30" =>   di.instruction := BMI;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BNE
+            when x"D0" =>   di.instruction := BNE;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BPL
+            when x"10" =>   di.instruction := BPL;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BVC
+            when x"50" =>   di.instruction := BVC;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            -- BVS
+            when x"70" =>   di.instruction := BVS;   di.addressMode := REL;      di.size := 2;  di.InsGroup := JUMP_BRANCH;
+            
+            ------------------------------
+            -- Stack Group              --
+            ------------------------------
+            -- TSX
+            when x"BA" =>   di.instruction := TSX;   di.addressMode := IMP;      di.size := 1;  di.InsGroup := STACK;
+            
+            -- TXS
+            when x"9A" =>   di.instruction := TXS;   di.addressMode := IMP;      di.size := 1;  di.InsGroup := STACK;
+            
+            -- PHA
+            when x"48" =>   di.instruction := PHA;   di.addressMode := IMP;      di.size := 1;  di.InsGroup := STACK;
+            
+            -- PHP
+            when x"08" =>   di.instruction := PHP;   di.addressMode := IMP;      di.size := 1;  di.InsGroup := STACK;
+            
+            -- PLA
+            when x"68" =>   di.instruction := PLA;   di.addressMode := IMP;      di.size := 1;  di.InsGroup := STACK;
+            
+            -- PLP
+            when x"28" =>   di.instruction := PLP;   di.addressMode := IMP;      di.size := 1;  di.InsGroup := STACK;
             
             ------------------------------
             -- Status Flag Change Group --
@@ -296,11 +378,9 @@ package body P6502_pkg is
             
             -- SEI
             when x"78" =>   di.instruction := SEI;  di.addressMode := IMP;       di.size := 1;  di.InsGroup := STATUS_FLAG;
-            
-            
-            
+                     
             --------------------------------------
-            -- Subroutine and Interrupt Group --
+            -- Subroutine and Interrupt Group  --
             --------------------------------------
             -- JSR
             when x"20" =>   di.instruction := JSR;  di.addressMode := AABS;      di.size := 3;  di.InsGroup := SUBROUTINE_INTERRUPT;
@@ -318,6 +398,7 @@ package body P6502_pkg is
             when x"EA" =>   di.instruction := NOP;  di.addressMode := IMP;       di.size := 1;  di.InsGroup := SUBROUTINE_INTERRUPT;
             
             when others =>   di.instruction := invalid_instruction;
+            
         end case;                     
         return di;
         
