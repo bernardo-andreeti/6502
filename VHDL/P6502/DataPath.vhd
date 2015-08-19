@@ -116,7 +116,8 @@ begin
     -- ADL bus
     MUX_ADL: ADL <= ALUresult when uins.mux_adl = "00" else
                     S_q when uins.mux_adl = "01" else
-                    DB;
+                    DB when uins.mux_adl = "10" else
+                    PCL_q;
     
     
     -- ADH bus
