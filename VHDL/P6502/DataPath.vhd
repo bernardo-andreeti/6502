@@ -18,6 +18,7 @@ entity DataPath is
         address     : out std_logic_vector(15 downto 0);    -- Address bus to memory
         data_in     : in std_logic_vector(7 downto 0);      -- Data from memory
         data_out    : out std_logic_vector(7 downto 0);     -- Data to memory
+        spr_out     : out std_logic_vector(7 downto 0);     -- Status Processor Register
         uins        : in Microinstruction                   -- Control signals
       );
 end DataPath;
@@ -239,7 +240,9 @@ begin
     MUX_ADDRESS: address <= MAR_q when uins.mux_address = '0' else
                             (ABH_q & ABL_q);
         
-    data_out <= DB; 
+    data_out <= DB;
+
+    spr_out <= P_q;    
     
     P_d(CARRY) <= carryFlag;
     P_d(ZERO) <= '1' when SB = x"00" else '0';

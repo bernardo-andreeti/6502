@@ -13,7 +13,8 @@ use work.P6502_pkg.all;
 
 entity ControlPath is
     port(   
-        clk, rst    : in std_logic;          
+        clk, rst    : in std_logic;
+        spr_in      : in std_logic_vector(7 downto 0); -- Status Processor Register    
         uins        : out microinstruction;             -- Control signals to data path
         instruction : in std_logic_vector(7 downto 0)   -- Current instruction stored in instruction register
        );
@@ -65,7 +66,7 @@ begin
                     nextState <= T1;
                     
             when T1 =>  
-                if (decIns.InsGroup = STATUS_FLAG) then 
+                if (decIns.InsGroup = STATUS_FLAG) or (decIns.instruction=BEQ and spr_in(ZERO)='0') then 
                     nextState <= T0;
                 
                 elsif decIns.instruction=BRK then  
@@ -89,7 +90,7 @@ begin
                 end if; 
                 
             when T4 => 
-                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and decIns.InsGroup=LOGICAL) then
+                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and decIns.InsGroup=LOGICAL) or decIns.addressMode=REL then
                     nextState <= T0;
                 else
                     nextState <= T5;
@@ -279,17 +280,22 @@ begin
             uins.mux_db <= "100";   -- DB <- MEM[MAR]
             uins.mux_adh <= "00";
             uins.wrABH <= '1';      -- ABH <- DB
-            uins.mux_address <= '1';-- address <- ABH & ABL 
+            uins.mux_address <= '1';-- address <- ABH & ABL
 
-    -- DECODE (ABS_X, ABS_Y and IND_Y)    
-    -- T4 or T5: ABH <- AI + BI + hc;
-        elsif ((currentState = T4 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState = T5 and decIns.addressMode=IND_Y)) then 
+    -- DECODE (ABS_X, ABS_Y IND_Y, and REL)    
+    -- T4 or T5: ABH (PCH for REL) <- AI + BI + hc;
+        elsif ((currentState = T4 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y or decIns.addressMode=REL)) or (currentState = T5 and decIns.addressMode=IND_Y)) then 
             uins.mux_carry <= "11";     -- carry <- hc
             uins.ALUoperation <= "101"; -- AI + BI + carry
             uins.mux_sb <= "001";
             uins.mux_adh <= "01";
-            uins.wrABH <= '1';          -- ABH <- ALUresult
-            uins.mux_address <= '1';    -- address <- ABH & ABL
+            if decIns.addressMode=REL then
+                uins.mux_pc <= '1';
+                uins.wrPCH <= '1';
+            else
+                uins.wrABH <= '1';          -- ABH <- ALUresult
+                uins.mux_address <= '1';    -- address <- ABH & ABL
+            end if;
             
     -- DECODE (IND_X and IND_Y) 
     -- T3 or T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;   
@@ -400,21 +406,26 @@ begin
                 uins.rstP(OVERFLOW) <= '1';  -- Clear overflow flag
             end if;        
     
-    -- EXECUTE: Jump and Branch Group
+    -- EXECUTE(Jump), DECODE(Branch):
         elsif (decIns.InsGroup=JUMP_BRANCH) then
-            if (currentState=T3 and decIns.addressMode=AABS) then
+            if (currentState=T3 and (decIns.addressMode=AABS or decIns.addressMode=REL)) then
                 uins.ALUoperation <= "110";
                 uins.mux_pc <= '1';                         -- PC <- ADH & ADL
-                uins.mux_adl <= '"00"; uins.wrPCL <= '1';   -- PCL <- AI + BI
-                uins.mux_db <= "100";                       -- DB <- MEM[MAR]
-                uins.mux_adh <= "00"; uins.wrPCH <= '1';    -- PCH <- MEM[MAR]    
+                uins.mux_adl <= "00"; uins.wrPCL <= '1';   -- PCL <- AI + BI
+                if decIns.addressMode=AABS then -- Jump
+                    uins.mux_db <= "100";                       -- DB <- MEM[MAR]
+                    uins.mux_adh <= "00"; uins.wrPCH <= '1';    -- PCH <- MEM[MAR]
+                else -- Branch
+                    uins.mux_ai <= "01"; uins.wrAI <= '1';  -- AI <- x"00"
+                    uins.mux_db <= "011"; uins.wrBI <= '1'; -- BI <- PCH
+                end if;
             end if;
     
     -- EXECUTE: Compare and Bit Test Group
         elsif (decIns.InsGroup=COMPARE) then
             if (currentState=T5 and decIns.addressMode=AABS) then
-                uins.ALUoperation <= "110"; 
-                uins.mux_sb <= "001";       -- SB <- AI + BI
+                uins.ALUoperation <= "000"; 
+                uins.mux_sb <= "001";       -- SB <- AI & !BI
                 uins.ceP(NEGATIVE) <= '1';
                 uins.ceP(CARRY)    <= '1';
                 uins.ceP(ZERO)     <= '1';

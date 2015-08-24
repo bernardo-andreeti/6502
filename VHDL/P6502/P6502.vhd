@@ -26,6 +26,7 @@ architecture structural of P6502 is
 
     signal uins         : Microinstruction;
     signal instruction  : std_logic_vector(7 downto 0);
+    signal spr          : std_logic_vector(7 downto 0);
     signal clk_n        : std_logic;
     
 begin
@@ -41,6 +42,7 @@ begin
             address     => address,
             data_in     => data_in,
             data_out    => data_out,
+            spr_out     => spr,
             uins        => uins
         );
         
@@ -49,6 +51,7 @@ begin
             clk         => clk,
             rst         => rst,
             uins        => uins,
+            spr_in      => spr,    
             instruction => data_in            
         );
         
