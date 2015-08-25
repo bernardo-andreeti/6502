@@ -36,14 +36,14 @@ begin
     temp <= a and b         when Operation = "000" else
             a or b          when Operation = "001" else
             a xor b         when Operation = "010" else
-            a               when Operation = "011" else 
+            --a               when Operation = "011" else 
             b               when Operation = "100" else
             sum(7 downto 0);    
             
     
     -- Sum and carry generation
     carry <= carry_in when Operation = "101" else '0';      -- Operation = "101": ADC or SBC
-    sum <= ('0' & a) + ('0' & b) + carry;
+    sum <= ('0' & a) + ('0' & b) + carry when (Operation = "101" or Operation = "110") else ('0' & a) + ('0' & b) - x"01" when Operation="011" else ('0' & a) - ('0' & b);
         
     -- Overflow flag (Operands with the same signal but different from the result's signal)
     v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
