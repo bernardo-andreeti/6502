@@ -1,0 +1,73 @@
+Brief: 
+    - Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
+    - Lenght: 2 to 3 bytes;
+    - Cycles: 3 to 7;
+    
+States shared between different addressing modes:
+
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;          # First Decode step, IR receives opcode 
+            
+Specific States:    
+        
+        CMP
+        ----
+            - IMM: CMP #01 (c9 01)                          # AC - 01
+                T2: BI <- MEM[MAR]; AI <- AC
+                T3: AI - BI; wrn; wrz; wrc
+                
+            - Z-PAGE: CMP $33 (c5 33)                       # AC - MEM[33h]
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- AC
+                T4: AI - BI; wrn; wrz; wrc 
+
+            - Z-PAGE,X: CMP $13 (d5 13)                     # AC - MEM[13h+X]
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AI - BI; wrn; wrz; wrc 
+                   
+            - (IND,X): CMP ($36,X) (c1 36)                  # AC - MEM[MEM[36h+X]]    OBS: O ENDEREÇO RESULTANTE DE (IND+X) FICA DENTRO DA PÁGINA 0 (00:FF)
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI; ADH <- 0
+                T4: ABL <- AI + BI + 1; BI <- MEM[ABH/ABL]; AI <- 0;
+                T5: ABL <- AI + BI; ABH <- MEM[ABH/ABL]
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AI - BI; wrn; wrz; wrc 
+                
+            - (IND),Y: CMP ($A5),Y (d1 a5)                  # AC - MEM[MEM[a5h]+Y]
+                T2: MAR <- MEM[MAR]; BI <- MEM[MAR]; AI <- 0
+                T3: MAR <- AI + BI + 1; BI <- MEM[MAR]; AI <- Y 
+                T4: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0
+                T5: ABH <- AI + BI + hc;
+                T6: BI <- MEM[ABH/ABL]; AI <- AC
+                T7: AI - BI; wrn; wrz; wrc 
+                
+            - ABS: CMP $0001 (cd 01 00)                     # AC - MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AI - BI; wrn; wrz; wrc 
+                
+            - ABS,X: CMP $12F0,X (dd F0 12)                 # AC - MEM[12F0h+X]
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AI - BI; wrn; wrz; wrc 
+                
+            - ABS,Y: CMP $12F0,Y (d9 F0 12)                 # AC - MEM[12F0h+Y]
+                T2: BI <- MEM[MAR]; AI <- Y; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+Y]
+                T5: BI <- MEM[ABH/ABL]; AI <- AC
+                T6: AI - BI; wrn; wrz; wrc
+
+Compare Instruction Results
+    Compare Result	        N	Z	C
+    A, X, or Y < Memory	    *	0	0
+    A, X, or Y = Memory	    0	1	1
+    A, X, or Y > Memory	    *	0	1
+    * The N flag will be bit 7 of A, X, or Y - Memory                

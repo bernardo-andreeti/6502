@@ -1,0 +1,84 @@
+Brief: 
+    - Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
+    - Lenght: 2 bytes;
+    - Cycles: 4;
+    
+States shared between different addressing modes:
+
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;          # First Decode step, IR receives opcode 
+            
+Specific States:    
+        
+        JMP
+        ----
+            - ABS: JMP $0001 (4c 01 00)                     # PC <- 0001h
+                T2: MAR <- PC; PC++; BI <- MEM[MAR]; AI <- 0
+                T3: PCL <- AI + BI; PCH <- MEM[MAR]
+                
+            - IND: JMP ($0001) (6c 01 00)                   # PC <- MEM[0001h]
+                T2: MAR <- PC; PC++; ABL <- MEM[MAR]
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; ADL <- AI + BI + 1
+                T5: PCL <- BI; PCH <- MEM[ABH/ABL];         
+        
+        BCC
+        ---
+            - RELATIVE: BCC $05 (90 05)                     # PC <- PC + 05h         
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BCS
+        ---
+            - RELATIVE: BCS $05 (b0 05)                     # PC <- PC + 05h           
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BEQ
+        ---
+            - RELATIVE: BEQ $05 (f0 05)                     # PC <- PC + 05h            
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BMI
+        ---
+            - RELATIVE: BMI $05 (30 05)                     # PC <- PC + 05h           
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BNE
+        ---
+            - RELATIVE: BNE $05 (D0 05)                     # PC <- PC + 05h            
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BPL
+        ---
+            - RELATIVE: BPL $05 (10 05)                     # PC <- PC + 05h            
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BVC
+        ---
+            - RELATIVE: BVC $05 (50 05)                     # PC <- PC + 05h           
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+                
+        BVS
+        ---
+            - RELATIVE: BVS $05 (70 05)                     # PC <- PC + 05h           
+                T2: BI <- MEM[MAR]; AI <- PCL                # DAQUI VOLTA PARA T0 SE A CONDI플O FOR FALSA
+                T3: PCL <- AI + BI; AI <- 0; BI <- PCH
+                T4: PCH <- AI + BI + hc
+        
+        
+Branch instructions use a signed 8-bit offset relative to the instruction after the branch

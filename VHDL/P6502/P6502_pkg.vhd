@@ -48,6 +48,12 @@ package P6502_pkg is
         JUMP_BRANCH, STACK, SHIFT_ROTATE
     );
     
+    type ALU_Operation_type is (
+        ALU_AND, ALU_OR, ALU_XOR,
+        ALU_A, ALU_B, ALU_ADD,
+        ALU_ADC, ALU_DEC, ALU_NOP
+    );
+    
     type AddressMode_type is (IMM, ZPG, ZPG_X, ZPG_Y, IND_X, IND_Y, AABS, ABS_X, ABS_Y, IMP, REL, ACC, IND);
     
     type DecodedInstruction_type is record
@@ -80,7 +86,7 @@ package P6502_pkg is
         mux_sb       : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
         mux_adl      : std_logic_vector(1 downto 0); -- ADL Multiplexer selection input 
         mux_adh      : std_logic_vector(1 downto 0); -- ADH Multiplexer selection input 
-        ALUoperation : std_logic_vector(2 downto 0);
+        ALUoperation : ALU_Operation_type;
         setP         : std_logic_vector(7 downto 0);
         rstP         : std_logic_vector(7 downto 0);
         ceP          : std_logic_vector(7 downto 0);
