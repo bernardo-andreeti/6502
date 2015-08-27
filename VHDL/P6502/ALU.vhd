@@ -9,7 +9,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.std_logic_unsigned.all;
+use IEEE.numeric_std.all;
 use work.P6502_pkg.all;
 
 entity ALU is
@@ -27,30 +27,31 @@ architecture behavioral of ALU is
 
     -- Signal used to read the result bits (Can't read directly output ports)
     signal temp: std_logic_vector(7 downto 0);
-    signal sum, a_s, b_s: std_logic_vector(8 downto 0);
-    signal carry: std_logic;
-
+    signal sum: unsigned(8 downto 0);
+    signal a_s, b_s: unsigned (8 downto 0);
+    signal carry: unsigned(0 downto 0);
+ 
 begin
     
-    Result <= temp;
+    result <= temp;
     
     temp <= a and b         when operation = ALU_AND else
             a or b          when operation = ALU_OR else
             a xor b         when operation = ALU_XOR else
             a               when operation = ALU_A else 
             b               when operation = ALU_B else
-            sum(7 downto 0);    
+            std_logic_vector(sum(7 downto 0));        
             
-    a_s <= ('0' & a); b_s <= ('0' & b);
+    a_s <= unsigned('0' & a); b_s <= unsigned('0' & b);
     -- Sum and carry generation
-    carry <= carry_in;
-    sum <= (a_s + b_s + carry) when operation = ALU_ADC else (a_s + b_s) when operation = ALU_ADD else (a_s + b_s - 1) when operation = ALU_DEC else "000000000" when operation = ALU_NOP;
-        
+    carry <= to_unsigned(1, 1) when carry_in = '1' else to_unsigned(0, 1);
+    sum <= (a_s + b_s + carry) when operation = ALU_ADC else (a_s + b_s) when operation = ALU_ADD else (a_s + b_s - 1) when operation = ALU_DEC else ("000000000") when operation = ALU_NOP;
+       
     -- Overflow flag (Operands with the same signal but different from the result's signal)
     v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
     
     -- Carry flag
-    c <= sum(8); -- when Operation = "101" else '0';
+    c <= std_logic(sum(8)); 
     
 end behavioral;
 
