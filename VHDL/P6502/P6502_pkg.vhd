@@ -50,8 +50,9 @@ package P6502_pkg is
     
     type ALU_Operation_type is (
         ALU_AND, ALU_OR, ALU_XOR,
-        ALU_A, ALU_B, ALU_ADD,
-        ALU_ADC, ALU_DEC, ALU_NOP
+        ALU_A, ALU_B, ALU_ADD, ALU_ADC, 
+        ALU_DEC, ALU_ASL, ALU_LSR, ALU_ROL, 
+        ALU_ROR, ALU_NOP
     );
     
     type AddressMode_type is (IMM, ZPG, ZPG_X, ZPG_Y, IND_X, IND_Y, AABS, ABS_X, ABS_Y, IMP, REL, ACC, IND);
