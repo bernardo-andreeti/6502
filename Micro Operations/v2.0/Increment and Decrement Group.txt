@@ -1,4 +1,4 @@
-rief: 
+Brief: 
     - Addressing Modes: Absolute, Zero Page, Absolute_X, Zero Page_X;
     - Lenght: 2 to 3 bytes;
     - Cycles: 3 to 7;
@@ -14,53 +14,53 @@ Specific States:
         
         INC
         ----    
-            - Z-PAGE: AND $33 (25 33)                       # AC <- AC & MEM[33h]            
+            - Z-PAGE: INC $33 (e6 33)                   # MEM[33h] <- MEM[33h] + 1   
                 T2: MAR <- MEM[MAR];                      
                 T3: BI <- MEM[MAR]; AI <- 0
                 T4: MEM[MAR] <- AI + BI + 1; wrn; wnz
 
-            - Z-PAGE,X: AND $13 (35 13)                     # AC <- AC & MEM[13h+X]
+            - Z-PAGE,X: INC $13 (f6 13)                 # MEM[13h+X] <- MEM[13h+X] + 1
                 T2: BI <- MEM[MAR]; AI <- X
                 T3: ABL <- AI + BI;
                 T4: BI <- MEM[ABH/ABL]; AI <- 0
-                T5: MEM[MAR] <- AI + BI + 1; wrn; wnz
+                T5: MEM[ABH/ABL] <- AI + BI + 1; wrn; wnz
                 
-            - ABS: AND $0001 (2d 01 00)                     # AC <- AC & MEM[0001h]
+            - ABS: INC $0001 (ee 01 00)                 # MEM[0001h] <- MEM[0001h] + 1
                 T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
                 T3: ABH <- MEM[MAR]
                 T4: BI <- MEM[ABH/ABL]; AI <- 0
-                T5: MEM[MAR] <- AI + BI + 1; wrn; wnz
+                T5: MEM[ABH/ABL] <- AI + BI + 1; wrn; wnz
                 
-            - ABS,X: LDA $12F0,X (3d F0 12)                     # AC <- AC & MEM[12F0h+X]    
+            - ABS,X: INC $12F0,X (fe F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] + 1
                 T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
                 T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
                 T5: BI <- MEM[ABH/ABL]; AI <- 0
-                T6: MEM[MAR] <- AI + BI + 1; wrn; wnz
+                T6: MEM[ABH/ABL] <- AI + BI + 1; wrn; wnz
                             
         DEC
         ---- 
-            - Z-PAGE: ORA $33 (05 33)                       # AC <- AC | MEM[33h]
+            - Z-PAGE: DEC $33 (c6 33)                   # MEM[33h] <- MEM[33h] - 1
                 T2: MAR <- MEM[MAR];                      
                 T3: BI <- MEM[MAR]; AI <- 0
                 T4: MEM[MAR] <- AI + BI - 1; wrn; wnz
             
-            - Z-PAGE,X: ORA $13 (15 13)                     # AC <- AC | MEM[13h+X]
+            - Z-PAGE,X: DEC $13 (d6 13)                 # MEM[13h+X] <- MEM[13h+X] - 1
                 T2: BI <- MEM[MAR]; AI <- X
                 T3: ABL <- AI + BI;
-                T4: BI <- MEM[MAR]; AI <- 0
-                T5: MEM[MAR] <- AI + BI - 1; wrn; wnz
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- AI + BI - 1; wrn; wnz
                         
-            - ABS: ORA $0001 (0d 01 00)                     # AC <- AC | MEM[0001h]
+            - ABS: DEC $0001 (ce 01 00)                 # MEM[0001h] <- MEM[0001h] - 1
                 T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
                 T3: ABH <- MEM[MAR]
-                T4: BI <- MEM[MAR]; AI <- 0
-                T5: MEM[MAR] <- AI + BI - 1; wrn; wnz
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- AI + BI - 1; wrn; wnz
             
-            - ABS,X: LDA $12F0,X (1d F0 12)                     # AC <- AC | MEM[12F0h+X]
+            - ABS,X: DEC $12F0,X (de F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] - 1
                 T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
                 T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
                 T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
-                T5: BI <- MEM[MAR]; AI <- 0
-                T6: MEM[MAR] <- AI + BI - 1; wrn; wnz
+                T5: BI <- MEM[ABH/ABL]; AI <- 0
+                T6: MEM[ABH/ABL] <- AI + BI - 1; wrn; wnz
             

@@ -1,0 +1,141 @@
+Brief: 
+    - Addressing Modes: Accumulator, Absolute, Zero Page, Absolute_X, Zero Page_X;
+    - Lenght: 1 to 3 bytes;
+    - Cycles: 3 to 7;
+    
+States shared between different addressing modes:
+
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;          # First Decode step, IR receives opcode 
+            
+Specific States:    
+        
+        ASL
+        ----
+            - ACC: ASL A (0a)                           # AC <- AC << 1; c <- AC(7); AC(0) <- 0             
+                T2: BI <- AC                      
+                T3: AC <- BI << 1; wrn; wrz; wrc        # c <- AC(7); AC(0) <- 0    
+                                
+            - Z-PAGE: ASL $33 (06 33)                   # MEM[33h] <- MEM[33h] << 1; c <- MEM[33h](7); MEM[33h](0) <- 0           
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- 0
+                T4: MEM[MAR] <- BI << 1; wrn; wrz; wrc  # c <- MEM[33h](7); MEM[33h](0) <- 0
+
+            - Z-PAGE,X: ASL $13 (16 13)                 # MEM[13h+X] <- MEM[13h+X] << 1; c <- MEM[13h+X](7); MEM[13h+X](0) <- 0
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI << 1; wrn; wrz; wrc # c <- MEM[13h+X](7); MEM[13h+X](0) <- 0
+                
+            - ABS: ASL $0001 (0e 01 00)                 # MEM[0001h] <- MEM[0001h] << 1; c <- MEM[0001h](7); MEM[0001h](0) <- 0
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI << 1; wrn; wrz; wrc   # c <- MEM[0001h](7); MEM[0001h](0) <- 0
+                
+            - ABS,X: ASL $12F0,X (1e F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] << 1; c <- MEM[12F0h+X](7); MEM[12F0h+X](0) <- 0 
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- 0
+                T6: MEM[ABH/ABL] <- BI << 1; wrn; wrz; wrc   # c <- MEM[12F0h+X](7); MEM[12F0h+X](0) <- 0
+                
+        *ASL shifts all bits left one position. 0 is shifted into bit 0 and the original bit 7 is shifted into the Carry        
+                            
+        LSR
+        ----
+            - ACC: LSR A (4a)                       # AC <- AC >> 1; c <- AC(0); AC(7) <- 0           
+                T2: BI <- AC                      
+                T3: AC <- BI >> 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- 0    
+                
+            - Z-PAGE: LSR $33 (46 33)               # MEM[33h] <- MEM[33h] >> 1; c <- MEM[33h](0); MEM[33h](7) <- 0
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- 0
+                T4: MEM[MAR] <- BI >> 1; wrn; wrz; wrc    # c <- MEM[33h](0); MEM[33h](7) <- 0
+            
+            - Z-PAGE,X: LSR $13 (56 13)             # MEM[13h+X] <- MEM[13h+X] >> 1; c <- MEM[13h+X](0); MEM[13h+X](7) <- 0
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI >> 1; wrn; wrz; wrc   # c <- MEM[13h+X](0); MEM[13h+X](7) <- 0
+                        
+            - ABS: LSR $0001 (4e 01 00)                 # MEM[0001h] <- MEM[0001h] >> 1; c <- MEM[0001h](0); MEM[0001h](7) <- 0
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI >> 1; wrn; wrz; wrc   # c <- MEM[0001h](0); MEM[0001h](7) <- 0
+            
+            - ABS,X: LSR $12F0,X (5e F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] >> 1; c <- MEM[12F0h+X](0); MEM[12F0h+X](7) <- 0
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- 0
+                T6: MEM[ABH/ABL] <- BI >> 1; wrn; wrz; wrc   # c <- MEM[12F0h+X](0); MEM[12F0h+X](7) <- 0
+            
+        *LSR shifts all bits right one position. 0 is shifted into bit 7 and the original bit 0 is shifted into the Carry.
+
+        ROL
+        ----
+            - ACC: ROL A (2a)                   # AC <- AC rol 1; AC(0) <- c; c <- AC(7)            
+                T2: BI <- AC                      
+                T3: AC <- BI rol 1; wrn; wrz; wrc    # AC(0) <- c; c <- AC(7)        
+                
+            - Z-PAGE: ROL $33 (26 33)               # MEM[33h] <- MEM[33h] rol 1; MEM[33h](0) <- c; c <- MEM[33h](7); MEM[33h](7) <- 0
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- 0
+                T4: MEM[MAR] <- BI rol 1; wrn; wrz; wrc    # MEM[33h](0) <- c; c <- MEM[33h](7)
+            
+            - Z-PAGE,X: ROL $13 (36 13)             # MEM[13h+X] <- MEM[13h+X] rol 1; MEM[13h+X](0) <- c; c <- MEM[13h+X](7);
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI rol 1; wrn; wrz; wrc   # MEM[13h+X](0) <- c; c <- MEM[13h+X](7)
+                        
+            - ABS: ROL $0001 (2e 01 00)                 # MEM[0001h] <- MEM[0001h] rol 1; MEM[0001h](0) <- c; c <- MEM[0001h](7)
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI rol 1; wrn; wrz; wrc   # MEM[0001h](0) <- c; c <- MEM[0001h](7)
+            
+            - ABS,X: ROL $12F0,X (3e F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] rol 1; MEM[12F0h+X](0) <- c; c <- MEM[12F0h+X](7)
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- 0
+                T6: MEM[ABH/ABL] <- BI rol 1; wrn; wrz; wrc   # MEM[12F0h+X](0) <- c; c <- MEM[12F0h+X](7)
+            
+        *ROL shifts all bits left one position. The Carry is shifted into bit 0 and the original bit 7 is shifted into the Carry.
+        
+        ROR
+        ----
+            - ACC: ROR A (6a)                   # AC <- AC ror 1; c <- AC(0); AC(7) <- c            
+                T2: BI <- AC                      
+                T3: AC <- BI ror 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- c            
+                
+            - Z-PAGE: ROR $33 (66 33)               # MEM[33h] <- MEM[33h] ror 1; c <- MEM[33h](0); MEM[33h](7) <- c
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- 0
+                T4: MEM[MAR] <- BI ror 1; wrn; wrz; wrc    # c <- MEM[33h](0); MEM[33h](7) <- c
+            
+            - Z-PAGE,X: ROR $13 (76 13)             # MEM[13h+X] <- MEM[13h+X] ror 1; c <- MEM[13h+X](0); MEM[13h+X](7) <- c
+                T2: BI <- MEM[MAR]; AI <- X
+                T3: ABL <- AI + BI;
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI ror 1; wrn; wrz; wrc   # c <- MEM[13h+X](0); MEM[13h+X](7) <- c
+                        
+            - ABS: ROR $0001 (6e 01 00)                 # MEM[0001h] <- MEM[0001h] ror 1; c <- MEM[0001h](0); MEM[0001h](7) <- c
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- 0
+                T5: MEM[ABH/ABL] <- BI ror 1; wrn; wrz; wrc   # c <- MEM[0001h](0); MEM[0001h](7) <- c
+            
+            - ABS,X: ROR $12F0,X (7e F0 12)             # MEM[12F0h+X] <- MEM[12F0h+X] ror 1; c <- MEM[12F0h+X](0); MEM[12F0h+X](7) <- c
+                T2: BI <- MEM[MAR]; AI <- X; MAR <- PC; PC++;   # BI <- LOW ADDRESS BYTE
+                T3: ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0;    # BI <- HIGH ADDRESS BYTE
+                T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+X]
+                T5: BI <- MEM[ABH/ABL]; AI <- 0
+                T6: MEM[ABH/ABL] <- BI ror 1; wrn; wrz; wrc   # c <- MEM[12F0h+X](0); MEM[12F0h+X](7) <- c
+            
+        *ROR shifts all bits right one position. The Carry is shifted into bit 7 and the original bit 0 is shifted into the Carry.
