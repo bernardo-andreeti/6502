@@ -41,8 +41,8 @@ begin
             b_u srl 1        when operation = ALU_LSR else
             a_u              when operation = ALU_A else 
             b_u              when operation = ALU_B else
-            ((b_u rol 1) or carry_u)          when operation = ALU_ROL else
-            ((carry_u sll 7) or (b_u ror 1))  when operation = ALU_ROR else
+            (b_u sll 1) or carry_u          when operation = ALU_ROL else
+            (b_u srl 1) or (carry_u sll 7)  when operation = ALU_ROR else
             sum_ext(8 downto 1);        
     
     a_u <= UNSIGNED(a); b_u <= UNSIGNED(b); 
