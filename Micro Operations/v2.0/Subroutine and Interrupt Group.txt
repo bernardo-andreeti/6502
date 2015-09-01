@@ -1,0 +1,30 @@
+Brief: 
+    - Addressing Modes: Absolute and Implied;
+    - Lenght: 1 to 3 bytes;
+    - Cycles: 6;
+    
+States shared between different addressing modes:
+
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            T1: MAR <- PC ; IR <- MEM[MAR] ; PC++;          # First Decode step, IR receives opcode
+            
+Specific States:    
+        
+        JSR
+        ----            
+            - ABS: JSR $0001 (20 01 00)         # PC <- 0001h; MEM[SP] <- PCH; SP--; MEM[SP] <- PCL; SP--; 
+                T2: PC++; BI <- MEM[MAR]; AI <- 0; ABL <- S; ABH <- 1; S--; # PC <- points to target's high address byte, MAR <- points to target's low address byte  
+                T3: MEM[ABH/ABL] <- PCH; ADL <- S; ADH <- 1; S--;
+                T4: MEM[ABH/ABL] <- PCL; MAR <- PC; PCL <- BI
+                T5: PCH <- MEM[MAR]
+                
+        RTS
+        ----
+            - IMPLIED: RTS (60)                 # SP++; PCL <- MEM[SP]; SP++; PCH <- MEM[SP]
+                T2: BI <- S; AI <- 0
+                T3: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
+                T4: PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0
+                T5: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
+                T6: PCH <- MEM[ABH/ABL];

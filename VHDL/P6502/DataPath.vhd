@@ -129,7 +129,8 @@ begin
     
     S: entity work.RegisterNbits
         generic map (
-            WIDTH   => 8
+            WIDTH   => 8,
+            INIT_VALUE  => 255
         )
         port map (
             clk     => clk,
