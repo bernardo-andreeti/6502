@@ -76,8 +76,8 @@ package P6502_pkg is
         wrABH        : std_logic;                    -- Write control for the ABH register
         wrABL        : std_logic;                    -- Write control for the ABL register
         wrMAR        : std_logic;                    -- Write control for the MAR register
-        mux_bi       : std_logic;                    -- Multiplexer selection input
         mux_address  : std_logic;                    -- Multiplexer selection input
+        mux_bi       : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_mar      : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_ai       : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_carry    : std_logic_vector(1 downto 0); -- Multiplexer selection input

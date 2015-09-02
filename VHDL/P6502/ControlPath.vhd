@@ -97,14 +97,14 @@ begin
                 end if;
             
             when T5 =>
-                if (decIns.addressMode=IND) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=SUBROUTINE_INTERRUPT)) then
+                if (decIns.addressMode=IND and decIns.InsGroup=JUMP_BRANCH) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE)) then
                         nextState <= T0;
                 else
                         nextState <= T6;
                 end if;
             
             when T6 =>
-                if ((decIns.addressMode=IMP and decIns.InsGroup=SUBROUTINE_INTERRUPT) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE)))  then
+                if ((decIns.addressMode=IMP or decIns.addressMode=AABS) and decIns.InsGroup=SUBROUTINE_INTERRUPT) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE))  then
                         nextState <= T0;
                 else
                         nextState <= T7;
@@ -146,7 +146,7 @@ begin
     process(decIns,currentState)
     begin
         -- Default Values
-        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0','0',"00","00","00",'0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0','0');
+        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","00","00","00",'0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0','0');
         
         if currentState = IDLE then
             uins.rstP(CARRY)     <= '1';
@@ -185,8 +185,7 @@ begin
                     if decIns.instruction=JSR then 
                         uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
                         uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
-                        uins.mux_s <= '0'; uins.wrS <= '1'; -- S <- S - 1
-                        uins.mux_address <= '1';            -- address <- ABH & ABL                        
+                        uins.mux_s <= '0'; uins.wrS <= '1'; -- S <- S - 1                      
                     end if;
                 else
                     uins.mux_adl <= "10";
@@ -227,7 +226,7 @@ begin
             uins.rw <= '1';        -- Enable Read Mode
             uins.mux_db <= "100";  -- DB <- MEM[MAR]
             if decIns.InsGroup=COMPARE then
-                uins.mux_bi <= '1'; -- BI <- !MEM[MAR] for compare instructions
+                uins.mux_bi <= "01"; -- BI <- !MEM[MAR] for compare instructions
             end if;
             uins.wrBI <= '1';      -- BI <- DB
             if decIns.InsGroup=JUMP_BRANCH then
@@ -274,7 +273,7 @@ begin
             
     -- DECODE (ZPG_X, ZPG_Y IND_X, IND_Y, ABS_X, ABS_Y)
     --  ABL <- AI + BI; ADH <- 0 or ABL <- AI + BI; BI <- MEM[MAR]; AI <- 0        
-        elsif ((currentState = T3 and (decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y or decIns.addressMode=IND_X or decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState = T4 and (decIns.addressMode=IND_Y or decIns.addressMode=IND))) then
+        elsif (currentState = T3 and (decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y or decIns.addressMode=IND_X or decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState = T4 and (decIns.addressMode=IND_Y or decIns.addressMode=IND)) then
             if decIns.addressMode=IND then
                 uins.ALUoperation <= ALU_ADC; -- AI + BI + 1
             else
@@ -297,7 +296,7 @@ begin
     -- DECODE (Accumulator and Implied addressing mode): BI <- AC; AI <- 0
         elsif currentState = T2 and (decIns.addressMode=ACC or decIns.addressMode=IMP) then
             if decIns.addressMode = IMP then
-                uins.mux_db <= "001";
+                uins.mux_bi <= "10"; -- BI <- SB
                 uins.mux_ai <= "01"; uins.wrAI <= '1'; -- AI <- x"00"
             end if;    
             uins.wrBI <= '1'; -- BI <- AC or S
@@ -321,9 +320,6 @@ begin
                 uins.ce <= '1'; uins.rw <= '0';          -- Write Mode
                 uins.mux_address <= '1';                 -- address <- ABH & ABL
                 uins.mux_db <= "011";                    -- MEM[ABH/ABL] <- PCH
-                uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
-                uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
-                uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
             else
                 uins.ce <= '1'; uins.rw <= '1';         -- Enable Read Mode
                 uins.mux_db <= "100";                   -- DB <- MEM[MAR]
@@ -338,28 +334,40 @@ begin
             uins.mux_adl <= "00"; uins.wrPCL <= '1'; -- PCL <- AI + BI
             uins.mux_ai <= "01"; uins.wrAI <= '1';   -- AI <- x"00"
             uins.mux_db <= "011"; uins.wrBI <= '1';  -- BI <- PCH
-        
-    -- DECODE (JSR) T4: MEM[ABH/ABL] <- PCL; MAR <- PC; PCL <- BI
-        elsif (currentState = T4 and decIns.addressMode = AABS and decIns.InsGroup = SUBROUTINE_INTERRUPT) then
+    
+    -- DECODE (JSR): ADL <- S; ADH <- 1; S--;        
+        elsif (currentState=T4 and decIns.addressMode=AABS and decIns.InsGroup=SUBROUTINE_INTERRUPT) then
+            uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
+            uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
+            uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
+            uins.mux_db <= "010";                      -- MEM[ABH/ABL] <- PCL
+            uins.mux_address <= '1';                 -- address <- ABH & ABL
+            
+    -- DECODE (JSR) MEM[ABH/ABL] <- PCL; MAR <- PC; PCL <- BI
+        elsif (currentState = T5 and decIns.addressMode = AABS and decIns.InsGroup = SUBROUTINE_INTERRUPT) then
             uins.ce <= '1'; uins.rw <= '0';            -- Write Mode
-            --uins.mux_address <= '1';                   -- address <- ABH & ABL
+            uins.mux_address <= '1';                   -- address <- ABH & ABL
             uins.mux_db <= "010";                      -- MEM[ABH/ABL] <- PCL
             uins.mux_mar <= "00"; uins.wrMAR   <= '1'; -- MAR <- PCH_q & PCL_q
-            uins.mux_pc <= '1';                        -- PC <- ADH & ADL
-            uins.mux_adl <= "00"; uins.wrPCL <= '1';   -- PCL <- BI
     
     -- DECODE (Implied addressing mode): PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0    
-        elsif currentState = T4 and decIns.addressMode = IMP then
-            uins.mux_adl <= "10"; uins.mux_pc <= '1'; uins.wrPCL <= '1';
-            uins.mux_db <= "001"; uins.wrBI <= '1'; -- BI <- S
+        elsif (currentState= T4 and decIns.addressMode= IMP and decIns.InsGroup= SUBROUTINE_INTERRUPT) then
+            uins.mux_db <= "100"; uins.mux_adl <= "10"; uins.mux_pc <= '1'; uins.wrPCL <= '1';
+            uins.mux_bi <= "10"; uins.wrBI <= '1'; -- BI <- S (over SB)
             uins.mux_ai <= "01"; uins.wrAI <= '1'; -- AI <- x"00"
             uins.mux_address <= '1';
             
     -- Last cycle for JSR and RTS: PCH <- MEM[MAR or ABH/ABL]
-        elsif (currentState = T5 or currentState = T6) and decIns.InsGroup = SUBROUTINE_INTERRUPT then
-            uins.mux_pc <= '1'; uins.mux_adh <= "00"; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
-            if currentState=T6 then
+        elsif currentState = T6 and decIns.InsGroup = SUBROUTINE_INTERRUPT then
+            uins.ce <= '1'; uins.rw <= '1';         -- Enable Read Mode
+            uins.mux_db <= "100"; uins.mux_pc <= '1';
+            if decIns.addressMode=IMP then
+                uins.mux_adh <= "00"; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
                 uins.mux_address <= '1';
+            else
+                uins.mux_pc <= '1';                        -- PC <- ADH & ADL
+                uins.ALUoperation <= ALU_B;
+                uins.mux_adl <= "00"; uins.wrPCL <= '1';   -- PCL <- BI
             end if;
     
     -- DECODE (third step for INC and DEC, Shift and Rotate); BI <- MEM[AB]; AI <- 0    

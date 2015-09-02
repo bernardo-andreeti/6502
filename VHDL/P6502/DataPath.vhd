@@ -64,10 +64,13 @@ begin
         
     -- Multiplexer connected to the AI register input
     MUX_AI: AI_d <= ADL when uins.mux_ai = "00" else 
+                    x"00" when uins.mux_ai = "01" else
                     SB;
     
     -- Multiplexer connected to the BI register input
-    MUX_BI: BI_d <= DB when uins.mux_bi = '0' else not DB;
+    MUX_BI: BI_d <= DB when uins.mux_bi = "00" else 
+                    not DB when uins.mux_bi = "01" else
+                    SB;
     
     ALU: entity work.ALU 
         port map (
