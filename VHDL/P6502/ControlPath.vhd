@@ -179,13 +179,15 @@ begin
         -- DECODE (absolute)    
             if currentState = T2 and (decIns.addressMode = AABS or decIns.addressMode = IND) then
                 uins.mux_db <= "100";   -- DB <- MEM[MAR]
-                if (decIns.instruction=JMP or decIns.instruction=JSR) and decIns.addressMode = AABS then
+                if decIns.instruction=JMP or decIns.instruction=JSR then
                     uins.wrBI <= '1';                       -- BI <- DB
                     uins.mux_ai <= "01"; uins.wrAI <= '1';  -- AI <- x"00"
                     if decIns.instruction=JSR then 
                         uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
                         uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
-                        uins.mux_s <= '0'; uins.wrS <= '1'; -- S <- S - 1                      
+                        uins.mux_s <= '0'; uins.wrS <= '1'; -- S <- S - 1
+                    elsif decIns.addressMode=IND then
+                        uins.mux_adl <= "10"; uins.wrABL <= '1'; -- ABL <- DB
                     end if;
                 else
                     uins.mux_adl <= "10";
@@ -287,6 +289,9 @@ begin
                 uins.wrBI <= '1';      -- BI <- DB
                 uins.mux_ai <= "01";   
                 uins.wrAI <= '1';      -- AI <- x"00"
+                if decIns.addressMode=IND then
+                    uins.mux_address <= '1'; -- address <- ABH & ABL
+                end if;
             else
                 uins.mux_adh <= "10";
                 uins.wrABH <= '1';       -- ABH <- x"00"

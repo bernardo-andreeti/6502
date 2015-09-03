@@ -19,7 +19,7 @@ Specific States:
                 T3: PCL <- AI + BI; PCH <- MEM[MAR]
                 
             - IND: JMP ($0001) (6c 01 00)                   # PC <- MEM[0001h]
-                T2: MAR <- PC; PC++; ABL <- MEM[MAR]
+                T2: MAR <- PC; PC++; ABL <- MEM[MAR]; BI <- MEM[MAR]
                 T3: ABH <- MEM[MAR]
                 T4: BI <- MEM[ABH/ABL]; ADL <- AI + BI + 1
                 T5: PCL <- BI; PCH <- MEM[ABH/ABL];         
