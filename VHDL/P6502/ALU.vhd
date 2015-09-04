@@ -46,7 +46,7 @@ begin
     b_ext <= UNSIGNED('0' & b & carry_in) when operation = ALU_ADC else UNSIGNED('0' & b & '0');
     
     -- Sum and carry generation
-    sum_ext <= (a_ext + b_ext) when (operation = ALU_ADC or operation = ALU_ADD) else (a_ext + b_ext - 2) when operation = ALU_DEC else "0000000000" when operation = ALU_NOP;
+    sum_ext <= (a_ext + b_ext) when (operation = ALU_ADC or operation = ALU_ADD) else (a_ext + b_ext - 2) when operation = ALU_DEC else "0000000000";
        
     -- Overflow flag (Operands with the same signal but different from the result's signal)
     v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
