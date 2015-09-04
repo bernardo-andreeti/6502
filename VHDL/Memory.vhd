@@ -47,19 +47,16 @@ architecture block_RAM of Memory is
     signal RAM : RamType := InitRamFromFile("AllSuite.txt");
             
     begin
-    -- Process to control the memory writing
+    -- Process to control the memory access
     process(clk)
     begin
         if rising_edge(clk) then    -- Memory writing        
-            if we = '1'  then
+            if we = '1' then
                 RAM(TO_INTEGER(UNSIGNED(address))) <= data_in; 
             end if;
-        
-                -- Synchronous memory read (Block RAM)
-                data_out <= RAM(TO_INTEGER(UNSIGNED(address)));
-          end if;   
+            -- Synchronous memory read (Block RAM)
+            data_out <= RAM(TO_INTEGER(UNSIGNED(address)));
+        end if;   
     end process;
     
-    -- Asynchronous memory read
-    --data_out <= RAM(TO_INTEGER(UNSIGNED(address)));
 end block_RAM;

@@ -14,8 +14,7 @@ use work.P6502_pkg.all;
 entity P6502 is
     port( 
         clk, rst    : in std_logic;
-        ce          : out std_logic;    -- Chip enable to data memory
-        rw          : out std_logic;    -- Access control to data memory (rw =0 : WRITE, rw = 1: READ)
+        we          : out std_logic;    -- Access control to data memory (we =0 : READ, we = 1: WRITE)
         address     : out std_logic_vector(15 downto 0);    -- Address bus to memory
         data_in     : in std_logic_vector(7 downto 0);      -- Data from memory
         data_out    : out std_logic_vector(7 downto 0)      -- Data to memory
@@ -55,7 +54,6 @@ begin
             instruction => data_in            
         );
         
-    ce <= uins.ce;
-    rw <= uins.rw;
+    we <= uins.we;
      
 end structural;

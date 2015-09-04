@@ -15,8 +15,8 @@ Specific States:
         ASL
         ----
             - ACC: ASL A (0a)                           # AC <- AC << 1; c <- AC(7); AC(0) <- 0             
-                T2: BI <- AC                      
-                T3: AC <- BI << 1; wrn; wrz; wrc        # c <- AC(7); AC(0) <- 0    
+                T1: BI <- AC; IR <- MEM[MAR]                      
+                T2: AC <- BI << 1; wrn; wrz; wrc        # c <- AC(7); AC(0) <- 0    
                                 
             - Z-PAGE: ASL $33 (06 33)                   # MEM[33h] <- MEM[33h] << 1; c <- MEM[33h](7); MEM[33h](0) <- 0           
                 T2: MAR <- MEM[MAR];                      
@@ -47,8 +47,8 @@ Specific States:
         LSR
         ----
             - ACC: LSR A (4a)                       # AC <- AC >> 1; c <- AC(0); AC(7) <- 0           
-                T2: BI <- AC                      
-                T3: AC <- BI >> 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- 0    
+                T1: BI <- AC; IR <- MEM[MAR]                        
+                T2: AC <- BI >> 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- 0    
                 
             - Z-PAGE: LSR $33 (46 33)               # MEM[33h] <- MEM[33h] >> 1; c <- MEM[33h](0); MEM[33h](7) <- 0
                 T2: MAR <- MEM[MAR];                      
@@ -79,8 +79,8 @@ Specific States:
         ROL
         ----
             - ACC: ROL A (2a)                   # AC <- AC rol 1; AC(0) <- c; c <- AC(7)            
-                T2: BI <- AC                      
-                T3: AC <- BI rol 1; wrn; wrz; wrc    # AC(0) <- c; c <- AC(7)        
+                T1: BI <- AC; IR <- MEM[MAR]                        
+                T2: AC <- BI rol 1; wrn; wrz; wrc    # AC(0) <- c; c <- AC(7)        
                 
             - Z-PAGE: ROL $33 (26 33)               # MEM[33h] <- MEM[33h] rol 1; MEM[33h](0) <- c; c <- MEM[33h](7); MEM[33h](7) <- 0
                 T2: MAR <- MEM[MAR];                      
@@ -111,8 +111,8 @@ Specific States:
         ROR
         ----
             - ACC: ROR A (6a)                   # AC <- AC ror 1; c <- AC(0); AC(7) <- c            
-                T2: BI <- AC                      
-                T3: AC <- BI ror 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- c            
+                T1: BI <- AC; IR <- MEM[MAR]                        
+                T2: AC <- BI ror 1; wrn; wrz; wrc    # c <- AC(0); AC(7) <- c            
                 
             - Z-PAGE: ROR $33 (66 33)               # MEM[33h] <- MEM[33h] ror 1; c <- MEM[33h](0); MEM[33h](7) <- c
                 T2: MAR <- MEM[MAR];                      

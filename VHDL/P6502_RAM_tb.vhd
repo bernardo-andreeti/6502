@@ -15,7 +15,7 @@ architecture behavioral of P6502_RAM_tb is
     
     signal clk          : std_logic := '0';
     signal rst          : std_logic;
-    signal rw, ce, we   : std_logic;
+    signal we           : std_logic;
     signal address      : std_logic_vector(ADDR_WIDTH-1 downto 0);
     signal dataBus      : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal RAM_data_in, RAM_data_out: std_logic_vector(DATA_WIDTH-1 downto 0);

@@ -17,7 +17,7 @@ end P6502_RAM;
 -- Instantiate the components and generates the stimuli.
 architecture behavioral of P6502_RAM is  
     
-    signal rw, ce, we                : std_logic;
+    signal we                        : std_logic;
     signal address                   : std_logic_vector(15 downto 0);
     signal RAMdata_in, RAMdata_out   : std_logic_vector(7 downto 0);
      
@@ -71,8 +71,7 @@ begin
         port map (
             clk         => clk_div,
             rst         => rst,
-            ce          => ce,
-            rw          => rw,
+            we          => we,
             data_in     => RAMdata_out,
             data_out    => RAMdata_in,
             address     => address
@@ -104,8 +103,6 @@ begin
             display2        => display2,  
             display3        => display3   -- Right most display
         );
-        
-    we <= '1' when ce = '1' and rw = '0' else '0'; -- Mode Select (Read/Write)
     
     process(clk_div,rst)
     begin
