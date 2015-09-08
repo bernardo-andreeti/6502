@@ -1,5 +1,5 @@
 Brief: 
-    - Addressing Modes: Absolute, Zero Page, Absolute_X, Zero Page_X;
+    - Addressing Modes: Absolute, Zero Page, Absolute_X, Zero Page_X and Implied;
     - Lenght: 2 to 3 bytes;
     - Cycles: 3 to 7;
     
@@ -64,3 +64,26 @@ Specific States:
                 T5: BI <- MEM[ABH/ABL]; AI <- 0
                 T6: MEM[ABH/ABL] <- AI + BI - 1; wrn; wnz
             
+        INX
+        ----
+            - IMPLIED: INX (e8)                   # X <- X + 1
+                T1: IR <- MEM[MAR]; BI <- X; AI <- 0; 
+                T2: X <- AI + BI + 1; wrn; wnz
+        
+        INY
+        ----
+            - IMPLIED: INY (c8)                   # Y <- Y + 1
+                T1: IR <- MEM[MAR]; BI <- Y; AI <- 0;
+                T2: Y <- AI + BI + 1; wrn; wnz
+            
+        DEX
+        ----
+            - IMPLIED: DEX (ca)                   # X <- X - 1
+                T1: IR <- MEM[MAR]; BI <- X; AI <- 0;
+                T2: X <- AI + BI - 1; wrn; wnz
+                
+        DEY
+        ----
+            - IMPLIED: DEY (88)                   # Y <- Y - 1
+                T1: IR <- MEM[MAR]; BI <- Y; AI <- 0;
+                T2: Y <- AI + BI - 1; wrn; wnz    

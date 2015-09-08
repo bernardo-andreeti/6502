@@ -1,0 +1,34 @@
+Brief: 
+    - Addressing Modes: Implied;
+    - Lenght: 1 byte;
+    - Cycles: 2;
+    
+States shared between different addressing modes:
+
+        ALL
+        ----
+            T0: MAR <- PC ;  PC++                           # Fetch
+            
+Specific States:    
+        
+        TAX
+        ----
+            - IMPLIED: TAX (aa)                      # X <- AC
+                T1: IR <- MEM[AB]; X <- AC; wrn; wrz 
+                
+        TAY
+        ---
+            - IMPLIED: TAY (a8)                      # Y <- AC        
+                T1: IR <- MEM[AB]; Y <- AC; wrn; wrz 
+        
+        TXA
+        ---
+            - IMPLIED: TXA (8a)                      # AC <- X        
+                T1: IR <- MEM[AB]; AC <- X; wrn; wrz
+        
+        TYA
+        ---
+            - IMPLIED: TYA (98)                      # AC <- Y        
+                T1: IR <- MEM[AB]; AC <- Y; wrn; wrz 
+
+                    
