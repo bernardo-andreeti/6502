@@ -83,28 +83,28 @@ begin
                 end if;
                 
             when T3 =>
-                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and decIns.InsGroup=LOGICAL)  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) then
+                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC))  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) then
                     nextState <= T0;
                 else
                     nextState <= T4;
                 end if; 
                 
             when T4 => 
-                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE)) or decIns.addressMode=REL then
+                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC)) or decIns.addressMode=REL then
                     nextState <= T0;
                 else
                     nextState <= T5;
                 end if;
             
             when T5 =>
-                if (decIns.addressMode=IMP and decIns.InsGroup=SUBROUTINE_INTERRUPT) or (decIns.addressMode=IND and decIns.InsGroup=JUMP_BRANCH) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE)) then
+                if (decIns.addressMode=IMP and decIns.InsGroup=SUBROUTINE_INTERRUPT) or (decIns.addressMode=IND and decIns.InsGroup=JUMP_BRANCH) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC)) then
                         nextState <= T0;
                 else
                         nextState <= T6;
                 end if;
             
             when T6 =>
-                if (decIns.addressMode=AABS and decIns.InsGroup=SUBROUTINE_INTERRUPT) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE))  then
+                if (decIns.addressMode=AABS and decIns.InsGroup=SUBROUTINE_INTERRUPT) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC))  then
                         nextState <= T0;
                 else
                         nextState <= T7;
@@ -234,9 +234,9 @@ begin
             
     -- DECODE (Logical and Compare Group)
     -- T2 or T3 or T4 or T5 or T6: BI <- MEM[MAR or ABH/ABL]; AI <- AC     
-        elsif (((currentState=T2 and (decIns.addressMode=IMM or decIns.addressMode=REL)) or (currentState=T3 and decIns.addressMode=ZPG) or (currentState=T4 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T5 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T6 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=JUMP_BRANCH)) then
+        elsif (((currentState=T2 and (decIns.addressMode=IMM or decIns.addressMode=REL)) or (currentState=T3 and decIns.addressMode=ZPG) or (currentState=T4 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T5 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T6 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=JUMP_BRANCH or decIns.InsGroup=ARITHMETIC)) then
             uins.mux_db <= "100";  -- DB <- MEM[MAR]
-            if decIns.InsGroup=COMPARE then
+            if decIns.InsGroup=COMPARE or decIns.instruction=SBC then
                 uins.mux_bi <= "01"; -- BI <- !MEM[MAR] for compare instructions
             end if;
             uins.wrBI <= '1';      -- BI <- DB
@@ -458,19 +458,23 @@ begin
                 end if;
             end if;
             
-    -- EXECUTE: Logical Group (all addressing modes)
-        elsif (decIns.InsGroup=LOGICAL) then
+    -- EXECUTE: Logical and Arithmetic Group (all addressing modes)
+        elsif (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC) then
             if ((currentState=T3 and decIns.addressMode=IMM) or (currentState=T4 and decIns.addressMode=ZPG) or (currentState=T5 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T6 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T7 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) then
-                uins.mux_sb <= "001";   -- SB <- ALUresult
-                uins.wrAC <= '1';          -- AC <- SB  
+                uins.mux_sb <= "001";       -- SB <- ALUresult
+                uins.wrAC <= '1';           -- AC <- SB  
                 uins.ceP(NEGATIVE) <= '1';
                 uins.ceP(ZERO)     <= '1';
                 if decIns.instruction = AAND then
                     uins.ALUoperation <= ALU_AND; -- AI & BI
                 elsif decIns.instruction = ORA then
                     uins.ALUoperation <= ALU_OR;  -- AI | BI
-                else  -- EOR
-                    uins.ALUoperation <= ALU_XOR; -- AI ^ BI 
+                elsif decIns.instruction = EOR then  
+                    uins.ALUoperation <= ALU_XOR; -- AI ^ BI
+                else    -- ADC and SBC
+                    uins.mux_carry <= "01";
+                    uins.ALUoperation <= ALU_ADC; -- AI + BI + carry
+                    uins.ceP(CARRY) <= '1'; uins.ceP(OVERFLOW) <= '1';
                 end if; 
             end if;            
                         
