@@ -66,7 +66,7 @@ begin
                     nextState <= T1;
                     
             when T1 =>  
-                if decIns.InsGroup = STATUS_FLAG or decIns.InsGroup = REG_TRANSFER or decIns.instruction = TXS or decIns.instruction = TSX or (decIns.instruction=BEQ and spr_in(ZERO)='0') then 
+                if decIns.InsGroup = STATUS_FLAG or decIns.InsGroup = REG_TRANSFER or decIns.instruction = TXS or decIns.instruction = TSX or (decIns.instruction=BEQ and spr_in(ZERO)='0') or (decIns.instruction=BNE and spr_in(ZERO)='1') then 
                     nextState <= T0;
                 
                 elsif decIns.instruction=BRK then  
@@ -83,14 +83,14 @@ begin
                 end if;
                 
             when T3 =>
-                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC))  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) then
+                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE))  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) then
                     nextState <= T0;
                 else
                     nextState <= T4;
                 end if; 
                 
             when T4 => 
-                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC)) or decIns.addressMode=REL then
+                if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE)) or decIns.addressMode=REL then
                     nextState <= T0;
                 else
                     nextState <= T5;
@@ -104,7 +104,7 @@ begin
                 end if;
             
             when T6 =>
-                if (decIns.addressMode=AABS and decIns.InsGroup=SUBROUTINE_INTERRUPT) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC))  then
+                if (decIns.addressMode=AABS and decIns.InsGroup=SUBROUTINE_INTERRUPT) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE))  then
                         nextState <= T0;
                 else
                         nextState <= T7;
@@ -519,15 +519,14 @@ begin
                 uins.wrS <= '1';          
             end if;            
             
-    -- EXECUTE: Compare and Bit Test Group
+    -- EXECUTE: Compare and Bit Test Group -> pode ser colocado no bloco de exec do grupo logico e aritmético!
         elsif (decIns.InsGroup=COMPARE) then
-            if (currentState=T5 and decIns.addressMode=AABS) then
+            if ((currentState=T3 and decIns.addressMode=IMM) or (currentState=T4 and decIns.addressMode=ZPG) or (currentState=T5 and (decIns.addressMode=ZPG_X or decIns.addressMode=AABS)) or (currentState=T6 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y)) or (currentState=T7 and (decIns.addressMode=IND_X or decIns.addressMode=IND_Y))) then
                 uins.ALUoperation <= ALU_ADC; 
                 uins.mux_sb <= "001";       -- SB <- AI + BI + 1
                 uins.ceP(NEGATIVE) <= '1';
                 uins.ceP(CARRY)    <= '1';
-                uins.ceP(ZERO)     <= '1';
-                
+                uins.ceP(ZERO)     <= '1';   
             end if;
         
     -- EXECUTE: Increment and Decrement Group
