@@ -14,9 +14,37 @@ Specific States:
         TSX
         ----
             - IMPLIED: TSX (ba)                      # X <- S
-                T1: IR <- MEM[AB]; X <- S; wrn; wrz
+                T1: IR <- MEM[MAR]; X <- S; wrn; wrz
                 
         TXS
         ----
             - IMPLIED: TXS (9a)                      # S <- X
-                T1: IR <- MEM[AB]; S <- X;       
+                T1: IR <- MEM[MAR]; S <- X;
+
+        PHA
+        ----        
+            - IMPLIED: PHA (48)                     # MEM[SP] <- AC; SP-- 
+                T1: IR <- MEM[MAR]; ABL <- SP; ABH <- 1; SP-- 
+                T2: MEM[ABH/ABL] <- AC;
+
+        PHP
+        ----        
+            - IMPLIED: PHP (08)                     # MEM[SP] <- P; SP--
+                T1: IR <- MEM[MAR]; ABL <- SP; ABH <- 1; SP-- 
+                T2: MEM[ABH/ABL] <- P;
+                
+        PLA
+        ----        
+            - IMPLIED: PLA (68)                     # SP++; AC <- MEM[SP]
+                T1: IR <- MEM[MAR]; BI <- SP; AI <- 0
+                T2: ABL <- AI + BI + 1; ABH <- 1; SP <- AI + BI + 1
+                T3: AC <- MEM[ABH/ABL]; wrn; wrz
+        
+        PLP
+        ---        
+            - IMPLIED: PLP (28)                     # SP++; P <- MEM[SP] 
+                T1: IR <- MEM[MAR]; BI <- SP; AI <- 0
+                T2: ABL <- AI + BI + 1; ABH <- 1; SP <- AI + BI + 1
+                T3: P <- MEM[ABH/ABL]; 
+        
+*PROCESSOR STATUS REGISTER (P) LÊ/ESCREVE NO DB

@@ -83,6 +83,7 @@ package P6502_pkg is
         mux_carry    : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_s        : std_logic;                    -- Multiplexer selection input
         mux_pc       : std_logic;                    -- Multiplexer selection input
+        mux_p        : std_logic;                    -- Multiplexer selection input
         mux_db       : std_logic_vector(2 downto 0); -- DB Multiplexer selection input
         mux_sb       : std_logic_vector(2 downto 0); -- SB Multiplexer selection input 
         mux_adl      : std_logic_vector(1 downto 0); -- ADL Multiplexer selection input 

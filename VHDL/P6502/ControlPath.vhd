@@ -28,11 +28,9 @@ architecture ControlPath of ControlPath is
     
     -- Current instruction decoded
     signal decIns : DecodedInstruction_type;
-    
     signal opcode: std_logic_vector(7 downto 0);
     
 begin  
-
     
     opcode <= instruction when currentState = T1 else IR;          
     decIns <= InstructionDecoder(opcode);
@@ -49,7 +47,6 @@ begin
             currentState <= nextState;
         end if;
     end process;
-    
     
     ----------------------------------------
     -- FSM next state combinational logic --
@@ -76,14 +73,14 @@ begin
                 end if;
                 
             when T2 =>
-                if (decIns.addressMode=IMM and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMP and decIns.InsGroup=INC_DEC) or decIns.addressMode=ACC then 
+                if (decIns.addressMode=IMM and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMP and decIns.InsGroup=INC_DEC) or decIns.addressMode=ACC or decIns.instruction=PHA or decIns.instruction=PHP then 
                     nextState <= T0;
                 else
                     nextState <= T3;
                 end if;
                 
             when T3 =>
-                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE))  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) then
+                if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE))  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) or decIns.instruction=PLA or decIns.instruction=PLP then
                     nextState <= T0;
                 else
                     nextState <= T4;
@@ -146,7 +143,7 @@ begin
     process(decIns,currentState)
     begin
         -- Default Values
-        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","00","00","00",'0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0');
+        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","00","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0');
         
         if currentState = IDLE then
             uins.rstP(CARRY)     <= '1';
@@ -222,13 +219,20 @@ begin
     -- DECODE (Accumulator and Implied addressing mode): BI <- AC; AI <- 0
         elsif currentState = T1 and (decIns.addressMode=ACC or decIns.addressMode=IMP) and (decIns.InsGroup=INC_DEC or decIns.InsGroup=SUBROUTINE_INTERRUPT or decIns.InsGroup=SHIFT_ROTATE) then
             if decIns.addressMode=IMP then
-                uins.mux_bi <= "10"; -- BI <- SB                
-                if decIns.instruction=INX or decIns.instruction=DEX then
-                    uins.mux_sb <= "011"; uins.mux_db <= "001";
-                elsif decIns.instruction=INY or decIns.instruction=DEY then
-                    uins.mux_sb <= "100"; uins.mux_db <= "001";
-                end if;
-                uins.mux_ai <= "01"; uins.wrAI <= '1'; -- AI <- x"00"
+                if decIns.instruction=PHA or decIns.instruction=PHP then
+                    uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
+                    uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
+                    uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
+                    uins.mux_address <= '1';
+                else
+                    uins.mux_bi <= "10"; -- BI <- SB                
+                    if decIns.instruction=INX or decIns.instruction=DEX then
+                        uins.mux_sb <= "011"; uins.mux_db <= "001";
+                    elsif decIns.instruction=INY or decIns.instruction=DEY then
+                        uins.mux_sb <= "100"; uins.mux_db <= "001";
+                    end if;
+                    uins.mux_ai <= "01"; uins.wrAI <= '1'; -- AI <- x"00"
+                end if;    
             end if;    
             uins.wrBI <= '1'; -- BI <- AC or S        
             
@@ -302,7 +306,7 @@ begin
             end if;
             
     -- DECODE (RTS): ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
-        elsif (currentState = T2 or currentState = T4) and decIns.instruction=RTS then
+        elsif (currentState = T2 or currentState = T4) and (decIns.instruction=RTS or decIns.instruction=PLA or decIns.instruction=PLP) then
             uins.ALUoperation <= ALU_ADC; uins.wrABL <= '1';
             uins.mux_sb <= "001"; uins.mux_s <= '1'; uins.wrS <= '1';
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
@@ -512,13 +516,26 @@ begin
             uins.ceP(NEGATIVE) <= '1'; uins.ceP(ZERO) <= '1';
 
     -- EXECUTE: Stack Group
-        elsif (decIns.InsGroup=STACK and currentState=T1 and decIns.addressMode=IMP) then 
-            if decIns.instruction=TSX then      -- X <- S
+        elsif (decIns.InsGroup=STACK) then 
+            if decIns.instruction=TSX and currentState=T1 then      -- X <- S
                 uins.mux_sb <= "000"; uins.wrX <= '1';
                 uins.ceP(NEGATIVE) <= '1'; uins.ceP(ZERO) <= '1';
-            else                                -- S <- X
+            elsif decIns.instruction=TXS and currentState=T1 then   -- S <- X
                 uins.mux_sb <= "011"; uins.mux_s <= '1'; 
-                uins.wrS <= '1';          
+                uins.wrS <= '1';
+            elsif decIns.instruction=PHA and currentState=T2 then   -- MEM[SP] <- AC
+                uins.we <= '1'; uins.mux_db <= "000";
+                uins.mux_address <= '1';    
+            elsif decIns.instruction=PHP and currentState=T2 then   -- MEM[SP] <- P
+                uins.we <= '1'; uins.mux_db <= "101";
+                uins.mux_address <= '1';
+            elsif decIns.instruction=PLA and currentState=T3 then   -- AC <- MEM[SP] 
+                uins.mux_db <= "100"; uins.mux_sb <= "110";  
+                uins.wrAC <= '1'; uins.mux_address <= '1';
+                uins.ceP(NEGATIVE) <= '1'; uins.ceP(ZERO) <= '1';
+            elsif decIns.instruction=PLP and currentState=T3 then   -- P <- MEM[SP]
+                uins.mux_db <= "100"; uins.mux_address <= '1';
+                uins.mux_p <= '1'; uins.ceP <= x"FF";
             end if;            
             
     -- EXECUTE: Compare and Bit Test Group(first stage) 

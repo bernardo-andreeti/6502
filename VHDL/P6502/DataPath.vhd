@@ -106,7 +106,8 @@ begin
                   SB when uins.mux_db = "001" else
                   PCL_q when uins.mux_db = "010" else
                   PCH_q when uins.mux_db = "011" else
-                  data_in;   
+                  data_in when uins.mux_db = "100" else
+                  P_q;   
                               
     -- SB bus
     MUX_SB: SB <= S_q when uins.mux_sb = "000" else
@@ -245,13 +246,15 @@ begin
                             (ABH_q & ABL_q);
         
     data_out <= DB;
-
     spr_out <= P_q;    
     
-    P_d(CARRY) <= carryFlag;
-    P_d(ZERO) <= '1' when SB = x"00" else '0';
-    P_d(OVERFLOW) <= overflowFlag;
-    P_d(NEGATIVE) <= SB(7); -- Negative flag (result's MSb)
+    P_d(CARRY) <= carryFlag when uins.mux_p = '0' else DB(CARRY);
+    P_d(ZERO) <= '1' when (SB = x"00" and uins.mux_p = '0') else DB(ZERO) when uins.mux_p = '1' else '0';
+    P_d(INTERRUPT) <= DB(INTERRUPT) when uins.mux_p = '1' else '0';
+    P_d(DECIMAL) <= DB(DECIMAL) when uins.mux_p = '1' else '0';
+    P_d(BREAKF) <= DB(BREAKF) when uins.mux_p = '1' else '0';
+    P_d(OVERFLOW) <= overflowFlag when uins.mux_p = '0' else DB(OVERFLOW);
+    P_d(NEGATIVE) <= SB(7) when uins.mux_p = '0' else DB(NEGATIVE); -- Negative flag (result's MSb)
     P_d(5) <= '1';
     
     STATUS_PROCESSOR_REGISTER: for i in 0 to 7 generate
