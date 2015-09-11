@@ -64,6 +64,55 @@ Specific States:
                 T4: ABH <- AI + BI + hc;                        # ABH & ABL <- [12F0h+Y]
                 T5: BI <- !MEM[ABH/ABL]; AI <- AC
                 T6: AI + BI + 1; wrn; wrz; wrc
+                
+        CPX
+        ---
+            - IMM: CPX #01 (e0 01)                      # X - 01
+                T2: BI <- !MEM[MAR]; AI <- X
+                T3: AI + BI + 1; wrn; wrz; wrc
+
+            - Z-PAGE: CPX $33 (e4 33)                   # X - MEM[33h]
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- !MEM[MAR]; AI <- X
+                T4: AI + BI + 1; wrn; wrz; wrc
+
+            - ABS: CPX $0001 (ec 01 00)                 # X - MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- !MEM[ABH/ABL]; AI <- AC
+                T5: AI + BI + 1; wrn; wrz; wrc
+                
+        CPY
+        ---
+            - IMM: CPY #01 (c0 01)                      # Y - 01 
+                T2: BI <- !MEM[MAR]; AI <- Y
+                T3: AI + BI + 1; wrn; wrz; wrc
+                
+            - Z-PAGE: CPY $33 (c4 33)                   # Y - MEM[33h]
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- !MEM[MAR]; AI <- Y
+                T4: AI + BI + 1; wrn; wrz; wrc
+        
+            - ABS: CPY $0001 (cc 01 00)                 # Y - MEM[0001h]
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- !MEM[ABH/ABL]; AI <- Y
+                T5: AI + BI + 1; wrn; wrz; wrc
+                
+        BIT
+        ---
+            - Z-PAGE: BIT $33 (24 33)                   # AC & MEM[33h]; n <- MEM(7); v <- MEM(6)
+                T2: MAR <- MEM[MAR];                      
+                T3: BI <- MEM[MAR]; AI <- AC
+                T4: AI & BI; wrz;
+                T5: SB <- BI; wrn; wrv;
+        
+            - ABS: BIT $0001 (2c 01 00)                 # AC & MEM[0001h]; n <- MEM(7); v <- MEM(6)
+                T2: ABL <- MEM[MAR]; MAR <- PC; PC++;
+                T3: ABH <- MEM[MAR]
+                T4: BI <- MEM[ABH/ABL]; AI <- AC
+                T5: AI & BI; wrz;
+                T6: SB <- BI; wrn; wrv;
 
 Compare Instruction Results
     Compare Result	        N	Z	C

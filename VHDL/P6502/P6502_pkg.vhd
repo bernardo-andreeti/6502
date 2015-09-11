@@ -42,10 +42,10 @@ package P6502_pkg is
     );
     
     type InstructionGroup_type is (
-        LOAD_STORE, ARITHMETIC, INC_DEC,
-        REG_TRANSFER, LOGICAL, COMPARE,
-        STATUS_FLAG, SUBROUTINE_INTERRUPT,
-        JUMP_BRANCH, STACK, SHIFT_ROTATE
+        LOAD_STORE, ARITHMETIC, INC_DEC, REG_TRANSFER, 
+        LOGICAL, COMPARE, BIT_TEST, STATUS_FLAG, 
+        SUBROUTINE_INTERRUPT, JUMP_BRANCH, 
+        STACK, SHIFT_ROTATE
     );
     
     type ALU_Operation_type is (
@@ -277,6 +277,10 @@ package body P6502_pkg is
             when x"CC" =>   di.instruction := CPY;  di.addressMode := AABS;      di.size := 3;  di.InsGroup := COMPARE;
             when x"C4" =>   di.instruction := CPY;  di.addressMode := ZPG;       di.size := 2;  di.InsGroup := COMPARE;
             when x"C0" =>   di.instruction := CPY;  di.addressMode := IMM;       di.size := 2;  di.InsGroup := COMPARE;
+            
+            -- BIT
+            when x"2C" =>   di.instruction := BITT; di.addressMode := AABS;      di.size := 3;  di.InsGroup := BIT_TEST;
+            when x"24" =>   di.instruction := BITT; di.addressMode := ZPG;       di.size := 2;  di.InsGroup := BIT_TEST;
             
             ------------------------------
             -- Shift and Rotate Group   --

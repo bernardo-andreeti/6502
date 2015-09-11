@@ -252,6 +252,7 @@ begin
     P_d(ZERO) <= '1' when SB = x"00" else '0';
     P_d(OVERFLOW) <= overflowFlag;
     P_d(NEGATIVE) <= SB(7); -- Negative flag (result's MSb)
+    P_d(5) <= '1';
     
     STATUS_PROCESSOR_REGISTER: for i in 0 to 7 generate
         FFD: entity work.FlipFlopD_sr
