@@ -29,3 +29,14 @@ Specific States:
                 T3: PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0 
                 T4: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
                 T5: PCH <- MEM[ABH/ABL];
+                
+        RTI
+        ----
+            - IMPLIED: RTI (40)                 # SP++; P <- MEM[SP]; PCL <- MEM[SP]; SP++; PCH <- MEM[SP]
+                T1: BI <- S; AI <- 0; IR <- MEM[MAR]
+                T2: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
+                T3: P <- MEM[ABH/ABL]; BI <- S; AI <- 0
+                T4: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
+                T5: PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0 
+                T6: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
+                T7: PCH <- MEM[ABH/ABL];        
