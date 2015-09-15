@@ -217,7 +217,7 @@ begin
             end if;
          
     -- DECODE (Accumulator and Implied addressing mode): BI <- AC; AI <- 0
-        elsif currentState = T1 and (decIns.addressMode=ACC or decIns.addressMode=IMP) and (decIns.InsGroup=INC_DEC or decIns.InsGroup=SUBROUTINE_INTERRUPT or decIns.InsGroup=SHIFT_ROTATE) then
+        elsif currentState = T1 and (decIns.addressMode=ACC or decIns.addressMode=IMP) and (decIns.InsGroup=INC_DEC or decIns.InsGroup=SUBROUTINE_INTERRUPT or decIns.InsGroup=SHIFT_ROTATE or decIns.instruction=PLA or decIns.instruction=PLP) then
             if decIns.addressMode=IMP then
                 uins.mux_bi <= "10"; -- BI <- SB                
                 if decIns.instruction=INX or decIns.instruction=DEX then
@@ -305,8 +305,8 @@ begin
                 uins.mux_address <= '1'; -- address <- ABH & ABL
             end if;
             
-    -- DECODE (RTS): ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
-        elsif (currentState=T2 and (decIns.instruction=PLA or decIns.instruction=PLP or decIns.instruction=RTS or decIns.instruction=RTI)) or (currentState=T4 and (decIns.instruction=RTS or decIns.instruction=RTI)) or (currentState=T6 and decIns.instruction=RTI) then
+    -- DECODE (RTS, RTI, PLA, PLP): ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
+        elsif (currentState=T2 or currentState=T4 or currentState=T6) and (decIns.instruction=PLA or decIns.instruction=PLP or decIns.instruction=RTS or decIns.instruction=RTI) then
             uins.ALUoperation <= ALU_ADC; uins.wrABL <= '1';
             uins.mux_sb <= "001"; uins.mux_s <= '1'; uins.wrS <= '1';
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
