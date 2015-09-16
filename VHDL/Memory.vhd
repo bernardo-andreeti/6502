@@ -44,7 +44,7 @@ architecture block_RAM of Memory is
         return RAM;
     end function;
     
-    signal RAM : RamType := InitRamFromFile("AllSuite.txt");
+    signal RAM : RamType := InitRamFromFile("AllSuite_mod.txt");
             
     begin
     -- Process to control the memory access
