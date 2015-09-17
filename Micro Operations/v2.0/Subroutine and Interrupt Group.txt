@@ -40,3 +40,15 @@ Specific States:
                 T5: PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0 
                 T6: ABL <- AI + BI + 1; ABH <- 1; S <- AI + BI + 1
                 T7: PCH <- MEM[ABH/ABL];        
+                
+        BRK
+        ----
+            - IMPLIED: BRK (00)                 # Software Interruption
+                T1: IR <- MEM[MAR]; ABL <- SP; ABH <- 1; SP-- 
+                T2: MEM[ABH/ABL] <- PCH;                      
+                T3: ADL <- S; ADH <- 1; S--; MEM[ABH/ABL] <- PCL; 
+                T4: MEM[ABH/ABL] <- P; SP--; MAR <- x"FFFF"                       
+                T5: PCH <- MEM[FFFF];           # Interruption request handler
+                T6: MAR <- x"FFFE";
+                T7: PCL <- MEM[FFFE]; setB; setI;
+                

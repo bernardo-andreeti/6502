@@ -224,10 +224,15 @@ begin
             ce      => uins.wrABH
         );
         
-    MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "00" else
-                      (x"00" & DB) when uins.mux_mar = "01" else
-                      (SB & x"00") when uins.mux_mar = "10" else
-                      (x"00" & ALUresult);
+    MUX_MAR: MAR_d <= (PCH_q & PCL_q) when uins.mux_mar = "0000" else
+                      (x"00" & DB) when uins.mux_mar = "0001" else
+                      (x"00" & ALUresult) when uins.mux_mar = "0010" else
+                      (x"FFFF") when uins.mux_mar = "0011" else
+                      (x"FFFE") when uins.mux_mar = "0100" else -- BRK/IRQ request handler
+                      (x"FFFD") when uins.mux_mar = "0101" else
+                      (x"FFFC") when uins.mux_mar = "0110" else -- Power on reset handler
+                      (x"FFFB") when uins.mux_mar = "0111" else
+                      (x"FFFA");                               -- NMI request handler 
         
     MAR: entity work.RegisterNbits
 
