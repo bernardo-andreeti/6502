@@ -336,7 +336,7 @@ begin
                 uins.mux_address <= '1';                -- address <- ABH & ABL
             end if;
             
-    -- DECODE (JSR): ADL <- S; ADH <- 1; S--; MEM[ABH/ABL] <- PCL;       
+    -- DECODE (JSR): ABL <- S; ABH <- 1; S--; MEM[ABH/ABL] <- PCL;       
         elsif (currentState=T4 and decIns.addressMode=AABS and decIns.InsGroup=SUBROUTINE_INTERRUPT) or (currentState=T3 and decIns.instruction=BRK) then
             uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
@@ -345,23 +345,26 @@ begin
             uins.we <= '1';                          -- Write Mode
             uins.mux_address <= '1';                 -- address <- ABH & ABL
     
-    -- DECODE (BRK): MEM[SP] <- P; SP--    
-        elsif currentState=T4 and decIns.instruction=BRK then    
-            uins.we <= '1'; uins.mux_db <= "101"; -- MEM[SP] <- P
-            uins.mux_s <= '0'; uins.wrS <= '1';   -- SP <- SP - 1
-            uins.mux_mar <= "0011"; uins.wrMAR <= '1'; -- MAR <- x"FFFF"
+    -- DECODE (BRK): ABL <- S; ABH <- 1; S--; MEM[S] <- P;    
+        elsif currentState=T4 and decIns.instruction=BRK then
+            uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
+            uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
+            uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
+            uins.we <= '1'; uins.mux_db <= "101";    -- MEM[S] <- P
+            uins.mux_address <= '1';                 -- address <- ABH & ABL
     
-    -- DECODE (BRK): PCH <- MEM[FFFF];
+    -- DECODE (BRK): MAR <- x"FFFF"; 
         elsif currentState=T5 and decIns.instruction=BRK then
+            uins.mux_mar <= "0011"; uins.wrMAR <= '1'; -- MAR <- x"FFFF"
+                
+    -- DECODE (BRK): PCH <- MEM[MAR]; MAR <- x"FFFE" for BRK/IRQ, x"FFFC" for RST or x"FFFA" for NMI;
+        elsif currentState=T6 and decIns.instruction=BRK then
             uins.mux_db <= "100"; uins.mux_adh <= "00";
             uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[FFFF]
-    
-    -- DECODE (BRK): MAR <- x"FFFE" for BRK/IRQ, x"FFFC" for RST or x"FFFA" for NMI;
-        elsif currentState=T6 and decIns.instruction=BRK then
             -- check for IRQ, NMI and RST status here to decide wich address goes to PCL (FE for BRK/IRQ, FC for reset or FA for NMI)
             uins.mux_mar <= "0100"; uins.wrMAR <= '1'; -- MAR <- x"FFFE"
-    
-    -- DECODE (BRK): PCL <- MEM[FFFE];
+        
+    -- Last State (BRK): PCL <- MEM[FFFE];
         elsif currentState=T7 and decIns.instruction=BRK then        
             uins.mux_db <= "100"; uins.mux_adl <= "10"; 
             uins.mux_pc <= '1'; uins.wrPCL <= '1'; -- PCL <- MEM[FFFE];
