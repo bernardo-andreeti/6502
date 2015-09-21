@@ -16,23 +16,32 @@ architecture behavioral of P6502_RAM_tb is
     signal clk          : std_logic := '0';
     signal rst          : std_logic;
     signal we           : std_logic;
+    signal ready        : std_logic;
+    signal nmi          : std_logic;
+    signal nres         : std_logic;
+    signal irq          : std_logic;
     signal address      : std_logic_vector(ADDR_WIDTH-1 downto 0);
     signal dataBus      : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal RAM_data_in, RAM_data_out: std_logic_vector(DATA_WIDTH-1 downto 0);
     
 begin
-
     -- Instantiates the units under test.
     DUV: entity work.P6502_RAM 
         port map (
-            clk         => clk,
-            rst         => rst
+            clk      => clk,
+            rst      => rst,
+            ready    => ready,
+            nmi      => nmi,
+            nres     => nres,
+            irq      => irq
         );        
            
     -- Generates the stimuli.
     rst <= '1', '0' after 10 ns;
-    clk <= not clk after 20 ns;    -- 25 MHz    
-
+    ready <= '0', '1' after 20 ns;
+    clk <= not clk after 10 ns;    -- 100 MHz
+    nmi <= '1'; nres <= '1'; irq <= '1'; -- Interrupt lines (active low)
+    
 end behavioral;
 
 

@@ -232,7 +232,7 @@ begin
                       (x"FFFD") when uins.mux_mar = "0101" else
                       (x"FFFC") when uins.mux_mar = "0110" else -- Power on reset handler
                       (x"FFFB") when uins.mux_mar = "0111" else
-                      (x"FFFA");                               -- NMI request handler 
+                      (x"FFFA");                                -- NMI request handler 
         
     MAR: entity work.RegisterNbits
 

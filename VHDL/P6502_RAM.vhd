@@ -8,6 +8,8 @@ entity P6502_RAM  is
     port (
         clk             : in std_logic;
         rst             : in std_logic;
+        ready           : in std_logic;
+        nmi, nres, irq  : in std_logic;   -- Interrupt lines (active low)
         display         : out std_logic_vector(7 downto 0);
         display_en_n    : out std_logic_vector(3 downto 0)
     );
@@ -69,12 +71,16 @@ begin
     -- 6502 processor
     P6502: entity work.P6502 
         port map (
-            clk         => clk_div,
-            rst         => rst,
-            we          => we,
-            data_in     => RAMdata_out,
-            data_out    => RAMdata_in,
-            address     => address
+            clk_in      => clk_div,
+            rst_in      => rst,
+            r_nw_out    => we,
+            d_in        => RAMdata_out,
+            d_out       => RAMdata_in,
+            a_out       => address,
+            ready_in    => ready,
+            nnmi_in     => nmi,
+            nres_in     => nres,     
+            nirq_in     => irq
         );
         
     -- Program/Data memory

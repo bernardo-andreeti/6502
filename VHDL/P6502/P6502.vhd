@@ -11,13 +11,22 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use work.P6502_pkg.all;
 
+-- Same interface as cpu.v from fpga_nes project
 entity P6502 is
     port( 
-        clk, rst    : in std_logic;
-        we          : out std_logic;    -- Access control to data memory (we =0 : READ, we = 1: WRITE)
-        address     : out std_logic_vector(15 downto 0);    -- Address bus to memory
-        data_in     : in std_logic_vector(7 downto 0);      -- Data from memory
-        data_out    : out std_logic_vector(7 downto 0)      -- Data to memory
+        clk_in, rst_in, ready_in    : in std_logic;
+        nnmi_in, nres_in, nirq_in   : in std_logic;   -- Interrupt lines (active low)
+        d_in      : in std_logic_vector(7 downto 0);  -- Data from memory
+        d_out     : out std_logic_vector(7 downto 0); -- Data to memory
+        a_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
+        r_nw_out  : out std_logic -- Access control to data memory ('1' for Reads, '0' for Writes)
+               
+        -- Debuger lines (not used in this implementation)
+        -- dbgreg_sel_in : in std_logic_vector(3 downto 0);
+        -- dbgreg_in     : in std_logic_vector(7 downto 0);
+        -- dbgreg_wr_in  : in std_logic;
+        -- dbgreg_out    : out std_logic_vector(7 downto 0);
+        -- brk_out       : out std_logic
       );
 end P6502;
 
@@ -32,28 +41,32 @@ begin
 
     -- Data path operates in falling edge of clock
     -- in order to achieve synchronization on memory read 
-    clk_n <= not clk;
-    
+    clk_n <= not clk_in;
+    -- clock needs to be set to 1.785MHz for correct operation with fpga_nes project
     DATA_PATH: entity work.DataPath
         port map (
             clk         => clk_n,
-            rst         => rst,
-            address     => address,
-            data_in     => data_in,
-            data_out    => data_out,
+            rst         => rst_in,
+            address     => a_out,
+            data_in     => d_in,
+            data_out    => d_out,
             spr_out     => spr,
             uins        => uins
         );
         
     CONTROL_PATH: entity work.ControlPath
         port map (
-            clk         => clk,
-            rst         => rst,
+            clk         => clk_in,
+            rst         => rst_in,
             uins        => uins,
             spr_in      => spr,    
-            instruction => data_in            
+            instruction => d_in,
+            ready       => ready_in,
+            nmi         => nnmi_in,
+            nres        => nres_in,
+            irq         => nirq_in
         );
         
-    we <= uins.we;
+    r_nw_out <= uins.we;
      
 end structural;

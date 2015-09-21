@@ -13,8 +13,9 @@ use work.P6502_pkg.all;
 
 entity ControlPath is
     port(   
-        clk, rst    : in std_logic;
-        spr_in      : in std_logic_vector(7 downto 0); -- Status Processor Register    
+        clk, rst, ready : in std_logic;
+        nmi, nres, irq  : in std_logic; -- Interrupt lines (active low)
+        spr_in      : in std_logic_vector(7 downto 0);  -- Status Processor Register    
         uins        : out microinstruction;             -- Control signals to data path
         instruction : in std_logic_vector(7 downto 0)   -- Current instruction stored in instruction register
        );
@@ -30,20 +31,39 @@ architecture ControlPath of ControlPath is
     signal decIns : DecodedInstruction_type;
     signal opcode: std_logic_vector(7 downto 0);
     
+    -- Internal ready signal
+    signal rdy: std_logic;
+    
 begin  
     
     opcode <= instruction when currentState = T1 else IR;          
     decIns <= InstructionDecoder(opcode);
+    
+    ---------------------------
+    -- Ready signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                rdy <= '0';
+            else
+                rdy <= ready;
+            end if;
+        end if;
+    end process;
 
+    rdy <= ready;    
+        
     ------------------------
     -- FSM state register --
     ------------------------
-    process(rst, clk)
+    process(clk, rst, rdy)
     begin
         if rst = '1' then 
-            currentState <= IDLE;    -- Sidle is the state the machine stays while processor is being reset
+            currentState <= T0;  -- Resets state machine and keeps processor stuck at T0
                             
-        elsif rising_edge(clk) then
+        elsif rising_edge(clk) and rdy = '1' then
             currentState <= nextState;
         end if;
     end process;
@@ -53,14 +73,10 @@ begin
     ----------------------------------------
     process(currentState, decIns, spr_in)  
     begin
-  
         case currentState is
-                  
-            when IDLE =>  
-                nextState <= T0;
-                
+                            
             when T0 =>
-                    nextState <= T1;
+                nextState <= T1;
                     
             when T1 =>  
                 if decIns.InsGroup = STATUS_FLAG or decIns.InsGroup = REG_TRANSFER or decIns.instruction = TXS or decIns.instruction = TSX or (decIns.instruction=BEQ and spr_in(ZERO)='0') or (decIns.instruction=BNE and spr_in(ZERO)='1') or (decIns.instruction=BCS and spr_in(CARRY)='0') or (decIns.instruction=BCC and spr_in(CARRY)='1') or (decIns.instruction=BMI and spr_in(NEGATIVE)='0') or (decIns.instruction=BPL and spr_in(NEGATIVE)='1') or (decIns.instruction=BVS and spr_in(OVERFLOW)='0') or (decIns.instruction=BVC and spr_in(OVERFLOW)='1') or decIns.instruction=NOP then 
@@ -119,27 +135,30 @@ begin
     --------------------------
     -- Instruction register --
     --------------------------
-    process(clk, rst)
+    process(clk, rst, rdy, nmi, irq, nres)
     begin
         if rst = '1' then
-            IR <= (others=>'0');
-            
-        elsif rising_edge(clk) then
+            IR <= x"EA";    -- NOP
+        
+        elsif (nmi = '0' or irq = '0' or nres = '0') and rdy = '1' then -- interrupt signals probably need to be stored into registers!
+            IR <= x"00";    -- BRK
+        
+        elsif rising_edge(clk) and rdy = '1' then
             if currentState = T1 then
                 IR <= instruction;
             end if;
         end if;
     end process;
     
-    ----------------------------------------
+    ------------------------------------
     -- FSM output combinational logic --
     ----------------------------------------
-    process(decIns,currentState)
+    process(decIns, currentState, rst, rdy)
     begin
         -- Default Values
         uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0');
         
-        if currentState = IDLE then
+        if rst = '1' then
             uins.rstP(CARRY)     <= '1';
             uins.rstP(ZERO)      <= '1';
             uins.rstP(INTERRUPT) <= '1';
@@ -153,7 +172,7 @@ begin
     -- T0: MAR <- PC; PC++; (all instructions)
     -- DECODE
     -- T1: MAR <- PC; IR <- MEM[MAR]; PC++; (all instructions except one byte ones)
-        elsif currentState = T0 or (currentState = T1 and decIns.size > 1) or (currentState = T2 and decIns.size > 2) then  
+        elsif (currentState = T0 and rdy = '1') or (currentState = T1 and decIns.size > 1) or (currentState = T2 and decIns.size > 2) then  
             -- MAR <- PC
             uins.mux_mar <= "0000";
             uins.wrMAR   <= '1';    -- MAR <- PCH_q & PCL_q
@@ -353,16 +372,29 @@ begin
             uins.we <= '1'; uins.mux_db <= "101";    -- MEM[S] <- P
             uins.mux_address <= '1';                 -- address <- ABH & ABL
     
-    -- DECODE (BRK): MAR <- x"FFFF"; 
+    -- DECODE (BRK): MAR <- x"FFFF" for BRK/IRQ, FFFD for NRES or FFFB for NMI interruption 
         elsif currentState=T5 and decIns.instruction=BRK then
-            uins.mux_mar <= "0011"; uins.wrMAR <= '1'; -- MAR <- x"FFFF"
+            if (nmi = '0') then
+                uins.mux_mar <= "0111";  -- MAR <- x"FFFB"
+            elsif (nres = '0') then
+                uins.mux_mar <= "0101";  -- MAR <- x"FFFD"
+            else -- BRK and IRQ
+                uins.mux_mar <= "0011";  -- MAR <- x"FFFF"
+            end if;
+            uins.wrMAR <= '1';
                 
-    -- DECODE (BRK): PCH <- MEM[MAR]; MAR <- x"FFFE" for BRK/IRQ, x"FFFC" for RST or x"FFFA" for NMI;
+    -- DECODE (BRK): PCH <- MEM[MAR]; MAR <- x"FFFE" for BRK/IRQ, x"FFFC" for NRES or x"FFFA" for NMI;
         elsif currentState=T6 and decIns.instruction=BRK then
             uins.mux_db <= "100"; uins.mux_adh <= "00";
-            uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[FFFF]
-            -- check for IRQ, NMI and RST status here to decide wich address goes to PCL (FE for BRK/IRQ, FC for reset or FA for NMI)
-            uins.mux_mar <= "0100"; uins.wrMAR <= '1'; -- MAR <- x"FFFE"
+            uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
+            if (nmi = '0') then
+                uins.mux_mar <= "1000";  -- MAR <- x"FFFA"
+            elsif (nres = '0') then
+                uins.mux_mar <= "0110";  -- MAR <- x"FFFC"
+            else -- BRK and IRQ
+                uins.mux_mar <= "0100";  -- MAR <- x"FFFE"
+            end if;
+            uins.wrMAR <= '1';
         
     -- Last State (BRK): PCL <- MEM[FFFE];
         elsif currentState=T7 and decIns.instruction=BRK then        

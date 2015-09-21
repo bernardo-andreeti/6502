@@ -20,7 +20,7 @@ package P6502_pkg is
     constant NEGATIVE  : integer := 7;
     
     -- Instructions execution cycle
-    type State is (IDLE, T0, T1, T2, T3, T4, T5, T6, T7);
+    type State is (T0, T1, T2, T3, T4, T5, T6, T7);
      
     -- Instruction_type enumeration defines the instructions decodable by the control path
     type Instruction_type is (  
