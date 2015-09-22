@@ -1,7 +1,7 @@
 Brief: 
     - Addressing Modes: Absolute, Zero Page, Immediate, Absolute_X, Absolute_Y, Zero Page_X, Indexed Indirect, Indirect Indexed;
     - Lenght: 2 bytes;
-    - Cycles: 4;
+    - Cycles: 4 to 6 (JMP), 5 (Branches);
     
 States shared between different addressing modes:
 

@@ -1,6 +1,0 @@
- -- Changes:
- 
-	Added support for absolute addressing mode, load and store group tested;
-    Added a multiplexer to data path in order to change address source (MAR or ABH & ABL);
-	
-		

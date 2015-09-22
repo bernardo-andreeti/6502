@@ -1,7 +1,7 @@
 Brief: 
     - Addressing Modes: Absolute and Implied;
     - Lenght: 1 to 3 bytes;
-    - Cycles: 6;
+    - Cycles: 6 to 8;
     
 States shared between different addressing modes:
 

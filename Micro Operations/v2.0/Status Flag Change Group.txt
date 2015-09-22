@@ -11,44 +11,44 @@ States shared between different addressing modes:
 
 Specific States:	
 			
-CLC
-----
-	- IMPLIED: CLC (18)                      # P(CARRY) <- 0
-        
-		T1: IR <- MEM[MAR] ; P(CARRY) <- 0
+        CLC
+        ----
+            - IMPLIED: CLC (18)                      # P(CARRY) <- 0
+                
+                T1: IR <- MEM[MAR] ; P(CARRY) <- 0
 
-CLD
-----
-	- IMPLIED: CLD (D8)                      # P(DECIMAL) <- 0
-		
-		T1: IR <- MEM[MAR] ; P(DECIMAL) <- 0
+        CLD
+        ----
+            - IMPLIED: CLD (D8)                      # P(DECIMAL) <- 0
+                
+                T1: IR <- MEM[MAR] ; P(DECIMAL) <- 0
 
-CLI
-----
-	- IMPLIED: CLI (58)                      # P(INTERRUPT) <- 0
+        CLI
+        ----
+            - IMPLIED: CLI (58)                      # P(INTERRUPT) <- 0
 
-		T1: IR <- MEM[MAR] ; P(INTERRUPT) <- 0
+                T1: IR <- MEM[MAR] ; P(INTERRUPT) <- 0
 
-CLV
-----
-	- IMPLIED: CLV (B8)                      # P(OVERFLOW) <- 0
-		
-		T1: IR <- MEM[MAR] ; P(OVERFLOW) <- 0
+        CLV
+        ----
+            - IMPLIED: CLV (B8)                      # P(OVERFLOW) <- 0
+                
+                T1: IR <- MEM[MAR] ; P(OVERFLOW) <- 0
 
-SEC
-----
-	- IMPLIED: SEC (38)                      # P(CARRY) <- 1
+        SEC
+        ----
+            - IMPLIED: SEC (38)                      # P(CARRY) <- 1
 
-		T1: IR <- MEM[MAR] ; P(CARRY) <- 1
+                T1: IR <- MEM[MAR] ; P(CARRY) <- 1
 
-SED
-----
-	- IMPLIED: SED (F8)                      # P(DECIMAL) <- 1
-		
-		T1: IR <- MEM[MAR] ; P(DECIMAL) <- 1
+        SED
+        ----
+            - IMPLIED: SED (F8)                      # P(DECIMAL) <- 1
+                
+                T1: IR <- MEM[MAR] ; P(DECIMAL) <- 1
 
-SEI
-----
-	- IMPLIED: SEI (78)                      # P(INTERRUPT) <- 1
-		
-		T1: IR <- MEM[MAR] ; P(INTERRUPT) <- 1
+        SEI
+        ----
+            - IMPLIED: SEI (78)                      # P(INTERRUPT) <- 1
+                
+                T1: IR <- MEM[MAR] ; P(INTERRUPT) <- 1

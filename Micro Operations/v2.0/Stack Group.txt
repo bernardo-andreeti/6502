@@ -47,4 +47,4 @@ Specific States:
                 T2: ABL <- AI + BI + 1; ABH <- 1; SP <- AI + BI + 1
                 T3: P <- MEM[ABH/ABL]; 
         
-*PROCESSOR STATUS REGISTER (P) LÊ/ESCREVE NO DB
+*Status processor register uses DB to communicate with memory
