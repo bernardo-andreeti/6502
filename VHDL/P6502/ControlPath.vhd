@@ -139,21 +139,22 @@ begin
     begin
         if rst = '1' then
             IR <= x"EA";    -- NOP
-        
-        elsif (nmi = '0' or irq = '0' or nres = '0') and rdy = '1' then -- interrupt signals probably need to be stored into registers!
-            IR <= x"00";    -- BRK
-        
+            
         elsif rising_edge(clk) and rdy = '1' then
             if currentState = T1 then
-                IR <= instruction;
-            end if;
+                if nmi = '0' or irq = '0' or nres = '0' then -- interrupt signals probably need to be stored into registers!
+                    IR <= x"00";    -- BRK
+                else
+                    IR <= instruction;
+                end if;
+            end if;   
         end if;
     end process;
     
     ------------------------------------
     -- FSM output combinational logic --
     ----------------------------------------
-    process(decIns, currentState, rst, rdy)
+    process(decIns, currentState, rst, rdy, nmi, irq, nres)
     begin
         -- Default Values
         uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0');
