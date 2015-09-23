@@ -51,20 +51,19 @@ begin
                 rdy <= ready;
             end if;
         end if;
-    end process;
-
-    rdy <= ready;    
+    end process;   
         
     ------------------------
     -- FSM state register --
     ------------------------
     process(clk, rst, rdy)
     begin
-        if rst = '1' then 
-            currentState <= T0;  -- Resets state machine and keeps processor stuck at T0
-                            
-        elsif rising_edge(clk) and rdy = '1' then
-            currentState <= nextState;
+        if rising_edge(clk) then
+            if rst = '1' then 
+                currentState <= T0;  -- Resets state machine and keeps processor stuck at T0              
+            elsif rdy = '1' then
+                currentState <= nextState;
+            end if;
         end if;
     end process;
     
@@ -122,8 +121,7 @@ begin
             
             when T7 =>
                 -- if ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOGICAL) or decIns.instruction=RTI then
-                    nextState <= T0;
-                    
+                    nextState <= T0;   
                 -- end if;
             
             when others =>
@@ -137,12 +135,11 @@ begin
     --------------------------
     process(clk, rst, rdy, nmi, irq, nres)
     begin
-        if rst = '1' then
-            IR <= x"EA";    -- NOP
-            
+        if rst = '1' then   -- Deixar sincrono?
+            IR <= x"EA";    -- NOP   
         elsif rising_edge(clk) and rdy = '1' then
             if currentState = T1 then
-                if nmi = '0' or irq = '0' or nres = '0' then -- interrupt signals probably need to be stored into registers!
+                if nmi = '0' or nres = '0' or (irq = '0' and spr_in(INTERRUPT) = '0') then -- interrupt signals probably need to be stored into registers!
                     IR <= x"00";    -- BRK
                 else
                     IR <= instruction;
@@ -397,11 +394,14 @@ begin
             end if;
             uins.wrMAR <= '1';
         
-    -- Last State (BRK): PCL <- MEM[FFFE];
+    -- Last State (BRK): PCL <- MEM[MAR];
         elsif currentState=T7 and decIns.instruction=BRK then        
             uins.mux_db <= "100"; uins.mux_adl <= "10"; 
-            uins.mux_pc <= '1'; uins.wrPCL <= '1'; -- PCL <- MEM[FFFE];
-            uins.setP(BREAKF) <= '1'; uins.setP(INTERRUPT) <= '1'; -- Update Flags
+            uins.mux_pc <= '1'; uins.wrPCL <= '1'; 
+            uins.setP(INTERRUPT) <= '1'; -- Update Flags, maybe only for BREAK and IRQ
+            if (nmi = '1' and irq = '1' and nres = '1') then
+                uins.setP(BREAKF) <= '1'; -- Only set if Break instruction
+            end if;
             
     -- DECODE (Implied addressing mode): PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0    
         elsif (currentState=T3 and decIns.instruction=RTS) or (currentState=T5 and decIns.instruction=RTI) then
@@ -429,7 +429,10 @@ begin
             if decIns.addressMode=IMP then
                 uins.mux_address <= '1';
             end if;
-    
+            if decIns.instruction=RTI then
+                uins.rstP(INTERRUPT) <= '1'; -- Enable IRQ
+            end if;
+            
     -- DECODE (third step for INC and DEC, Shift and Rotate); BI <- MEM[AB]; AI <- 0    
         elsif ((currentState = T4 and (decIns.addressMode=AABS or decIns.addressMode=ZPG_X)) or (currentState=T5 and decIns.addressMode=ABS_X) or (currentState=T3 and decIns.addressMode=ZPG)) and (decIns.InsGroup=INC_DEC  or decIns.InsGroup=SHIFT_ROTATE) then 
             uins.mux_db <= "100"; uins.wrBI <= '1'; -- BI <- MEM[MAR]
