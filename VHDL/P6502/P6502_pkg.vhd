@@ -92,7 +92,6 @@ package P6502_pkg is
         setP         : std_logic_vector(7 downto 0);
         rstP         : std_logic_vector(7 downto 0);
         ceP          : std_logic_vector(7 downto 0);
-        we           : std_logic;                    -- Memory control (we = 0: READ; we = 1: WRITE)
     end record;
     
     function InstructionDecoder(opcode: in std_logic_vector(7 downto 0)) return DecodedInstruction_type;    

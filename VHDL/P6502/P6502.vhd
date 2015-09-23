@@ -19,7 +19,7 @@ entity P6502 is
         d_in      : in std_logic_vector(7 downto 0);  -- Data from memory
         d_out     : out std_logic_vector(7 downto 0); -- Data to memory
         a_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
-        r_nw_out  : out std_logic -- Access control to data memory ('1' for Reads, '0' for Writes)
+        r_nw_out  : out std_logic -- Access control to data memory ('0' for Reads, '1' for Writes)
                
         -- Debuger lines (not used in this implementation)
         -- dbgreg_sel_in : in std_logic_vector(3 downto 0);
@@ -39,8 +39,7 @@ architecture structural of P6502 is
     
 begin
 
-    -- Data path operates in falling edge of clock
-    -- in order to achieve synchronization on memory read 
+    -- Data path operates in falling edge of clock in order to achieve synchronization on memory read 
     clk_n <= not clk_in;
     -- clock needs to be set to 1.785MHz for correct operation with fpga_nes project
     DATA_PATH: entity work.DataPath
@@ -61,12 +60,11 @@ begin
             uins        => uins,
             spr_in      => spr,    
             instruction => d_in,
+            we          => r_nw_out,
             ready       => ready_in,
             nmi         => nnmi_in,
             nres        => nres_in,
             irq         => nirq_in
         );
-        
-    r_nw_out <= uins.we;
      
 end structural;

@@ -17,6 +17,7 @@ entity ControlPath is
         nmi, nres, irq  : in std_logic; -- Interrupt lines (active low)
         spr_in      : in std_logic_vector(7 downto 0);  -- Status Processor Register    
         uins        : out microinstruction;             -- Control signals to data path
+        we          : out std_logic;    -- Memory control (we = 0: READ; we = 1: WRITE)                    
         instruction : in std_logic_vector(7 downto 0)   -- Current instruction stored in instruction register
        );
 end ControlPath;
@@ -154,7 +155,8 @@ begin
     process(decIns, currentState, rst, rdy, nmi, irq, nres)
     begin
         -- Default Values
-        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00",'0');
+        uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00");
+        we <= '0'; -- Memory Read Mode
         
         if rst = '1' then
             uins.rstP(CARRY)     <= '1';
@@ -344,7 +346,7 @@ begin
                     uins.mux_adh <= "00"; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
                 end if;    
             elsif decIns.instruction=JSR or decIns.instruction=BRK then
-                uins.we <= '1';                          -- Write Mode
+                we <= '1';                               -- Write Mode
                 uins.mux_address <= '1';                 -- address <- ABH & ABL
                 uins.mux_db <= "011";                    -- MEM[ABH/ABL] <- PCH
             else
@@ -359,7 +361,7 @@ begin
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
             uins.mux_db <= "010";                    -- MEM[ABH/ABL] <- PCL
-            uins.we <= '1';                          -- Write Mode
+            we <= '1';                               -- Write Mode
             uins.mux_address <= '1';                 -- address <- ABH & ABL
     
     -- DECODE (BRK): ABL <- S; ABH <- 1; S--; MEM[S] <- P;    
@@ -367,7 +369,7 @@ begin
             uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
-            uins.we <= '1'; uins.mux_db <= "101";    -- MEM[S] <- P
+            we <= '1'; uins.mux_db <= "101";         -- MEM[S] <- P
             uins.mux_address <= '1';                 -- address <- ABH & ABL
     
     -- DECODE (BRK): MAR <- x"FFFF" for BRK/IRQ, FFFD for NRES or FFFB for NMI interruption 
@@ -517,7 +519,7 @@ begin
                         uins.mux_sb <= "100";  -- SB <- Y
                         uins.mux_db <= "001";  -- DB <- SB
                     end if;   
-                    uins.we <= '1'; -- Enable Write Mode : MEM[MAR] <- AC || X || Y       
+                    we <= '1'; -- Enable Write Mode : MEM[MAR] <- AC || X || Y       
                 end if;
                 if (decIns.addressMode=ZPG or decIns.addressMode=IMM) then 
                     uins.mux_address <= '0'; -- address <- MAR
@@ -586,10 +588,10 @@ begin
                 uins.mux_sb <= "011"; uins.mux_s <= '1'; 
                 uins.wrS <= '1';
             elsif decIns.instruction=PHA and currentState=T2 then   -- MEM[SP] <- AC
-                uins.we <= '1'; uins.mux_db <= "000";
+                we <= '1'; uins.mux_db <= "000";
                 uins.mux_address <= '1';    
             elsif decIns.instruction=PHP and currentState=T2 then   -- MEM[SP] <- P
-                uins.we <= '1'; uins.mux_db <= "101";
+                we <= '1'; uins.mux_db <= "101";
                 uins.mux_address <= '1';
             elsif decIns.instruction=PLA and currentState=T3 then   -- AC <- MEM[SP] 
                 uins.mux_db <= "100"; uins.mux_sb <= "110";  
@@ -635,7 +637,7 @@ begin
                     uins.wrY <= '1';
                 else
                     uins.mux_db <= "001"; -- DB <- ALUresult
-                    uins.we <= '1'; -- Enable Write Mode 
+                    we <= '1'; -- Enable Write Mode 
                     if decIns.addressMode=ZPG then 
                         uins.mux_address <= '0'; -- address <- MAR
                     else
@@ -664,7 +666,7 @@ begin
                    uins.wrAC <= '1';
                 else
                     uins.mux_db <= "001";  -- DB <- ALUresult
-                    uins.we <= '1';        -- Enable Write Mode 
+                    we <= '1';             -- Enable Write Mode 
                     if decIns.addressMode=ZPG then 
                         uins.mux_address <= '0'; -- address <- MAR
                     else
