@@ -25,7 +25,7 @@ architecture behavioral of P6502_RAM is
      
     signal reg1, reg2: std_logic_vector(7 downto 0);
     signal display0, display1, display2, display3: std_logic_vector(7 downto 0);
-    signal count: std_logic_vector(1 downto 0);
+    signal count: std_logic_vector(4 downto 0);
     signal clk_div: std_logic;
     
     function BCD7segments(number: in std_logic_vector(3 downto 0)) return std_logic_vector is
@@ -55,18 +55,20 @@ architecture behavioral of P6502_RAM is
     
 begin
 
-    -- Divides the Nexys board clock by 4 (50MHz/4)
-    clk_div <= count(1);
+    -- Divides the Nexys board clock by 56 (100MHz/56 = 1.785MHz) 
     process(clk,rst)
     begin
         if rst = '1' then
             count <= (others=>'0');
-        
         elsif rising_edge(clk) then
-            count <= count + 1;
+            if count = "11011" then -- 27
+                count <= "00000";
+            else
+                count <= count + 1;
+            end if;
         end if;
     end process;
-    
+    clk_div <= '0' when count < "01110" else '1';
     
     -- 6502 processor
     P6502: entity work.P6502 
