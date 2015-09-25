@@ -32,12 +32,15 @@ architecture ControlPath of ControlPath is
     signal decIns : DecodedInstruction_type;
     signal opcode: std_logic_vector(7 downto 0);
     
-    -- Internal ready signal
+    -- Internal signals
     signal rdy: std_logic;
+    signal noIncPC, incPC: std_logic;
+    signal inst: std_logic_vector(7 downto 0);
     
 begin  
     
-    opcode <= instruction when currentState = T1 else IR;          
+    inst <= x"00" when nmi = '0' or nres = '0' or (irq = '0' and spr_in(INTERRUPT) = '0') else instruction; 
+    opcode <= inst when currentState = T1 else IR;          
     decIns <= InstructionDecoder(opcode);
     
     ---------------------------
@@ -45,26 +48,36 @@ begin
     ---------------------------
     process(clk, rst)
     begin
-        if rising_edge(clk) then
-            if rst = '1' then
-                rdy <= '0';
-            else
-                rdy <= ready;
+        if rst = '1' then
+            rdy <= '0';
+        elsif rising_edge(clk) then 
+            rdy <= ready;
+        end if;
+    end process;
+
+    -----------------------------
+    -- noIncPC signal register --
+    -----------------------------
+    process(clk, rst, incPC)
+    begin
+        if rst = '1' or incPC = '1' then
+            noIncPC <= '0';
+        elsif rising_edge(clk) then
+            if nmi = '0' or nres = '0' or (irq = '0' and spr_in(INTERRUPT) = '0') then
+                noIncPC <= '1'; -- Blocks PC increment during T0 in order to store correct return value
             end if;
         end if;
-    end process;   
+    end process;    
         
     ------------------------
     -- FSM state register --
     ------------------------
     process(clk, rst, rdy)
     begin
-        if rising_edge(clk) then
-            if rst = '1' then 
-                currentState <= T0;  -- Resets state machine and keeps processor stuck at T0              
-            elsif rdy = '1' then
-                currentState <= nextState;
-            end if;
+        if rst = '1' then 
+            currentState <= T0;  -- Resets state machine and keeps processor stuck at T0              
+        elsif rising_edge(clk) and rdy = '1' then
+            currentState <= nextState;
         end if;
     end process;
     
@@ -134,25 +147,19 @@ begin
     --------------------------
     -- Instruction register --
     --------------------------
-    process(clk, rst, rdy, nmi, irq, nres)
+    process(clk, rst, rdy)
     begin
-        if rst = '1' then   -- Deixar sincrono?
+        if rst = '1' then   
             IR <= x"EA";    -- NOP   
-        elsif rising_edge(clk) and rdy = '1' then
-            if currentState = T1 then
-                if nmi = '0' or nres = '0' or (irq = '0' and spr_in(INTERRUPT) = '0') then -- interrupt signals probably need to be stored into registers!
-                    IR <= x"00";    -- BRK
-                else
-                    IR <= instruction;
-                end if;
-            end if;   
+        elsif rising_edge(clk) and currentState = T1 and rdy = '1' then
+            IR <= inst;
         end if;
     end process;
     
     ------------------------------------
     -- FSM output combinational logic --
     ----------------------------------------
-    process(decIns, currentState, rst, rdy, nmi, irq, nres)
+    process(decIns, currentState, rst, rdy, nmi, irq, nres, noIncPC)
     begin
         -- Default Values
         uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00");
@@ -178,10 +185,12 @@ begin
             uins.wrMAR   <= '1';    -- MAR <- PCH_q & PCL_q
                 
             -- PC++
-            uins.mux_pc <= '0';
-            uins.wrPCH  <= '1';
-            uins.wrPCL  <= '1';
-        
+            if noIncPC='0' then
+                uins.mux_pc <= '0';
+                uins.wrPCH  <= '1';
+                uins.wrPCL  <= '1';
+            end if;
+            
         -- DECODE (Absolute and Indirect)    
             if currentState = T2 and (decIns.addressMode = AABS or decIns.addressMode = IND) then
                 uins.mux_db <= "100";   -- DB <- MEM[MAR]
@@ -230,7 +239,7 @@ begin
             end if;
          
     -- DECODE (Accumulator and Implied addressing mode): BI <- AC; AI <- 0
-        elsif currentState = T1 and (decIns.addressMode=ACC or decIns.addressMode=IMP) and (decIns.InsGroup=INC_DEC or decIns.InsGroup=SUBROUTINE_INTERRUPT or decIns.InsGroup=SHIFT_ROTATE or decIns.instruction=PLA or decIns.instruction=PLP) then
+        elsif currentState = T1 and (decIns.addressMode=ACC or decIns.addressMode=IMP) and (decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.instruction=PLA or decIns.instruction=PLP or decIns.instruction=RTS or decIns.instruction=RTI) then
             if decIns.addressMode=IMP then
                 uins.mux_bi <= "10"; -- BI <- SB                
                 if decIns.instruction=INX or decIns.instruction=DEX then
@@ -247,7 +256,10 @@ begin
             uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
-            uins.mux_address <= '1'; 
+            uins.mux_address <= '1';
+            if noIncPC='1' then
+                incPC <= '1';
+            end if;    
                     
     -- DECODE (Logical and Compare Group)
     -- T2 or T3 or T4 or T5 or T6: BI <- MEM[MAR or ABH/ABL]; AI <- AC     

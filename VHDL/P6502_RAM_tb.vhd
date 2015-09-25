@@ -40,8 +40,8 @@ begin
     rst <= '1', '0' after 10 ns;
     ready <= '0', '1' after 20 ns;
     clk <= not clk after 10 ns;    -- 100 MHz
-    nmi <= '1'; nres <= '1'; irq <= '1'; -- Interrupt lines (active low)
-    
+    nmi <= '1'; nres <= '1'; --irq <= '1'; -- Interrupt lines (active low)
+    irq <= '1', '0' after 55 us;
 end behavioral;
 
 
