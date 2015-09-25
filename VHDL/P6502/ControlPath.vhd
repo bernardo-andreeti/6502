@@ -34,12 +34,11 @@ architecture ControlPath of ControlPath is
     
     -- Internal signals
     signal rdy: std_logic;
-    signal noIncPC, incPC: std_logic;
     signal inst: std_logic_vector(7 downto 0);
     
 begin  
     
-    inst <= x"00" when nmi = '0' or nres = '0' or (irq = '0' and spr_in(INTERRUPT) = '0') else instruction; 
+    inst <= x"00" when (nmi = '0' or nres = '0' or irq = '0') and spr_in(INTERRUPT) = '0' else instruction;  
     opcode <= inst when currentState = T1 else IR;          
     decIns <= InstructionDecoder(opcode);
     
@@ -53,21 +52,7 @@ begin
         elsif rising_edge(clk) then 
             rdy <= ready;
         end if;
-    end process;
-
-    -----------------------------
-    -- noIncPC signal register --
-    -----------------------------
-    process(clk, rst, incPC)
-    begin
-        if rst = '1' or incPC = '1' then
-            noIncPC <= '0';
-        elsif rising_edge(clk) then
-            if nmi = '0' or nres = '0' or (irq = '0' and spr_in(INTERRUPT) = '0') then
-                noIncPC <= '1'; -- Blocks PC increment during T0 in order to store correct return value
-            end if;
-        end if;
-    end process;    
+    end process;   
         
     ------------------------
     -- FSM state register --
@@ -159,7 +144,7 @@ begin
     ------------------------------------
     -- FSM output combinational logic --
     ----------------------------------------
-    process(decIns, currentState, rst, rdy, nmi, irq, nres, noIncPC)
+    process(decIns, currentState, rst, rdy, nmi, irq, nres, spr_in)
     begin
         -- Default Values
         uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00");
@@ -180,15 +165,13 @@ begin
     -- DECODE
     -- T1: MAR <- PC; IR <- MEM[MAR]; PC++; (all instructions except one byte ones)
         elsif (currentState = T0 and rdy = '1') or (currentState = T1 and decIns.size > 1) or (currentState = T2 and decIns.size > 2) then  
-            -- MAR <- PC
             uins.mux_mar <= "0000";
             uins.wrMAR   <= '1';    -- MAR <- PCH_q & PCL_q
-                
-            -- PC++
-            if noIncPC='0' then
-                uins.mux_pc <= '0';
-                uins.wrPCH  <= '1';
-                uins.wrPCL  <= '1';
+            
+            if currentState = T0 and (nmi = '0' or nres = '0' or irq = '0') and spr_in(INTERRUPT) = '0' then
+                uins.wrPCH <= '0'; uins.wrPCL <= '0';  -- Don't increment PC if handling an interruption
+            else
+                uins.wrPCH  <= '1'; uins.wrPCL  <= '1'; -- PC++
             end if;
             
         -- DECODE (Absolute and Indirect)    
@@ -256,10 +239,7 @@ begin
             uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
-            uins.mux_address <= '1';
-            if noIncPC='1' then
-                incPC <= '1';
-            end if;    
+            uins.mux_address <= '1';   
                     
     -- DECODE (Logical and Compare Group)
     -- T2 or T3 or T4 or T5 or T6: BI <- MEM[MAR or ABH/ABL]; AI <- AC     
@@ -444,7 +424,7 @@ begin
                 uins.mux_address <= '1';
             end if;
             if decIns.instruction=RTI then
-                uins.rstP(INTERRUPT) <= '1'; -- Enable IRQ
+                uins.setP(INTERRUPT) <= '1'; -- Enable IRQ
             end if;
             
     -- DECODE (third step for INC and DEC, Shift and Rotate); BI <- MEM[AB]; AI <- 0    
