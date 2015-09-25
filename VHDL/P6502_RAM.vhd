@@ -54,21 +54,37 @@ architecture behavioral of P6502_RAM is
     end BCD7segments;
     
 begin
-
+-----------------------------------
+-- ONLY NECESSARY FOR SYNTHESIS! --
+-----------------------------------
     -- Divides the Nexys board clock by 56 (100MHz/56 = 1.785MHz) 
-    process(clk,rst)
-    begin
-        if rst = '1' then
-            count <= (others=>'0');
-        elsif rising_edge(clk) then
-            if count = "11011" then -- 27
-                count <= "00000";
-            else
-                count <= count + 1;
-            end if;
-        end if;
-    end process;
-    clk_div <= '0' when count < "01110" else '1';
+--    process(clk,rst)
+--    begin
+--       if rst = '1' then
+--            count <= (others=>'0');
+--        elsif rising_edge(clk) then
+--            if count = "11011" then -- 27
+--                count <= "00000";
+--           else
+--                count <= count + 1;
+--            end if;
+--        end if;
+--    end process;
+--    
+--    process(clk,rst)
+--    begin
+--        if rst = '1' then
+--            clk_div <= '0';
+--       elsif rising_edge(clk) then
+--            if count < "01110" then -- count < 14
+--               clk_div <= '0';
+--            else
+--                clk_div <= '1';
+--            end if;
+--        end if;
+--   end process
+
+    clk_div <= clk; -- > REMOVE FOR SYNTHESIS!
     
     -- 6502 processor
     P6502: entity work.P6502 
@@ -119,11 +135,11 @@ begin
             reg2 <= (others=>'1');
         
         elsif rising_edge(clk_div) then
-            if address = x"0055" and we = '1' then
-                reg1 <= RAMdata_in;
+            if address = x"0210" and we = '0' then -- LOAD
+                reg1 <= RAMdata_out;
             end if;
             
-            if address = x"0056" and we = '1' then
+            if address = x"0210" and we = '1' then -- STORE
                 reg2 <= RAMdata_in;
             end if;
         end if;
@@ -133,7 +149,6 @@ begin
     display1 <= BCD7segments(reg2(7 downto 4));
     display2 <= BCD7segments(reg1(3 downto 0));
     display3 <= BCD7segments(reg1(7 downto 4));
-     
         
 end behavioral;
 

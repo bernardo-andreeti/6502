@@ -1,16 +1,22 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/rst
-add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/clk
+add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/ready
+add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/duv/P6502/control_path/rdy
+add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/nmi
+add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/nres
+add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/irq
+add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/duv/clk_div
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/control_path/currentstate
 add wave -noupdate -format Logic -radix hexadecimal P6502_RAM_tb/duv/P6502/uins
 add wave -noupdate -format Literal P6502_RAM_tb/duv/P6502/control_path/decins
 add wave -noupdate -divider Datapath
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/data_in
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/data_out
-add wave -noupdate -format Literal P6502_RAM_tb/duv/P6502/data_path/p_q
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/p_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/db
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/sb
+add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/s_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/pch_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/pcl_q
 add wave -noupdate -format Literal -radix hexadecimal P6502_RAM_tb/duv/P6502/data_path/abh_q

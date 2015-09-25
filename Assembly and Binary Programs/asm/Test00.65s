@@ -1,0 +1,94 @@
+	.ORG $4000
+start
+; EXPECTED FINAL RESULTS: $0210 = FF
+; (any other number will be the 
+;  test that failed)
+; initialize:
+	LDA #$00
+	STA $0210
+	; store each test's expected
+	LDA #$55
+	STA $0200
+	LDA #$AA
+	STA $0201
+	LDA #$FF
+	STA $0202
+	LDA #$6E
+	STA $0203
+	LDA #$42
+	STA $0204
+	LDA #$33
+	STA $0205
+	LDA #$9D
+	STA $0206
+	LDA #$7F
+	STA $0207
+	LDA #$A5
+	STA $0208
+	LDA #$1F
+	STA $0209
+	LDA #$CE
+	STA $020A
+	LDA #$29
+	STA $020B
+	LDA #$42
+	STA $020C
+	LDA #$6C
+	STA $020D
+	LDA #$42
+	STA $020E
+	
+
+; expected result: $022A = 0x55
+test00
+   	LDA #85
+	LDX #42
+	LDY #115
+	STA $81
+	LDA #$01
+	STA $61
+	LDA #$7E
+	LDA $81
+	STA $0910
+	LDA #$7E
+	LDA $0910
+	STA $56,X
+	LDA #$7E
+	LDA $56,X
+	STY $60
+	STA ($60),Y
+	LDA #$7E
+	LDA ($60),Y
+	STA $07ff,X
+	LDA #$7E
+	LDA $07ff,X
+	STA $07ff,Y
+	LDA #$7E
+	LDA $07ff,Y
+	STA ($36,X)
+	LDA #$7E
+	LDA ($36,X)
+	STX $50
+	LDX $60
+	LDY $50
+	STX $0913
+	LDX #$22
+	LDX $0913
+	STY $0914
+	LDY #$99
+	LDY $0914
+	STY $2D,X
+	STX $77,Y
+	LDY #$99
+	LDY $2D,X
+	LDX #$22
+	LDX $77,Y
+	LDY #$99
+	LDY $08A0,X
+	LDX #$22
+	LDX $08A1,Y
+	STA $0200,X
+	
+; CHECK test00:
+	LDA $022A
+	

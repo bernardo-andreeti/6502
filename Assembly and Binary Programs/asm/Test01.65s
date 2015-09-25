@@ -1,0 +1,233 @@
+	.ORG $4000
+start
+; EXPECTED FINAL RESULTS: $0210 = FF
+; (any other number will be the 
+;  test that failed)
+; initialize:
+	LDA #$00
+	STA $0210
+	; store each test's expected
+	LDA #$55
+	STA $0200
+	LDA #$AA
+	STA $0201
+	LDA #$FF
+	STA $0202
+	LDA #$6E
+	STA $0203
+	LDA #$42
+	STA $0204
+	LDA #$33
+	STA $0205
+	LDA #$9D
+	STA $0206
+	LDA #$7F
+	STA $0207
+	LDA #$A5
+	STA $0208
+	LDA #$1F
+	STA $0209
+	LDA #$CE
+	STA $020A
+	LDA #$29
+	STA $020B
+	LDA #$42
+	STA $020C
+	LDA #$6C
+	STA $020D
+	LDA #$42
+	STA $020E
+	
+
+; expected result: $022A = 0x55
+test00
+   	LDA #85
+	LDX #42
+	LDY #115
+	STA $81
+	LDA #$01
+	STA $61
+	LDA #$7E
+	LDA $81
+	STA $0910
+	LDA #$7E
+	LDA $0910
+	STA $56,X
+	LDA #$7E
+	LDA $56,X
+	STY $60
+	STA ($60),Y
+	LDA #$7E
+	LDA ($60),Y
+	STA $07ff,X
+	LDA #$7E
+	LDA $07ff,X
+	STA $07ff,Y
+	LDA #$7E
+	LDA $07ff,Y
+	STA ($36,X)
+	LDA #$7E
+	LDA ($36,X)
+	STX $50
+	LDX $60
+	LDY $50
+	STX $0913
+	LDX #$22
+	LDX $0913
+	STY $0914
+	LDY #$99
+	LDY $0914
+	STY $2D,X
+	STX $77,Y
+	LDY #$99
+	LDY $2D,X
+	LDX #$22
+	LDX $77,Y
+	LDY #$99
+	LDY $08A0,X
+	LDX #$22
+	LDX $08A1,Y
+	STA $0200,X
+	
+; CHECK test00:
+	LDA $022A
+	
+	LDA #$FE
+	STA $0210
+	
+	
+; expected result: $A9 = 0xAA
+test01
+	; imm
+	LDA #85
+	AND #83
+	ORA #56
+	EOR #17
+	
+	; zpg
+	STA $99
+	LDA #185
+	STA $10
+	LDA #231
+	STA $11
+	LDA #57
+	STA $12
+	LDA $99
+	AND $10
+	ORA $11
+	EOR $12
+	
+	; zpx
+	LDX #16
+	STA $99
+	LDA #188
+	STA $20
+	LDA #49
+	STA $21
+	LDA #23
+	STA $22
+	LDA $99
+	AND $10,X
+	ORA $11,X
+	EOR $12,X
+	
+	; abs
+	STA $99
+	LDA #111
+	STA $0110
+	LDA #60
+	STA $0111
+	LDA #39
+	STA $0112
+	LDA $99
+	AND $0110
+	ORA $0111
+	EOR $0112
+	
+	; abx
+	STA $99
+	LDA #138
+	STA $0120
+	LDA #71
+	STA $0121
+	LDA #143
+	STA $0122
+	LDA $99
+	AND $0110,X
+	ORA $0111,X
+	EOR $0112,X
+	
+	; aby
+	LDY #32
+	STA $99
+	LDA #115
+	STA $0130
+	LDA #42
+	STA $0131
+	LDA #241
+	STA $0132
+	LDA $99
+	AND $0110,Y
+	ORA $0111,Y
+	EOR $0112,Y
+	
+	; idx
+	STA $99
+	LDA #112
+	STA $30
+	LDA #$01
+	STA $31
+	LDA #113
+	STA $32
+	LDA #$01
+	STA $33
+	LDA #114
+	STA $34
+        LDA #$01
+        STA $35
+	LDA #197
+	STA $0170
+	LDA #124
+	STA $0171
+	LDA #161
+	STA $0172
+	LDA $99
+	AND ($20,X)
+	ORA ($22,X)
+	EOR ($24,X)
+	
+	; idy
+	STA $99
+	LDA #96
+	STA $40
+	LDA #$01
+	STA $41
+	LDA #97
+	STA $42
+	LDA #$01
+	STA $43
+	LDA #98
+	STA $44
+	LDA #$01
+	STA $45
+	LDA #55
+	STA $0250
+	LDA #35
+	STA $0251
+	LDA #157
+	STA $0252
+	LDA $99
+	LDY #$F0
+	AND ($40),Y
+	ORA ($42),Y
+	EOR ($44),Y
+	
+	STA $A9
+	
+; CHECK test01
+	LDA $A9
+	
+	LDA #$01
+	STA $0210
+	
+	
