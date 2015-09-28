@@ -136,8 +136,10 @@ begin
     begin
         if rst = '1' then   
             IR <= x"EA";    -- NOP   
-        elsif rising_edge(clk) and currentState = T1 and rdy = '1' then
-            IR <= inst;
+        elsif rising_edge(clk) and rdy = '1' then
+            if currentState = T1 then
+                IR <= inst;
+            end if;    
         end if;
     end process;
     
@@ -424,7 +426,7 @@ begin
                 uins.mux_address <= '1';
             end if;
             if decIns.instruction=RTI then
-                uins.setP(INTERRUPT) <= '1'; -- Enable IRQ
+                uins.rstP(INTERRUPT) <= '1'; -- Enable IRQ
             end if;
             
     -- DECODE (third step for INC and DEC, Shift and Rotate); BI <- MEM[AB]; AI <- 0    
