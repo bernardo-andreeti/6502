@@ -25,7 +25,7 @@ architecture behavioral of P6502_RAM is
      
     signal reg1, reg2: std_logic_vector(7 downto 0);
     signal display0, display1, display2, display3: std_logic_vector(7 downto 0);
-    signal count: std_logic_vector(4 downto 0);
+    signal count: std_logic_vector(5 downto 0);
     signal clk_div: std_logic;
     
     function BCD7segments(number: in std_logic_vector(3 downto 0)) return std_logic_vector is
@@ -63,8 +63,8 @@ begin
 --       if rst = '1' then
 --            count <= (others=>'0');
 --        elsif rising_edge(clk) then
---            if count = "11011" then -- 27
---                count <= "00000";
+--            if count = x"37" then 
+--                count <= "000000";
 --           else
 --                count <= count + 1;
 --            end if;
@@ -76,7 +76,7 @@ begin
 --        if rst = '1' then
 --            clk_div <= '0';
 --       elsif rising_edge(clk) then
---            if count < "01110" then -- count < 14
+--            if count < x"1C" then 
 --               clk_div <= '0';
 --            else
 --                clk_div <= '1';
