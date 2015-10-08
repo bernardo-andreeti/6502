@@ -34,14 +34,117 @@ architecture ControlPath of ControlPath is
     
     -- Internal signals
     signal rdy: std_logic;
-    signal inst: std_logic_vector(7 downto 0);
+    signal instruction_aux: std_logic_vector(7 downto 0);
+    -- Interrupt Registers
+    signal d_nmi, q_nmi: std_logic;
+    signal d_nres, q_nres: std_logic;
+    signal d_irq, q_irq: std_logic;
+    -- Auxiliar Interrupt Registers 
+    signal nmi_aux, nres_aux, irq_aux: std_logic;
+        
+begin 
+
+    --------------------------
+    -- Instruction register --
+    --------------------------
+    process(clk, rst, rdy)
+    begin
+        if rst = '1' then   
+            IR <= x"EA";    -- NOP   
+        elsif rising_edge(clk) and rdy = '1' then
+            if currentState = T1 then
+                IR <= instruction_aux;
+            end if;    
+        end if;
+    end process;
     
-begin  
-    
-    inst <= x"00" when (nmi = '0' or nres = '0' or irq = '0') and spr_in(INTERRUPT) = '0' else instruction;  
-    opcode <= inst when currentState = T1 else IR;          
+    -- In case of an interruption, a break instruction is forced to process it;
+    instruction_aux <= x"00" when (q_nmi = '1' or q_nres = '1' or (q_irq = '1' and spr_in(INTERRUPT) = '0')) else instruction;
+    opcode <= instruction_aux when currentState = T1 else IR;          
     decIns <= InstructionDecoder(opcode);
     
+    ---------------------------
+    -- NMI signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            q_nmi <= '0';
+        elsif rising_edge(clk) then 
+            q_nmi <= d_nmi;
+        end if;
+    end process;
+    
+    ---------------------------
+    -- NRES signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            q_nres <= '0';
+        elsif rising_edge(clk) then 
+            q_nres <= d_nres;
+        end if;
+    end process;
+    
+    ---------------------------
+    -- IRQ signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            q_irq <= '0';
+        elsif rising_edge(clk) then 
+            q_irq <= d_irq;
+        end if;
+    end process;
+    
+    ---------------------------
+    -- NMI_AUX signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            nmi_aux <= '1';
+        elsif rising_edge(clk) then 
+            nmi_aux <= nmi;
+        end if;
+    end process;
+    
+    ---------------------------
+    -- NRES_AUX signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            nres_aux <= '1';
+        elsif rising_edge(clk) then 
+            nres_aux <= nres;
+        end if;
+    end process;
+    
+    ---------------------------
+    -- IRQ_AUX signal register --
+    ---------------------------
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            irq_aux <= '1';
+        elsif rising_edge(clk) then 
+            irq_aux <= irq;
+        end if;
+    end process;
+    
+    d_nmi <= '0' when q_nmi = '1' and currentState = T7 and decIns.instruction = BRK else 
+             '1' when nmi = '0' and nmi_aux = '1' else
+             q_nmi;		 
+    d_nres <= '0' when q_nres = '1' and currentState = T7 and decIns.instruction = BRK else 
+              '1' when nres = '0' and nres_aux = '1' else  
+              q_nres;
+    d_irq <= '0' when q_irq = '1' and currentState = T7 and decIns.instruction = BRK else 
+             '1' when irq = '0' and irq_aux = '1' else  
+              q_irq;          
+	 
     ---------------------------
     -- Ready signal register --
     ---------------------------
@@ -71,82 +174,56 @@ begin
     ----------------------------------------
     process(currentState, decIns, spr_in)  
     begin
-        case currentState is
-                            
+        case currentState is              
             when T0 =>
-                nextState <= T1;
-                    
+                nextState <= T1;   
             when T1 =>  
                 if decIns.InsGroup = STATUS_FLAG or decIns.InsGroup = REG_TRANSFER or decIns.instruction = TXS or decIns.instruction = TSX or (decIns.instruction=BEQ and spr_in(ZERO)='0') or (decIns.instruction=BNE and spr_in(ZERO)='1') or (decIns.instruction=BCS and spr_in(CARRY)='0') or (decIns.instruction=BCC and spr_in(CARRY)='1') or (decIns.instruction=BMI and spr_in(NEGATIVE)='0') or (decIns.instruction=BPL and spr_in(NEGATIVE)='1') or (decIns.instruction=BVS and spr_in(OVERFLOW)='0') or (decIns.instruction=BVC and spr_in(OVERFLOW)='1') or decIns.instruction=NOP then 
                     nextState <= T0;                                            
                 else
                     nextState <= T2;
                 end if;
-                
             when T2 =>
                 if (decIns.addressMode=IMM and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMP and decIns.InsGroup=INC_DEC) or decIns.addressMode=ACC or decIns.instruction=PHA or decIns.instruction=PHP then 
                     nextState <= T0;
                 else
                     nextState <= T3;
                 end if;
-                
             when T3 =>
                 if (decIns.addressMode=ZPG and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=IMM and (decIns.InsGroup=LOGICAL or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE))  or (decIns.addressMode=AABS and decIns.InsGroup=JUMP_BRANCH) or decIns.instruction=PLA or decIns.instruction=PLP then
                     nextState <= T0;
                 else
                     nextState <= T4;
                 end if; 
-                
             when T4 => 
                 if ((decIns.addressMode=AABS or decIns.addressMode=ZPG_X or decIns.addressMode=ZPG_Y) and decIns.InsGroup=LOAD_STORE) or (decIns.addressMode=ZPG and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE)) or decIns.addressMode=REL then
                     nextState <= T0;
                 else
                     nextState <= T5;
                 end if;
-            
             when T5 =>
                 if (decIns.instruction=RTS) or (decIns.addressMode=ZPG and decIns.InsGroup=BIT_TEST) or (decIns.addressMode=IND and decIns.InsGroup=JUMP_BRANCH) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ZPG_X or decIns.addressMode=AABS) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=COMPARE or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC)) then
                         nextState <= T0;
                 else
                         nextState <= T6;
                 end if;
-            
             when T6 =>
                 if (decIns.addressMode=AABS and (decIns.InsGroup=SUBROUTINE_INTERRUPT or decIns.InsGroup=BIT_TEST)) or ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOAD_STORE) or ((decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y) and (decIns.InsGroup=LOGICAL or decIns.InsGroup=INC_DEC or decIns.InsGroup=SHIFT_ROTATE or decIns.InsGroup=ARITHMETIC or decIns.InsGroup=COMPARE))  then
                         nextState <= T0;
                 else
                         nextState <= T7;
                 end if;
-            
             when T7 =>
-                -- if ((decIns.addressMode=IND_X or decIns.addressMode=IND_Y) and decIns.InsGroup=LOGICAL) or decIns.instruction=RTI then
-                    nextState <= T0;   
-                -- end if;
-            
+                    nextState <= T0;
             when others =>
-                nextState <= T0;
-                
+                nextState <= T0;  
         end case;
-    end process;
-    
-    --------------------------
-    -- Instruction register --
-    --------------------------
-    process(clk, rst, rdy)
-    begin
-        if rst = '1' then   
-            IR <= x"EA";    -- NOP   
-        elsif rising_edge(clk) and rdy = '1' then
-            if currentState = T1 then
-                IR <= inst;
-            end if;    
-        end if;
     end process;
     
     ------------------------------------
     -- FSM output combinational logic --
     ----------------------------------------
-    process(decIns, currentState, rst, rdy, nmi, irq, nres, spr_in)
+    process(decIns, currentState, rst, rdy, q_nmi, q_irq, q_nres, spr_in)
     begin
         -- Default Values
         uins <= ('0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00");
@@ -170,7 +247,7 @@ begin
             uins.mux_mar <= "0000";
             uins.wrMAR   <= '1';    -- MAR <- PCH_q & PCL_q
             
-            if currentState = T0 and (nmi = '0' or nres = '0' or irq = '0') and spr_in(INTERRUPT) = '0' then
+            if currentState = T0 and (q_nmi = '1' or q_nres = '1' or (q_irq = '1' and spr_in(INTERRUPT) = '0')) then
                 uins.wrPCH <= '0'; uins.wrPCL <= '0';  -- Don't increment PC if handling an interruption
             else
                 uins.wrPCH  <= '1'; uins.wrPCL  <= '1'; -- PC++
@@ -368,9 +445,9 @@ begin
     
     -- DECODE (BRK): MAR <- x"FFFF" for BRK/IRQ, FFFD for NRES or FFFB for NMI interruption 
         elsif currentState=T5 and decIns.instruction=BRK then
-            if (nmi = '0') then
+            if (q_nmi = '1') then
                 uins.mux_mar <= "0111";  -- MAR <- x"FFFB"
-            elsif (nres = '0') then
+            elsif (q_nres = '1') then
                 uins.mux_mar <= "0101";  -- MAR <- x"FFFD"
             else -- BRK and IRQ
                 uins.mux_mar <= "0011";  -- MAR <- x"FFFF"
@@ -381,9 +458,9 @@ begin
         elsif currentState=T6 and decIns.instruction=BRK then
             uins.mux_db <= "100"; uins.mux_adh <= "00";
             uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
-            if (nmi = '0') then
+            if (q_nmi = '1') then
                 uins.mux_mar <= "1000";  -- MAR <- x"FFFA"
-            elsif (nres = '0') then
+            elsif (q_nres = '1') then
                 uins.mux_mar <= "0110";  -- MAR <- x"FFFC"
             else -- BRK and IRQ
                 uins.mux_mar <= "0100";  -- MAR <- x"FFFE"
@@ -395,7 +472,7 @@ begin
             uins.mux_db <= "100"; uins.mux_adl <= "10"; 
             uins.mux_pc <= '1'; uins.wrPCL <= '1'; 
             uins.setP(INTERRUPT) <= '1'; -- Update Flags, maybe only for BREAK and IRQ
-            if (nmi = '1' and irq = '1' and nres = '1') then
+            if (q_nmi = '0' and q_irq = '0' and q_nres = '0') then
                 uins.setP(BREAKF) <= '1'; -- Only set if Break instruction
             end if;
             
@@ -442,10 +519,13 @@ begin
     -- DECODE (ABS_X, ABS_Y IND_Y), Last Cycle for REL: T4 or T5: ABH (PCH for REL) <- AI + BI + hc;
         elsif ((currentState = T4 and (decIns.addressMode=ABS_X or decIns.addressMode=ABS_Y or decIns.addressMode=REL)) or (currentState = T5 and decIns.addressMode=IND_Y)) then 
             uins.mux_carry <= "11";     -- carry <- hc
-            uins.ALUoperation <= ALU_ADC; -- AI + BI + carry
+            if decIns.addressMode/=REL then
+                uins.ALUoperation <= ALU_ADC; -- AI + BI + carry
+            end if;
             uins.mux_sb <= "001";
             uins.mux_adh <= "01";
             if decIns.addressMode=REL then
+                uins.ALUoperation <= ALU_ADD;
                 uins.mux_pc <= '1';
                 uins.wrPCH <= '1';
             else
