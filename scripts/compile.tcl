@@ -23,18 +23,18 @@ if { ![file exist work] } {
 
 # Source files listed in hierarchical order: botton -> top
 set sourceFiles {
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/P6502_pkg.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/FlipFlopD_sr.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/RegisterNbits.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/ALU.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/DataPath.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/ControlPath.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502/P6502.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/Util_package.vhd    
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/Memory.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/DisplayCtrl.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502_RAM.vhd
-    c:/Users/Leviathan/Documents/GitHub/6502/VHDL/P6502_RAM_tb.vhd
+    ../VHDL/P6502/P6502_pkg.vhd
+    ../VHDL/P6502/FlipFlopD_sr.vhd
+    ../VHDL/P6502/RegisterNbits.vhd
+    ../VHDL/P6502/ALU.vhd
+    ../VHDL/P6502/DataPath.vhd
+    ../VHDL/P6502/ControlPath.vhd
+    ../VHDL/P6502/P6502.vhd
+    ../VHDL/Util_package.vhd    
+    ../VHDL/Memory.vhd
+    ../VHDL/DisplayCtrl.vhd
+    ../VHDL/P6502_RAM.vhd
+    ../VHDL/P6502_RAM_tb.vhd
 }
 
 
