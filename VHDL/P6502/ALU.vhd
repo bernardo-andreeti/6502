@@ -49,7 +49,7 @@ begin
     sum_ext <= (a_ext + b_ext) when (operation = ALU_ADC or operation = ALU_ADD) else (a_ext + b_ext - 2) when (operation = ALU_DEC or operation = ALU_DECHC) else "0000000000";
        
     -- Overflow flag (Operands with the same signal but different from the result's signal)
-    v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '0';     -- Behavioral
+    v <= '1' when a(7) = b(7) and a(7) /= temp(7) else '1' when (b(6) = '1' and operation = ALU_B) else '0';     -- Behavioral
     
     -- Carry flag
     c <= b(7) when (operation = ALU_ASL or operation = ALU_ROL) else b(0) when (operation = ALU_LSR or operation = ALU_ROR) else sum_ext(9);     
