@@ -223,12 +223,12 @@ begin
     ------------------------------------
     -- FSM output combinational logic --
     ----------------------------------------
-    process(decIns, currentState, rst, rdy, q_nmi, q_irq, q_nres, spr_in)
+    process(decIns, currentState, rst, rdy, q_nmi, q_irq, q_nres, spr_in, nOffset_in)
     begin
         -- Default Values
         uins <= ('0','0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00");
         we <= '0'; -- Memory Read Mode
-        uins.setP(UNUSED) <= '1';
+        uins.ceP(UNUSED) <= '1';
         
         if rst = '1' then
             uins.rstP(CARRY)     <= '1';
@@ -238,10 +238,11 @@ begin
             uins.rstP(BREAKF)    <= '1';
             uins.rstP(OVERFLOW)  <= '1';
             uins.rstP(NEGATIVE)  <= '1';
-            uins.setP(UNUSED)    <= '1';
+            uins.rstP(UNUSED)    <= '1';
             
         elsif rdy = '0' then -- Stall processor operation
             uins <= ('0','0','0','0','0','0','0','0','0','0','0','0','0',"00","0000","00","00",'0','0','0',"000","000","00","00",ALU_NOP,x"00",x"00",x"00");
+            uins.ceP(UNUSED) <= '1';
             we <= '0'; 
                                     
     -- FETCH
