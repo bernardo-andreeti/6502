@@ -16,6 +16,7 @@ package P6502_pkg is
     constant INTERRUPT : integer := 2;
     constant DECIMAL   : integer := 3;
     constant BREAKF    : integer := 4;
+    constant UNUSED    : integer := 5;
     constant OVERFLOW  : integer := 6;
     constant NEGATIVE  : integer := 7;
     
@@ -51,8 +52,8 @@ package P6502_pkg is
     type ALU_Operation_type is (
         ALU_AND, ALU_OR, ALU_XOR,
         ALU_A, ALU_B, ALU_ADD, ALU_ADC, 
-        ALU_DEC, ALU_ASL, ALU_LSR, ALU_ROL, 
-        ALU_ROR, ALU_NOP
+        ALU_DEC, ALU_DECHC, ALU_ASL, ALU_LSR, 
+        ALU_ROL, ALU_ROR, ALU_NOP
     );
     
     type AddressMode_type is (IMM, ZPG, ZPG_X, ZPG_Y, IND_X, IND_Y, AABS, ABS_X, ABS_Y, IMP, REL, ACC, IND);
@@ -65,17 +66,18 @@ package P6502_pkg is
     end record;
  
     type Microinstruction is record
-        wrAI         : std_logic;                    -- Write control for the AI register
-        wrBI         : std_logic;                    -- Write control for the BI register
-        wrAC         : std_logic;                    -- Write control for the AC register
-        wrS          : std_logic;                    -- Write control for the S register
-        wrX          : std_logic;                    -- Write control for the X register
-        wrY          : std_logic;                    -- Write control for the Y register
-        wrPCH        : std_logic;                    -- Write control for the PCH register
-        wrPCL        : std_logic;                    -- Write control for the PCL register
-        wrABH        : std_logic;                    -- Write control for the ABH register
-        wrABL        : std_logic;                    -- Write control for the ABL register
-        wrMAR        : std_logic;                    -- Write control for the MAR register
+        wrAI         : std_logic;                    -- Write control for AI register
+        wrBI         : std_logic;                    -- Write control for BI register
+        wrAC         : std_logic;                    -- Write control for AC register
+        wrS          : std_logic;                    -- Write control for S register
+        wrX          : std_logic;                    -- Write control for X register
+        wrY          : std_logic;                    -- Write control for Y register
+        wrPCH        : std_logic;                    -- Write control for PCH register
+        wrPCL        : std_logic;                    -- Write control for PCL register
+        wrABH        : std_logic;                    -- Write control for ABH register
+        wrABL        : std_logic;                    -- Write control for ABL register
+        wrMAR        : std_logic;                    -- Write control for MAR register
+        wrOffset     : std_logic;                    -- Write control for Negative Offset register
         mux_address  : std_logic;                    -- Multiplexer selection input
         mux_bi       : std_logic_vector(1 downto 0); -- Multiplexer selection input
         mux_mar      : std_logic_vector(3 downto 0); -- Multiplexer selection input

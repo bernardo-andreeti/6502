@@ -20,22 +20,15 @@ entity P6502 is
         d_out     : out std_logic_vector(7 downto 0); -- Data to memory
         a_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
         r_nw_out  : out std_logic -- Access control to data memory ('0' for Reads, '1' for Writes)
-               
-        -- Debuger lines (not used in this implementation)
-        -- dbgreg_sel_in : in std_logic_vector(3 downto 0);
-        -- dbgreg_in     : in std_logic_vector(7 downto 0);
-        -- dbgreg_wr_in  : in std_logic;
-        -- dbgreg_out    : out std_logic_vector(7 downto 0);
-        -- brk_out       : out std_logic
-      );
+    );
 end P6502;
 
 architecture structural of P6502 is
 
-    signal uins         : Microinstruction;
-    signal instruction  : std_logic_vector(7 downto 0);
-    signal spr          : std_logic_vector(7 downto 0);
-    signal clk_n        : std_logic;
+    signal uins           : Microinstruction;
+    signal instruction    : std_logic_vector(7 downto 0);
+    signal spr            : std_logic_vector(7 downto 0);
+    signal clk_n, nOffset : std_logic;
     
 begin
 
@@ -50,6 +43,7 @@ begin
             data_in     => d_in,
             data_out    => d_out,
             spr_out     => spr,
+            nOffset_out => nOffset, 
             uins        => uins
         );
         
@@ -61,6 +55,7 @@ begin
             spr_in      => spr,    
             instruction => d_in,
             we          => r_nw_out,
+            nOffset_in  => nOffset,
             ready       => ready_in,
             nmi         => nnmi_in,
             nres        => nres_in,

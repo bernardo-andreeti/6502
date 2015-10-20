@@ -14,12 +14,13 @@ use work.P6502_pkg.all;
    
 entity DataPath is
     port(  
-        clk, rst    : in std_logic;
-        address     : out std_logic_vector(15 downto 0);    -- Address bus to memory
-        data_in     : in std_logic_vector(7 downto 0);      -- Data from memory
-        data_out    : out std_logic_vector(7 downto 0);     -- Data to memory
-        spr_out     : out std_logic_vector(7 downto 0);     -- Status Processor Register
-        uins        : in Microinstruction                   -- Control signals
+        clk, rst        : in std_logic;
+        address         : out std_logic_vector(15 downto 0);    -- Address bus to memory
+        data_in         : in std_logic_vector(7 downto 0);      -- Data from memory
+        data_out        : out std_logic_vector(7 downto 0);     -- Data to memory
+        spr_out         : out std_logic_vector(7 downto 0);     -- Status Processor Register
+        nOffset_out     : out std_logic;                        -- Negative Offset Signal
+        uins            : in Microinstruction                   -- Control signals
       );
 end DataPath;
 
@@ -260,7 +261,7 @@ begin
     P_d(BREAKF) <= DB(BREAKF) when uins.mux_p = '1' else '0';
     P_d(OVERFLOW) <= overflowFlag when uins.mux_p = '0' else DB(OVERFLOW);
     P_d(NEGATIVE) <= SB(7) when uins.mux_p = '0' else DB(NEGATIVE); -- Negative flag (result's MSb)
-    P_d(5) <= '1';
+    P_d(UNUSED) <= '1'; 
     
     STATUS_PROCESSOR_REGISTER: for i in 0 to 7 generate
         FFD: entity work.FlipFlopD_sr
@@ -284,5 +285,16 @@ begin
                 d       => carryFlag,
                 q       => halfCarry
             );
+            
+    -- Negative Offset Flip Flop
+    FFNO: entity work.FlipFlopD_sr 
+        port map(
+                clk     => clk,
+                rst     => uins.rstP(NEGATIVE),
+                set     => '0',
+                ce      => uins.wrOffset,
+                d       => SB(7), -- Detects negative offsets for branch instructions
+                q       => nOffset_out
+            );        
 
 end Structural;

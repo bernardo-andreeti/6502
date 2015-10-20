@@ -18,15 +18,14 @@ end P6502_RAM;
 -- Instantiate the components and generates the stimuli.
 architecture behavioral of P6502_RAM is  
     
-    signal CPUwe, we      : std_logic;
-    signal address : std_logic_vector(15 downto 0);
-    signal RAMdata_in, RAMdata_out, CPUdata_in   : std_logic_vector(7 downto 0);
-     
-    signal reg1, reg2, reg_CPUdata_in   : std_logic_vector(7 downto 0);
-    signal reg_CPUwe                    :std_logic;
-    signal display0, display1, display2, display3: std_logic_vector(7 downto 0);
-    signal count: std_logic_vector(5 downto 0);
-    signal clk_div: std_logic;
+    signal RAMdata_in, RAMdata_out      : std_logic_vector(7 downto 0);
+    signal reg1, reg2                   : std_logic_vector(7 downto 0);
+    signal reg_CPUwe, CPUwe             : std_logic;
+    signal reg_CPUaddress, address_temp : std_logic_vector(15 downto 0);
+    signal display0, display1, 
+           display2, display3           : std_logic_vector(7 downto 0);
+    signal count                        : std_logic_vector(5 downto 0);
+    signal clk_div                      : std_logic;
     
     function BCD7segments(number: in std_logic_vector(3 downto 0)) return std_logic_vector is
         variable display: std_logic_vector(7 downto 0);
@@ -54,16 +53,13 @@ architecture behavioral of P6502_RAM is
     end BCD7segments;
     
 begin
------------------------------------
--- ONLY NECESSARY FOR SYNTHESIS! --
------------------------------------
-    -- Divides the Nexys board clock by 56 (100MHz/56 = 1.785MHz) 
+    -- Divides the Nexys board clock by 48 (100 MHz/48 = 2 MHz) 
     process(clk,rst)
     begin
         if rst = '1' then
             count <= (others=>'0');
         elsif rising_edge(clk) then
-            if count = x"37" then 
+            if count = x"2F" then 
                 count <= "000000";
             else
                 count <= count + 1;
@@ -76,7 +72,7 @@ begin
         if rst = '1' then
             clk_div <= '0';
         elsif rising_edge(clk) then
-            if count < x"1C" then 
+            if count < x"18" then 
                 clk_div <= '0';
             else
                 clk_div <= '1';
@@ -84,60 +80,60 @@ begin
         end if;
    end process;
     
-    -- 6502 processor
+    -- 6502 Processor Core
     P6502: entity work.P6502 
         port map (
             clk_in      => clk_div,
             rst_in      => rst,
             r_nw_out    => CPUwe,
-            d_in        => CPUdata_in,
+            d_in        => RAMdata_out,
             d_out       => RAMdata_in,
-            a_out       => address,
+            a_out       => address_temp,
             ready_in    => ready,
             nnmi_in     => nmi,
             nres_in     => nres,     
             nirq_in     => irq
         );
     
-    -- Sync Memory Writes (only at last rising_edge of clk before next clk_div's rising_edge)     
+    -- Sync Memory Writes   
     process(clk, rst)
     begin
         if rst = '1' then
             reg_CPUwe <= '0';
         elsif rising_edge(clk) then
-            if count = x"1B" then  -- last clk's rising_edge before clk_div's rising_edge
-                reg_CPUwe <= CPUwe;
+            if count = x"16" then  
+                reg_CPUwe <= CPUwe; -- High only for one period of 100 MHz clock
             else
                 reg_CPUwe <= '0';
             end if;
         end if;
     end process;
-    -- Sync Memory Reads
-    process(clk_div, rst)
+    
+    -- Sync IO access when integrated in fpga_nes project
+    process(clk, rst)
     begin
         if rst = '1' then
-            reg_CPUdata_in <= (others=>'0');
-        elsif rising_edge(clk_div) then
-            reg_CPUdata_in <= RAMdata_out;
+            reg_CPUaddress <= (others=>'0');
+        elsif rising_edge(clk) then
+            if count = x"16" then
+                reg_CPUaddress <= address_temp; -- Same moment as CPUwe signal is assigned
+            end if;
         end if;
-    end process;
-    
-    CPUdata_in <= reg_CPUdata_in;
-    we <= reg_CPUwe;   
+    end process;   
         
     -- Program/Data memory
-    RAM: entity work.Memory(block_ram) -- or simulation architecture for Questa simulation
+    RAM: entity work.Memory(block_ram) 
         generic map (
             DATA_WIDTH    => 8,
             ADDR_WIDTH    => 16,
-            IMAGE         => "AllSuite.txt" -- only for simulation description
+            IMAGE         => "AllSuite_IRQ_test.txt" 
         )
         port map (
             clk         => clk,
-            we          => we,
+            we          => reg_CPUwe,
             data_in     => RAMdata_in,
             data_out    => RAMdata_out,
-            address     => address
+            address     => reg_CPUaddress
         );
         
     DISPLAY_CONTROL: entity work.DisplayCtrl
@@ -159,11 +155,11 @@ begin
             reg2 <= (others=>'0');
         
         elsif rising_edge(clk) then
-            if address = x"0210" and we = '0' then -- LOAD
+            if reg_CPUaddress = x"0210" and reg_CPUwe = '0' then -- LOAD
                 reg1 <= RAMdata_out;
             end if;
             
-            if address = x"0210" and we = '1' then -- STORE
+            if reg_CPUaddress = x"0210" and reg_CPUwe = '1' then -- STORE
                 reg2 <= RAMdata_in;
             end if;
         end if;
