@@ -373,7 +373,8 @@ begin
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
             uins.mux_address <= '1';
             if (q_nmi = '0' and q_nres = '0' and q_irq = '0' and decIns.instruction = BRK) then 
-                uins.wrPCH <= '1'; uins.wrPCL <= '1'; -- PC++, only if BREAK instruction    
+                uins.wrPCH <= '1'; uins.wrPCL <= '1'; -- PC++, only if BREAK instruction
+                uins.setP(BREAKF) <= '1';
             end if;    
                     
     -- DECODE (Logical and Compare Group)
@@ -550,10 +551,7 @@ begin
     -- Last State (BRK): PCL <- MEM[MAR];
         elsif currentState=T7 and decIns.instruction=BRK then  
             uins.mux_db <= "100"; uins.mux_adh <= "00";
-            uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
-            if (q_nmi = '0' and q_irq = '0' and q_nres = '0') then
-                uins.setP(BREAKF) <= '1'; -- Only set if Break instruction
-            end if;        
+            uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]       
      
     -- DECODE (Implied addressing mode): PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0    
         elsif (currentState=T3 and decIns.instruction=RTS) or 
