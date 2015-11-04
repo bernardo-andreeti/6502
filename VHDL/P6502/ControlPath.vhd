@@ -371,7 +371,10 @@ begin
             uins.mux_adl <= "01"; uins.wrABL <= '1'; -- ABL <- S 
             uins.mux_adh <= "11"; uins.wrABH <= '1'; -- ABH <- 1
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
-            uins.mux_address <= '1';   
+            uins.mux_address <= '1';
+            if (q_nmi = '0' and q_nres = '0' and q_irq = '0' and decIns.instruction = BRK) then 
+                uins.wrPCH <= '1'; uins.wrPCL <= '1'; -- PC++, only if BREAK instruction    
+            end if;    
                     
     -- DECODE (Logical and Compare Group)
     -- T2 or T3 or T4 or T5 or T6: BI <- MEM[MAR or ABH/ABL]; AI <- AC     
@@ -519,22 +522,9 @@ begin
             uins.mux_s <= '0'; uins.wrS <= '1';      -- S <- S - 1
             we <= '1'; uins.mux_db <= "101";         -- MEM[S] <- P
             uins.mux_address <= '1';                 -- address <- ABH & ABL
-    
-    -- DECODE (BRK): MAR <- x"FFFF" for BRK/IRQ, FFFD for NRES or FFFB for NMI interruption 
-        elsif currentState=T5 and decIns.instruction=BRK then
-            if (q_nmi = '1') then
-                uins.mux_mar <= "0111";  -- MAR <- x"FFFB"
-            elsif (q_nres = '1') then
-                uins.mux_mar <= "0101";  -- MAR <- x"FFFD"
-            else -- BRK and IRQ
-                uins.mux_mar <= "0011";  -- MAR <- x"FFFF"
-            end if;
-            uins.wrMAR <= '1';
                 
-    -- DECODE (BRK): PCH <- MEM[MAR]; MAR <- x"FFFE" for BRK/IRQ, x"FFFC" for NRES or x"FFFA" for NMI;
-        elsif currentState=T6 and decIns.instruction=BRK then
-            uins.mux_db <= "100"; uins.mux_adh <= "00";
-            uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
+    -- DECODE (BRK): MAR <- x"FFFE" for BRK/IRQ, FFFC for NRES or FFFA for NMI interruption 
+        elsif currentState=T5 and decIns.instruction=BRK then
             if (q_nmi = '1') then
                 uins.mux_mar <= "1000";  -- MAR <- x"FFFA"
             elsif (q_nres = '1') then
@@ -543,16 +533,28 @@ begin
                 uins.mux_mar <= "0100";  -- MAR <- x"FFFE"
             end if;
             uins.wrMAR <= '1';
-        
-    -- Last State (BRK): PCL <- MEM[MAR];
-        elsif currentState=T7 and decIns.instruction=BRK then        
+                            
+    -- DECODE (BRK): PCL <- MEM[MAR]; MAR <- x"FFFF" for BRK/IRQ, x"FFFD" for NRES or x"FFFB" for NMI;
+        elsif currentState=T6 and decIns.instruction=BRK then
+            if (q_nmi = '1') then
+                uins.mux_mar <= "0111";  -- MAR <- x"FFFB"
+            elsif (q_nres = '1') then
+                uins.mux_mar <= "0101";  -- MAR <- x"FFFD
+            else -- BRK and IRQ
+                uins.mux_mar <= "0011";  -- MAR <- x"FFFF"
+            end if;
+            uins.wrMAR <= '1';
             uins.mux_db <= "100"; uins.mux_adl <= "10"; 
-            uins.mux_pc <= '1'; uins.wrPCL <= '1'; 
-            uins.setP(INTERRUPT) <= '1'; -- Update Flags, maybe only for BREAK and IRQ
+            uins.mux_pc <= '1'; uins.wrPCL <= '1'; -- PCL <- MEM[MAR]
+            
+    -- Last State (BRK): PCL <- MEM[MAR];
+        elsif currentState=T7 and decIns.instruction=BRK then  
+            uins.mux_db <= "100"; uins.mux_adh <= "00";
+            uins.mux_pc <= '1'; uins.wrPCH <= '1'; -- PCH <- MEM[MAR]
             if (q_nmi = '0' and q_irq = '0' and q_nres = '0') then
                 uins.setP(BREAKF) <= '1'; -- Only set if Break instruction
-            end if;
-            
+            end if;        
+     
     -- DECODE (Implied addressing mode): PCL <- MEM[ABH/ABL]; BI <- S; AI <- 0    
         elsif (currentState=T3 and decIns.instruction=RTS) or 
         (currentState=T5 and decIns.instruction=RTI) then

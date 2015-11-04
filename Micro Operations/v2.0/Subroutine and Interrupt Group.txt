@@ -45,13 +45,13 @@ Specific States:
         BRK
         ----
             - IMPLIED: BRK (00)                 # Software Interruption
-                T1: IR <- MEM[MAR]; ABL <- S; ABH <- 1; S-- 
-                T2: MEM[ABH/ABL] <- PCH;                      
+                T1: IR <- MEM[MAR]; PC++; ABL <- S; ABH <- 1; S-- 
+                T2: MEM[ABH/ABL] <- PCH;                       
                 T3: ABL <- S; ABH <- 1; S--; MEM[ABH/ABL] <- PCL; 
-                T4: ABL <- S; ABH <- 1; S--; MEM[ABH/ABL] <- P;                       
-                T5: MAR <- x"FFFF"                   # Prepares address for next state
-                T6: PCH <- MEM[MAR]; MAR <- x"FFFE"; # Interruption request handler
-                T7: PCL <- MEM[FFFE]; setB; setI;
+                T4: ABL <- S; ABH <- 1; S--; MEM[ABH/ABL] <- P;                
+                T5: MAR <- x"FFFE"                   # Prepares address for next state
+                T6: PCL <- MEM[MAR]; MAR <- x"FFFF"; # Interruption request handler
+                T7: PCH <- MEM[MAR]; setB; 
                 
                 
        *It should be noted that the program counter low, which is now stored
