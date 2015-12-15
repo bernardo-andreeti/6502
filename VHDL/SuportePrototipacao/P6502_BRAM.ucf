@@ -1,0 +1,31 @@
+NET clk LOC=V10  |  IOSTANDARD=LVCMOS33;
+NET rst LOC=B8   |  IOSTANDARD=LVCMOS33;
+
+# ==== Force System Clock to 100 MHz ====
+NET clk TNM_NET = sys_clk_pin;
+TIMESPEC TS_sys_clk_pin = PERIOD sys_clk_pin 100000 kHz;
+
+# ==== Display Segments ====
+NET display<0> LOC=T17  |  IOSTANDARD=LVCMOS33;
+NET display<1> LOC=T18  |  IOSTANDARD=LVCMOS33;
+NET display<2> LOC=U17  |  IOSTANDARD=LVCMOS33;
+NET display<3> LOC=U18  |  IOSTANDARD=LVCMOS33;
+NET display<4> LOC=M14  |  IOSTANDARD=LVCMOS33;
+NET display<5> LOC=N14  |  IOSTANDARD=LVCMOS33;
+NET display<6> LOC=L14  |  IOSTANDARD=LVCMOS33;
+NET display<7> LOC=M13  |  IOSTANDARD=LVCMOS33;
+
+# ==== Enable Display Signals ====
+NET display_en_n<0> LOC=N16  |  IOSTANDARD=LVCMOS33;
+NET display_en_n<1> LOC=N15  |  IOSTANDARD=LVCMOS33;
+NET display_en_n<2> LOC=P18  |  IOSTANDARD=LVCMOS33;
+NET display_en_n<3> LOC=P17  |  IOSTANDARD=LVCMOS33;
+
+# ==== Slide Switch (SW0) ====
+NET ready LOC = T10 | IOSTANDARD = LVCMOS33;
+NET nmi   LOC = T9  | IOSTANDARD = LVCMOS33;
+NET irq   LOC = M8  | IOSTANDARD = LVCMOS33;
+NET nres  LOC = V9  | IOSTANDARD = LVCMOS33;
+
+# ==== Pushbuttons (BTN) ====
+NET rst LOC = C9 | IOSTANDARD = LVCMOS33;

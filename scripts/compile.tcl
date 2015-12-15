@@ -30,11 +30,11 @@ set sourceFiles {
     ../VHDL/P6502/DataPath.vhd
     ../VHDL/P6502/ControlPath.vhd
     ../VHDL/P6502/P6502.vhd
-    ../VHDL/Util_package.vhd    
-    ../VHDL/Memory.vhd
-    ../VHDL/DisplayCtrl.vhd
-    ../VHDL/P6502_RAM.vhd
-    ../VHDL/P6502_RAM_tb.vhd
+    ../VHDL/SuportePrototipacao/Util_package.vhd    
+    ../VHDL/SuportePrototipacao/Memory.vhd
+    ../VHDL/SuportePrototipacao/DisplayCtrl.vhd
+    ../VHDL/SuportePrototipacao/P6502_RAM.vhd
+    ../VHDL/SuportePrototipacao/P6502_RAM_tb.vhd
 }
 
 

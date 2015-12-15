@@ -155,7 +155,7 @@ begin
             reg2 <= (others=>'0');
         
         elsif rising_edge(clk) then
-            if reg_CPUaddress = x"0210" and reg_CPUwe = '0' then -- LOAD
+            if reg_CPUaddress = x"0210" and reg_CPUwe = '0' and RAMdata_out = x"FE" then -- LOAD
                 reg1 <= RAMdata_out;
             end if;
             
