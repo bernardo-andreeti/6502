@@ -83,16 +83,16 @@ begin
     -- 6502 Processor Core
     P6502: entity work.P6502 
         port map (
-            clk_in      => clk_div,
-            rst_in      => rst,
-            r_nw_out    => CPUwe,
-            d_in        => RAMdata_out,
-            d_out       => RAMdata_in,
-            a_out       => address_temp,
-            ready_in    => ready,
-            nnmi_in     => nmi,
-            nres_in     => nres,     
-            nirq_in     => irq
+            clk         => clk_div,
+            rst         => rst,
+            we          => CPUwe,
+            data_in     => RAMdata_out,
+            data_out    => RAMdata_in,
+            address_out => address_temp,
+            ready       => ready,
+            nmi         => nmi,
+            nres        => nres,     
+            irq         => irq
         );
     
     -- Sync Memory Writes   
