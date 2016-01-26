@@ -1,7 +1,8 @@
 
 library IEEE;                        
 use IEEE.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
+--use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 -- Test bench interface is always empty.
 entity P6502_RAM  is
@@ -18,13 +19,17 @@ end P6502_RAM;
 -- Instantiate the components and generates the stimuli.
 architecture behavioral of P6502_RAM is  
     
+    -- Address of the program first instruction. Set according to the assembler process.
+    constant PC_INIT                    : UNSIGNED(15 downto 0) := x"4000";
+    
     signal RAMdata_in, RAMdata_out      : std_logic_vector(7 downto 0);
     signal reg1, reg2                   : std_logic_vector(7 downto 0);
     signal reg_CPUwe, CPUwe             : std_logic;
     signal reg_CPUaddress, address_temp : std_logic_vector(15 downto 0);
     signal display0, display1, 
            display2, display3           : std_logic_vector(7 downto 0);
-    signal count                        : std_logic_vector(5 downto 0);
+    --signal count                        : std_logic_vector(5 downto 0);
+    signal count                        : UNSIGNED(5 downto 0);
     signal clk_div                      : std_logic;
     
     function BCD7segments(number: in std_logic_vector(3 downto 0)) return std_logic_vector is
@@ -82,6 +87,9 @@ begin
     
     -- 6502 Processor Core
     P6502: entity work.P6502 
+        generic map (
+            PC_INIT => PC_INIT
+        )
         port map (
             clk         => clk_div,
             rst         => rst,

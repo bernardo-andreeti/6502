@@ -9,15 +9,19 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
+use ieee.numeric_std.all;
 use work.P6502_pkg.all;
 
 -- Same interface as cpu.v from fpga_nes project
 entity P6502 is
+    generic (
+        PC_INIT         : UNSIGNED(15 downto 0) := (others=>'0')    -- Address of the program first instruction. Set according to the assembler process.
+    );
     port( 
-        clk, rst, ready    : in std_logic;
-        nmi, nres, irq   : in std_logic;   -- Interrupt lines (active low)
-        data_in      : in std_logic_vector(7 downto 0);  -- Data from memory
-        data_out     : out std_logic_vector(7 downto 0); -- Data to memory
+        clk, rst, ready : in std_logic;
+        nmi, nres, irq  : in std_logic;   -- Interrupt lines (active low)
+        data_in         : in std_logic_vector(7 downto 0);  -- Data from memory
+        data_out        : out std_logic_vector(7 downto 0); -- Data to memory
         address_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
         we  : out std_logic -- Access control to data memory ('0' for Reads, '1' for Writes)
     );
@@ -36,6 +40,9 @@ begin
     clk_n <= not clk;
     -- clock needs to be set to 1.785MHz for correct operation with fpga_nes project
     DATA_PATH: entity work.DataPath
+        generic map (
+            PC_INIT     => PC_INIT
+        )
         port map (
             clk         => clk_n,
             rst         => rst,

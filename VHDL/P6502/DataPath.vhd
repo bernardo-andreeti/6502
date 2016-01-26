@@ -13,6 +13,9 @@ use IEEE.numeric_std.all;
 use work.P6502_pkg.all;
    
 entity DataPath is
+    generic (
+        PC_INIT         : UNSIGNED(15 downto 0) := (others=>'0')    -- First instruction address
+    );
     port(  
         clk, rst        : in std_logic;
         address         : out std_logic_vector(15 downto 0);    -- Address bus to memory
@@ -175,7 +178,7 @@ begin
     PCH: entity work.RegisterNbits
         generic map (
             WIDTH   => 8,
-            INIT_VALUE  => 64
+            INIT_VALUE => TO_INTEGER(PC_INIT(15 downto 8))
         )
         port map (
             clk     => clk,
@@ -188,7 +191,7 @@ begin
     PCL: entity work.RegisterNbits
         generic map (
             WIDTH   => 8,
-            INIT_VALUE  => 0
+            INIT_VALUE => TO_INTEGER(PC_INIT(7 downto 0))
         )
         port map (
             clk     => clk,
